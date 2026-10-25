@@ -1,0 +1,5 @@
+ARG COMPARISON_IMAGE
+FROM ${COMPARISON_IMAGE}
+ARG COMPARISON_IMAGE_ID
+LABEL n1x-ai.comparison-base="${COMPARISON_IMAGE_ID}" n1x-ai.efficiency-protocol="1"
+COPY run_suite.py optimization_workloads.py /suite/

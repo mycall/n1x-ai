@@ -37,6 +37,15 @@ is user-reported 100 W USB-C. Check `wslc list` for the active container.
 
 ## Runtime
 
+The ongoing agent/cache comparisons are specified in
+[`OPTIMIZATION_PLAN.md`](OPTIMIZATION_PLAN.md) and launched with
+`run-optimization-matrix.ps1`. Each comparison records its exact image digest.
+For future agent harnesses, keep system instructions, tool definitions, and
+reference documents in a stable order; append new user/tool messages to the
+history. Put changing turn identifiers and timestamps after reusable content.
+Keep a session's cache salt stable across turns and resumes. Replacing that salt
+or rewriting earlier messages prevents reuse of the corresponding token prefix.
+
 ### 88 GiB GPU partition / 8 GiB LMCache capacity check (October 24)
 
 After the user changed the NVIDIA App partition from 96 to 88 GiB, Windows
@@ -55,12 +64,22 @@ checks passed, including separate OCR and image-shape checks. The container
 stopped after completion. Evidence: `results/gpu88-lmcache8-verification.json`
 and `results/cache-four-131k-gpu88-l1-8g-20261024/`.
 
+The subsequent two-client check at the same 88/8/8 configuration passed both
+260,988-token sessions in cold/warm/reset stages. Forced GPU reset loaded 254
+chunks, reporting 516,096 external-hit tokens with zero measured preemptions.
+Peak sampled GPU usage was 85.53 GiB; Windows available RAM stayed above 9.43
+GiB including startup and 10.57 GiB in paired serving samples. All six feature
+checks passed on this retry. The first attempt stopped at OCR after producing
+HTML and reaching the output limit; that failed response is retained. Evidence:
+`results/two-262k-gpu88-verification.json`. Cold long prefills were observed being
+scheduled one at a time; this is concurrent-client and restored-prefix evidence.
+
 The prior 96 GiB / 4 GiB L1 four-client run also passed all answers and loaded
 252 chunks after GPU reset, but recorded one L1 allocation failure during the
 warm stage. See `results/four-131k-verification.json`. The larger pool fits with
 more Windows headroom; these battery-mode results are not a controlled speed
-comparison. Two simultaneous near-262K restores, sustained use, restart, and
-combined long-context vision remain unqualified at the new partition. Default
+comparison. Sustained use, restart, and combined long-context vision remain
+unqualified at the new partition. Default
 serving settings are unchanged.
 
 Desktop memory budget: target 6 GiB of available Windows RAM, with a 4 GiB
@@ -310,6 +329,14 @@ the resolved package list is stored in `/opt/lmcache-runtime-packages.txt`.
 The original serving image is preserved. This is an experimental qualification
 runner, not a promoted default profile.
 
+Warm-agent tuning uses correct tool/answer turns per second as its primary
+score. See [the controlled protocol](efficiency-protocol.json),
+[screening evidence](optimization-results.json), and
+[the optimization plan](OPTIMIZATION_PLAN.md). `run-efficiency-tests.ps1`
+compares growing near-131K sessions at concurrency 1/2/3/4 with fixed seed
+and external power required; cold and forced-restore turns are scored
+separately. The controlled follow-up is still running.
+
 The current test-runner default is **FP8-e4m3 KV with a 4,000 MiB pool and
 2,048-token blocks**;
 this does not change `n1x.ps1` serving defaults. The first BF16/10 GB LMCache
@@ -327,7 +354,7 @@ answer correctness and MTP/vision behavior. No BF16-equivalent quality claim
 is implied. See `results/lmcache-ipc-*-probe.txt` and
 `results/cache-suite-20261023/summary.json` for the initial failure evidence.
 
-The test order is a 4K cache gate, feature checks (including tool use, reasoning,
+The test order is a 16K cache gate, feature checks (including tool use, reasoning,
 vision and multimodal restore), 32K/128K/near-262K retrieval, halo-ai's pinned
 six-sample LongBench-v2 canary, and two independent roughly 129K conversations.
 LongBench samples outside the native context are explicitly skipped, never

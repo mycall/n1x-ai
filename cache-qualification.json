@@ -1,36 +1,110 @@
-﻿{
-    "status":  "blocked",
-    "date":  "2026-10-23",
-    "feature":  "LMCache multiprocess qualification",
-    "lmcache":  "0.5.6",
-    "vllm":  "0.32.0",
-    "torch":  "2.13.0+cu130",
-    "finalRun":  "results/cache-suite-fp8-4000m-block2048-usbc-20261023",
-    "rootError":  "CUDA error: invalid resource handle on torch.UntypedStorage._new_shared_cuda in receiving process",
-    "reproduction":  "results/lmcache-ipc-roundtrip-probe.txt",
-    "reproducedSizesMiB":  [
-                               1,
-                               64
-                           ],
-    "externalPower":  "Online throughout final attempt; user reports 100 W USB-C",
-    "windowsMinimumAvailableGiB":  7.429443359375,
-    "completedModelRequests":  0,
-    "unvalidated":  [
-                        "LMCache prefix restore",
-                        "LMCache MTP and vision",
-                        "FP8 quality",
-                        "long-context comparison",
-                        "LongBench-v2 canary",
-                        "concurrency 1/2 with LMCache"
+{
+    "status":  "experimental-capacity-verified",
+    "date":  "2026-10-24",
+    "feature":  "LMCache multiprocess integration on N1X/WSLC",
+    "runtime":  {
+                    "vllm":  "0.32.0",
+                    "lmcache":  "0.5.6",
+                    "torch":  "2.13.0+cu130"
+                },
+    "backend":  "Exportable segmented CUDA VMM, alias-safe FD sharing, staged transfers, demand admission",
+    "configuration":  {
+                          "maxModelTokens":  262144,
+                          "kvPrecision":  "fp8_e4m3",
+                          "mtpDraftTokens":  1,
+                          "gpuPartitionGiB":  88,
+                          "hostL1GiB":  8,
+                          "gpuKvGiB":  8,
+                          "ple":  "native SSD",
+                          "maxSequences":  16,
+                          "cacheBlockTokens":  2048,
+                          "recurrentPrecision":  "bfloat16"
+                      },
+    "verifiedRuns":  [
+                         {
+                             "run":  "results/cache-four-131k-gpu88-l1-8g-20261024",
+                             "trackedRequests":  24,
+                             "status":  "complete"
+                         },
+                         {
+                             "run":  "results/cache-two-262k-gpu88-l1-8g-retry-20261024",
+                             "trackedRequests":  18,
+                             "status":  "complete"
+                         },
+                         {
+                             "run":  "results/opt-20261024-agents",
+                             "trackedRequests":  52,
+                             "status":  "complete"
+                         },
+                         {
+                             "run":  "results/opt-20261024-eager-retry",
+                             "trackedRequests":  44,
+                             "status":  "complete"
+                         }
+                     ],
+    "capabilities":  [
+                         "Cold, GPU-warm, external restore, and follow-up correctness",
+                         "Separate JSON, tool-call/result, reasoning, OCR and image-shape checks",
+                         "Two 260988-token concurrent clients: 254 restored chunks and 516096 external-hit tokens after GPU reset",
+                         "Four near-131K agents: four growing tool-call turns, including external restore"
+                     ],
+    "optimizationMatrix":  {
+                               "status":  "in progress",
+                               "plan":  "OPTIMIZATION_PLAN.md",
+                               "audit":  "results/optimization-audit.json",
+                               "overrides":  "results/opt-20261024-overrides.json"
+                           },
+    "limitations":  [
+                        "Experimental integration, not the default serving profile",
+                        "Capacity correctness is not general model-quality or BF16-equivalence validation",
+                        "Concurrent clients do not prove simultaneous long GPU prefills",
+                        "Combined near-limit vision, restart and sustained production use remain unqualified",
+                        "Periodic memory sampling can miss transient peaks; mixed-power timings are observational"
                     ],
-    "testImage":  "n1x-ai:lmcache-test",
-    "testImageId":  "sha256:2f0e3e4ec9cdd015d1b9e09d8295262dfb0ff1b3c5121e6a427279d05b4bfd3b",
-    "preservedServingProfile":  "candidate-16",
-    "interpretation":  "Observed failure in this runtime, not proof all WSL CUDA IPC is unsupported. Export probes alone passed but import failed.",
-    "restoredService":  {
-                            "evidence":  "results/lmcache-fallback-restore-check.json",
-                            "health":  200,
-                            "container":  "n1x-qwen38-candidate-16",
-                            "response":  "READY"
-                        }
+    "historicalFailures":  {
+                               "ocr":  {
+                                           "run":  "results/cache-two-262k-gpu88-l1-8g-20261024",
+                                           "failure":  "OCR returned HTML and hit output limit; unchanged retry passed"
+                                       },
+                               "monitorInterruption":  {
+                                                           "run":  "results/opt-20261024-eager",
+                                                           "failure":  "Parent runner disappeared; host memory monitor became stale; detached-worker retry passed"
+                                                       },
+                               "legacyCudaIpc":  {
+                                                     "status":  "blocked",
+                                                     "date":  "2026-10-23",
+                                                     "feature":  "LMCache multiprocess qualification",
+                                                     "lmcache":  "0.5.6",
+                                                     "vllm":  "0.32.0",
+                                                     "torch":  "2.13.0+cu130",
+                                                     "finalRun":  "results/cache-suite-fp8-4000m-block2048-usbc-20261023",
+                                                     "rootError":  "CUDA error: invalid resource handle on torch.UntypedStorage._new_shared_cuda in receiving process",
+                                                     "reproduction":  "results/lmcache-ipc-roundtrip-probe.txt",
+                                                     "reproducedSizesMiB":  [
+                                                                                1,
+                                                                                64
+                                                                            ],
+                                                     "externalPower":  "Online throughout final attempt; user reports 100 W USB-C",
+                                                     "windowsMinimumAvailableGiB":  7.429443359375,
+                                                     "completedModelRequests":  0,
+                                                     "unvalidated":  [
+                                                                         "LMCache prefix restore",
+                                                                         "LMCache MTP and vision",
+                                                                         "FP8 quality",
+                                                                         "long-context comparison",
+                                                                         "LongBench-v2 canary",
+                                                                         "concurrency 1/2 with LMCache"
+                                                                     ],
+                                                     "testImage":  "n1x-ai:lmcache-test",
+                                                     "testImageId":  "sha256:2f0e3e4ec9cdd015d1b9e09d8295262dfb0ff1b3c5121e6a427279d05b4bfd3b",
+                                                     "preservedServingProfile":  "candidate-16",
+                                                     "interpretation":  "Observed failure in this runtime, not proof all WSL CUDA IPC is unsupported. Export probes alone passed but import failed.",
+                                                     "restoredService":  {
+                                                                             "evidence":  "results/lmcache-fallback-restore-check.json",
+                                                                             "health":  200,
+                                                                             "container":  "n1x-qwen38-candidate-16",
+                                                                             "response":  "READY"
+                                                                         }
+                                                 }
+                           }
 }

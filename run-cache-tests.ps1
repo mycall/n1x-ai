@@ -5,6 +5,21 @@ param(
     [switch]$Admission,
     [switch]$Segmented,
     [switch]$CapacityCheck,
+    [switch]$Optimizations,
+    [switch]$AgentLoops,
+    [switch]$AgentConcurrencySweep,
+    [ValidateRange(1,16)][int[]]$AgentConcurrencies = @(),
+    [int]$RequestSeed = 0,
+    [switch]$PrefixExperiment,
+    [switch]$CodingWorkload,
+    [ValidateRange(2,20)][int]$AgentTurns = 4,
+    [ValidateRange(4096,131000)][int]$AgentContextTokens = 131000,
+    [switch]$EagerPrefetch,
+    [switch]$DisableMtp,
+    [ValidateSet(0,2048,4096,8192)][int]$PrefillBatchTokens = 0,
+    [ValidateRange(0,5000)][int]$RestoreWaitMs = 0,
+    [ValidateSet(1,2)][int]$RestoreQueueVersion = 1,
+    [ValidatePattern('^(n1x-ai:[a-zA-Z0-9_.-]+|sha256:[a-f0-9]{64})$')][string]$TestImageOverride = '',
     [string]$PowerModeNote = 'Not recorded for this run',
     [switch]$AllowBattery,
     [ValidateRange(0.125,8)][double]$LmcacheL1GiB = 0.5,
@@ -20,8 +35,13 @@ param(
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 if ($RunName -notmatch '^[a-zA-Z0-9_-]+$') { throw 'Invalid RunName' }
+if (@($AgentConcurrencies | Select-Object -Unique).Count -ne $AgentConcurrencies.Count) { throw 'AgentConcurrencies must be unique' }
 if ($Admission -and -not $Vmm) { throw '-Admission requires -Vmm' }
 if ($Segmented -and (-not $Admission -or -not $Vmm)) { throw '-Segmented requires -Vmm -Admission' }
+if (($Optimizations -or $AgentLoops -or $AgentConcurrencySweep -or $PrefixExperiment -or $CodingWorkload -or $EagerPrefetch -or $DisableMtp -or $RestoreWaitMs) -and -not ($Optimizations -and $Segmented)) {
+    throw 'Optimization experiments require -Optimizations -Segmented -Admission -Vmm'
+}
+if (($TestImageOverride -or $RestoreQueueVersion -ne 1) -and -not $Optimizations) { throw 'Image/queue overrides require -Optimizations' }
 $root = $PSScriptRoot
 $out = Join-Path $root "results/$RunName"
 if (Test-Path $out) { throw 'RunName already exists; choose a new name. Completed evidence will not be overwritten.' }
@@ -52,6 +72,10 @@ if (-not $SkipBuild) {
             if ($Segmented) {
                 & wslc build -t n1x-ai:lmcache-segmented-test -f "$root/cache-tests/Dockerfile.segmented" "$root/cache-tests"
                 if ($LASTEXITCODE -ne 0) { throw 'Segmented test image build failed' }
+                if ($Optimizations) {
+                    & wslc build -t n1x-ai:lmcache-optimization-test -f "$root/cache-tests/Dockerfile.optimizations" "$root/cache-tests"
+                    if ($LASTEXITCODE -ne 0) { throw 'Optimization test image build failed' }
+                }
             }
         }
     }
@@ -61,12 +85,23 @@ if ($LASTEXITCODE -ne 0) { throw 'The qualified candidate-16 container configura
 $old = @(($raw -join "`n") | ConvertFrom-Json)[0]
 $utf8 = [Text.UTF8Encoding]::new($false)
 $modelArgs=@($old.Config.Cmd)
+if ($PrefillBatchTokens) { $modelArgs[[Array]::IndexOf($modelArgs,'--max-num-batched-tokens')+1]=[string]$PrefillBatchTokens }
+if ($DisableMtp) {
+    $configIndex=[Array]::IndexOf($modelArgs,'--config')
+    if ($configIndex -lt 0 -or $modelArgs[$configIndex+1] -ne '/profiles/mtp.yaml') { throw 'Unexpected MTP configuration; refusing to remove an unknown config' }
+    $modelArgs=@(for($i=0;$i -lt $modelArgs.Count;$i++){if($i -ne $configIndex -and $i -ne ($configIndex+1)){$modelArgs[$i]}})
+}
 if ($KvCacheBytes) { $modelArgs[[Array]::IndexOf($modelArgs,'--kv-cache-memory-bytes')+1]=$KvCacheBytes }
 $modelArgs[[Array]::IndexOf($modelArgs,'--kv-cache-dtype')+1]=$KvCacheDtype
 if ($BlockSize -gt 0) { $modelArgs += @('--block-size',[string]$BlockSize) }
 [IO.File]::WriteAllText((Join-Path $out 'run-config.json'), (@{modelArgs=$modelArgs;kvCacheDtype=$KvCacheDtype;useVmm=[bool]$Vmm;allowBattery=[bool]$AllowBattery;
     lmcacheL1GiB=$LmcacheL1GiB; demandAdmission=[bool]$Admission; segmented=[bool]$Segmented; capacityCheck=[bool]$CapacityCheck;
     parallelContextTokens=$ParallelContextTokens; parallelSessions=$ParallelSessions; parallelRestore=[bool]$ParallelRestore;
+    optimizations=[bool]$Optimizations; agentLoops=[bool]$AgentLoops; prefixExperiment=[bool]$PrefixExperiment; codingWorkload=[bool]$CodingWorkload;
+    agentTurns=$AgentTurns; agentContextTokens=$AgentContextTokens; eagerPrefetch=[bool]$EagerPrefetch; disableMtp=[bool]$DisableMtp;
+    agentConcurrencySweep=[bool]$AgentConcurrencySweep;
+    agentConcurrencies=@($AgentConcurrencies); requestSeed=$RequestSeed;
+    restoreWaitMs=$RestoreWaitMs; restoreQueueVersion=$RestoreQueueVersion; prefillBatchTokens=$PrefillBatchTokens;
     lmcacheChunkSize=$(if ($BlockSize -gt 0) { $BlockSize } elseif ($KvCacheDtype -eq 'fp8_e4m3') { 1616 } else { 816 });
     note='Both comparison phases use this same precision and KV capacity. FP8 is experimental; not a BF16 quality-equivalence claim.'} | ConvertTo-Json -Depth 10), $utf8)
 $name = 'n1x-' + $RunName
@@ -84,8 +119,18 @@ $arguments += @('--env','VLLM_SERVER_DEV_MODE=1')
 # Disable outbound usage reporting; retain local Prometheus verification metrics.
 $arguments += @('--env','LMCACHE_TRACK_USAGE=false','--env','DO_NOT_TRACK=1',
     '--env','VLLM_NO_USAGE_STATS=1','--env','HF_HUB_DISABLE_TELEMETRY=1')
-$testImage = if ($Segmented) { 'n1x-ai:lmcache-segmented-test' } elseif ($Admission) { 'n1x-ai:lmcache-admission-test' } elseif ($Vmm) { 'n1x-ai:lmcache-vmm-test' } else { 'n1x-ai:lmcache-test' }
-$arguments += @($testImage,'--run-id',$RunName,'--config','/results/run-config.json','--lengths')
+$testImage = if ($Optimizations) { 'n1x-ai:lmcache-optimization-test' } elseif ($Segmented) { 'n1x-ai:lmcache-segmented-test' } elseif ($Admission) { 'n1x-ai:lmcache-admission-test' } elseif ($Vmm) { 'n1x-ai:lmcache-vmm-test' } else { 'n1x-ai:lmcache-test' }
+if ($TestImageOverride) { $testImage=$TestImageOverride }
+$imageRaw = & wslc image inspect $testImage
+if ($LASTEXITCODE -ne 0) { throw 'Cannot resolve test image' }
+$imageInfo = @(($imageRaw -join "`n") | ConvertFrom-Json)[0]
+$imageRecord=@{tag=$testImage; id=$imageInfo.Id}
+if ($RestoreQueueVersion -eq 2) {
+    $imageRecord.baseImageId=$imageInfo.Config.Labels.'n1x-ai.comparison-base'
+    if ($imageInfo.Config.Labels.'n1x-ai.restore-queue-version' -ne '2') { throw 'Queue-version label does not match requested revision' }
+}
+[IO.File]::WriteAllText((Join-Path $out 'test-image.json'), ($imageRecord | ConvertTo-Json), $utf8)
+$arguments += @($imageInfo.Id,'--run-id',$RunName,'--config','/results/run-config.json','--lengths')
 $arguments += @($ContextTokens | ForEach-Object { [string]$_ })
 if (-not $SkipConcurrency) { $arguments += '--concurrency' }
 $stop = Join-Path $out 'host-monitor.stop'

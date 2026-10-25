@@ -1,0 +1,2643 @@
+{
+  "stage": "screening-complete-controlled-follow-up-running",
+  "primaryObjective": "Correct warm agent turns per second",
+  "runs": [
+    {
+      "directory": "results\\opt-20261024-agents",
+      "status": "complete",
+      "error": null,
+      "config": {
+        "useVmm": true,
+        "restoreWaitMs": 0,
+        "prefixExperiment": true,
+        "disableMtp": false,
+        "segmented": true,
+        "allowBattery": true,
+        "lmcacheChunkSize": 2048,
+        "demandAdmission": true,
+        "parallelRestore": false,
+        "optimizations": true,
+        "parallelSessions": 4,
+        "parallelContextTokens": 129000,
+        "note": "Both comparison phases use this same precision and KV capacity. FP8 is experimental; not a BF16 quality-equivalence claim.",
+        "eagerPrefetch": false,
+        "agentContextTokens": 131000,
+        "agentTurns": 4,
+        "prefillBatchTokens": 8192,
+        "modelArgs": [
+          "--model",
+          "/model",
+          "--served-model-name",
+          "qwen",
+          "--host",
+          "0.0.0.0",
+          "--port",
+          "8000",
+          "--max-model-len",
+          "262144",
+          "--max-num-seqs",
+          "16",
+          "--gpu-memory-utilization",
+          "0.01",
+          "--kv-cache-memory-bytes",
+          "8589934592",
+          "--load-format",
+          "safetensors",
+          "--safetensors-load-strategy",
+          "lazy",
+          "--enable-prefix-caching",
+          "--enable-chunked-prefill",
+          "--max-num-batched-tokens",
+          "8192",
+          "--mamba-ssm-cache-dtype",
+          "bfloat16",
+          "--kv-cache-dtype",
+          "fp8_e4m3",
+          "--no-enable-flashinfer-autotune",
+          "--enable-auto-tool-choice",
+          "--tool-call-parser",
+          "qwen3_xml",
+          "--reasoning-parser",
+          "qwen3",
+          "-cc.cudagraph_mode=FULL_AND_PIECEWISE",
+          "--config",
+          "/profiles/mtp.yaml",
+          "--block-size",
+          "2048"
+        ],
+        "agentLoops": true,
+        "kvCacheDtype": "fp8_e4m3",
+        "lmcacheL1GiB": 8,
+        "capacityCheck": true,
+        "agentConcurrencySweep": false,
+        "codingWorkload": false
+      },
+      "power": {
+        "timingUse": "Correctness only; battery operation authorized. Not a comparable performance benchmark.",
+        "msiMode": "Eco Mode and Energy Saver (last user-reported mode)",
+        "externalPower": "100 W USB-C supply (user reported; connection state monitored separately)",
+        "note": "Windows PowerLineStatus Online indicates external power. It does not measure USB-C negotiated power or system draw.",
+        "allowBattery": true
+      },
+      "memory": {
+        "runDirectory": "C:\\Users\\michael\\source\\github\\mycall\\n1x-ai\\results\\opt-20261024-agents",
+        "pairedServingSamples": 78,
+        "gpuPeakUsedGiB": 85.7021484375,
+        "gpuReportedCapacityGiB": 88,
+        "gpuUnusedAtPeakGiB": 2.2978515625,
+        "configuredGpuKvGiB": 8,
+        "configuredLmcacheL1GiB": 8,
+        "lowestWindowsSample": {
+          "timestamp": "2026-10-24T18:53:49.0531779-07:00",
+          "availableGiB": 10.628921508789062,
+          "gpuUsedGiB": 85.64453125,
+          "guestAvailableGiB": 3.4497108459472656,
+          "guestCachedGiB": 2.7534523010253906,
+          "guestSwapUsedGiB": 0.000228881835937
+        },
+        "limitations": [
+          "Samples are periodic and fields are collected sequentially, not atomically.",
+          "Guest memory is within host memory; do not add guest and Windows totals.",
+          "Reported GPU unused memory is not a guarantee of successful allocation.",
+          "Guest Cached includes file cache; this capture cannot attribute it to PLE versus other files.",
+          "No per-process PSS or PyTorch reserved/allocated breakdown was recorded."
+        ]
+      },
+      "agents": [
+        {
+          "file": "agent-loops-c4.json",
+          "status": "complete",
+          "metrics": {
+            "loadedChunks": 1472.0,
+            "prefetchFailureChunks": 0,
+            "externalHitTokens": 2967552.0,
+            "preemptions": 0.0,
+            "draftTokens": 656.0,
+            "acceptedDraftTokens": 656.0,
+            "draftAcceptance": 1.0
+          },
+          "turns": [
+            {
+              "turn": 0,
+              "gpuReset": false,
+              "wallSeconds": 184.53516319999994,
+              "allCorrect": true,
+              "completionTokens": 328,
+              "requestWallSeconds": 183.48357844352722,
+              "outputTokensPerRequestWallSecond": 1.7876259160759294,
+              "outputTokensPerWallSecond": 1.7774390219847276,
+              "sessionSeconds": [
+                181.0800174000001,
+                181.08326160000024,
+                183.20644999999968,
+                183.4602960000002
+              ],
+              "metrics": {
+                "loadedChunks": 64.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 129024.0,
+                "preemptions": 0.0,
+                "draftTokens": 164.0,
+                "acceptedDraftTokens": 164.0,
+                "draftAcceptance": 1.0
+              }
+            },
+            {
+              "turn": 1,
+              "gpuReset": false,
+              "wallSeconds": 14.775229500000023,
+              "allCorrect": true,
+              "completionTokens": 328,
+              "requestWallSeconds": 13.731741428375244,
+              "outputTokensPerRequestWallSecond": 23.886263931697798,
+              "outputTokensPerWallSecond": 22.19931676864982,
+              "sessionSeconds": [
+                11.47924739999985,
+                13.713690799999995,
+                12.960742400000072,
+                11.097171200000275
+              ],
+              "metrics": {
+                "loadedChunks": 448.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 903168.0,
+                "preemptions": 0.0,
+                "draftTokens": 164.0,
+                "acceptedDraftTokens": 164.0,
+                "draftAcceptance": 1.0
+              }
+            },
+            {
+              "turn": 2,
+              "gpuReset": true,
+              "wallSeconds": 15.1178546000001,
+              "allCorrect": true,
+              "completionTokens": 328,
+              "requestWallSeconds": 14.054978609085083,
+              "outputTokensPerRequestWallSecond": 23.336926303678762,
+              "outputTokensPerWallSecond": 21.696200200258428,
+              "sessionSeconds": [
+                12.538024299999961,
+                11.409509400000161,
+                13.232048600000098,
+                14.029063199999882
+              ],
+              "metrics": {
+                "loadedChunks": 512.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 1032192.0,
+                "preemptions": 0.0,
+                "draftTokens": 164.0,
+                "acceptedDraftTokens": 164.0,
+                "draftAcceptance": 1.0
+              }
+            },
+            {
+              "turn": 3,
+              "gpuReset": false,
+              "wallSeconds": 15.717448200000035,
+              "allCorrect": true,
+              "completionTokens": 328,
+              "requestWallSeconds": 14.660642623901367,
+              "outputTokensPerRequestWallSecond": 22.37282555849625,
+              "outputTokensPerWallSecond": 20.86852750053913,
+              "sessionSeconds": [
+                12.395398000000114,
+                13.672244700000192,
+                12.020835900000066,
+                14.62854880000009
+              ],
+              "metrics": {
+                "loadedChunks": 448.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 903168.0,
+                "preemptions": 0.0,
+                "draftTokens": 164.0,
+                "acceptedDraftTokens": 164.0,
+                "draftAcceptance": 1.0
+              }
+            }
+          ]
+        }
+      ],
+      "coding": [],
+      "parallel": [],
+      "prefix": {
+        "status": "complete",
+        "archiveTokens": 31983,
+        "results": [
+          {
+            "placement": "early",
+            "requests": [
+              "lmcache-prefix-early-turn-0",
+              "lmcache-prefix-early-turn-1",
+              "lmcache-prefix-early-turn-2",
+              "lmcache-prefix-early-turn-3"
+            ],
+            "totalSeconds": [
+              10.847267500000044,
+              10.778393800000003,
+              10.808748700000024,
+              10.937296899999865
+            ],
+            "ttftSeconds": [
+              10.34740540000007,
+              10.315997100000004,
+              10.358255099999951,
+              10.444148299999824
+            ],
+            "gpuHitTokens": [
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          {
+            "placement": "late",
+            "requests": [
+              "lmcache-prefix-late-turn-0",
+              "lmcache-prefix-late-turn-1",
+              "lmcache-prefix-late-turn-2",
+              "lmcache-prefix-late-turn-3"
+            ],
+            "totalSeconds": [
+              10.936137099999996,
+              1.6639006000000336,
+              1.672121000000061,
+              1.640354699999989
+            ],
+            "ttftSeconds": [
+              10.485875599999872,
+              1.2917261000000053,
+              1.2920459000001756,
+              1.2725977000000057
+            ],
+            "gpuHitTokens": [
+              0.0,
+              28672.0,
+              28672.0,
+              28672.0
+            ]
+          }
+        ],
+        "note": "Stable salt within each variant; changing identifier early versus late."
+      }
+    },
+    {
+      "directory": "results\\opt-20261024-eager-retry",
+      "status": "complete",
+      "error": null,
+      "config": {
+        "useVmm": true,
+        "restoreWaitMs": 0,
+        "prefixExperiment": false,
+        "disableMtp": false,
+        "segmented": true,
+        "allowBattery": true,
+        "lmcacheChunkSize": 2048,
+        "demandAdmission": true,
+        "parallelRestore": false,
+        "optimizations": true,
+        "parallelSessions": 4,
+        "parallelContextTokens": 129000,
+        "note": "Both comparison phases use this same precision and KV capacity. FP8 is experimental; not a BF16 quality-equivalence claim.",
+        "eagerPrefetch": true,
+        "agentContextTokens": 131000,
+        "agentTurns": 4,
+        "prefillBatchTokens": 8192,
+        "modelArgs": [
+          "--model",
+          "/model",
+          "--served-model-name",
+          "qwen",
+          "--host",
+          "0.0.0.0",
+          "--port",
+          "8000",
+          "--max-model-len",
+          "262144",
+          "--max-num-seqs",
+          "16",
+          "--gpu-memory-utilization",
+          "0.01",
+          "--kv-cache-memory-bytes",
+          "8589934592",
+          "--load-format",
+          "safetensors",
+          "--safetensors-load-strategy",
+          "lazy",
+          "--enable-prefix-caching",
+          "--enable-chunked-prefill",
+          "--max-num-batched-tokens",
+          "8192",
+          "--mamba-ssm-cache-dtype",
+          "bfloat16",
+          "--kv-cache-dtype",
+          "fp8_e4m3",
+          "--no-enable-flashinfer-autotune",
+          "--enable-auto-tool-choice",
+          "--tool-call-parser",
+          "qwen3_xml",
+          "--reasoning-parser",
+          "qwen3",
+          "-cc.cudagraph_mode=FULL_AND_PIECEWISE",
+          "--config",
+          "/profiles/mtp.yaml",
+          "--block-size",
+          "2048"
+        ],
+        "agentLoops": true,
+        "kvCacheDtype": "fp8_e4m3",
+        "lmcacheL1GiB": 8,
+        "capacityCheck": true,
+        "agentConcurrencySweep": false,
+        "codingWorkload": false
+      },
+      "power": {
+        "timingUse": "Correctness only; battery operation authorized. Not a comparable performance benchmark.",
+        "msiMode": "Eco Mode and Energy Saver (last user-reported mode)",
+        "externalPower": "100 W USB-C supply (user reported; connection state monitored separately)",
+        "note": "Windows PowerLineStatus Online indicates external power. It does not measure USB-C negotiated power or system draw.",
+        "allowBattery": true
+      },
+      "memory": {
+        "runDirectory": "C:\\Users\\michael\\source\\github\\mycall\\n1x-ai\\results\\opt-20261024-eager-retry",
+        "pairedServingSamples": 65,
+        "gpuPeakUsedGiB": 85.736328125,
+        "gpuReportedCapacityGiB": 88,
+        "gpuUnusedAtPeakGiB": 2.263671875,
+        "configuredGpuKvGiB": 8,
+        "configuredLmcacheL1GiB": 8,
+        "lowestWindowsSample": {
+          "timestamp": "2026-10-24T19:21:50.8448785-07:00",
+          "availableGiB": 10.08633804321289,
+          "gpuUsedGiB": 85.724609375,
+          "guestAvailableGiB": 3.369609832763672,
+          "guestCachedGiB": 2.319293975830078,
+          "guestSwapUsedGiB": 0.0
+        },
+        "limitations": [
+          "Samples are periodic and fields are collected sequentially, not atomically.",
+          "Guest memory is within host memory; do not add guest and Windows totals.",
+          "Reported GPU unused memory is not a guarantee of successful allocation.",
+          "Guest Cached includes file cache; this capture cannot attribute it to PLE versus other files.",
+          "No per-process PSS or PyTorch reserved/allocated breakdown was recorded."
+        ]
+      },
+      "agents": [
+        {
+          "file": "agent-loops-c4.json",
+          "status": "complete",
+          "metrics": {
+            "loadedChunks": 1606.0,
+            "prefetchFailureChunks": 0,
+            "externalHitTokens": 3237888.0,
+            "preemptions": 0.0,
+            "draftTokens": 640.0,
+            "acceptedDraftTokens": 640.0,
+            "draftAcceptance": 1.0
+          },
+          "turns": [
+            {
+              "turn": 0,
+              "gpuReset": false,
+              "wallSeconds": 186.42900240000006,
+              "allCorrect": true,
+              "completionTokens": 321,
+              "requestWallSeconds": 185.38468599319458,
+              "outputTokensPerRequestWallSecond": 1.7315346102093019,
+              "outputTokensPerWallSecond": 1.7218351000520074,
+              "sessionSeconds": [
+                182.27309599999995,
+                183.07268839999995,
+                185.00469790000005,
+                185.36010099999993
+              ],
+              "metrics": {
+                "loadedChunks": 192.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 387072.0,
+                "preemptions": 0.0,
+                "draftTokens": 160.0,
+                "acceptedDraftTokens": 160.0,
+                "draftAcceptance": 1.0
+              }
+            },
+            {
+              "turn": 1,
+              "gpuReset": false,
+              "wallSeconds": 13.86324019999995,
+              "allCorrect": true,
+              "completionTokens": 321,
+              "requestWallSeconds": 12.807611227035522,
+              "outputTokensPerRequestWallSecond": 25.063221728842198,
+              "outputTokensPerWallSecond": 23.154760025004915,
+              "sessionSeconds": [
+                12.797672099999886,
+                11.982490600000006,
+                11.060078999999973,
+                11.768374600000016
+              ],
+              "metrics": {
+                "loadedChunks": 386.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 778240.0,
+                "preemptions": 0.0,
+                "draftTokens": 160.0,
+                "acceptedDraftTokens": 160.0,
+                "draftAcceptance": 1.0
+              }
+            },
+            {
+              "turn": 2,
+              "gpuReset": true,
+              "wallSeconds": 14.16175659999999,
+              "allCorrect": true,
+              "completionTokens": 321,
+              "requestWallSeconds": 13.102906465530396,
+              "outputTokensPerRequestWallSecond": 24.498381396864087,
+              "outputTokensPerWallSecond": 22.66667964057511,
+              "sessionSeconds": [
+                13.078959599999962,
+                11.274315499999943,
+                12.300449599999979,
+                11.624357999999916
+              ],
+              "metrics": {
+                "loadedChunks": 514.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 1036288.0,
+                "preemptions": 0.0,
+                "draftTokens": 160.0,
+                "acceptedDraftTokens": 160.0,
+                "draftAcceptance": 1.0
+              }
+            },
+            {
+              "turn": 3,
+              "gpuReset": false,
+              "wallSeconds": 14.402798099999927,
+              "allCorrect": true,
+              "completionTokens": 321,
+              "requestWallSeconds": 13.352290391921997,
+              "outputTokensPerRequestWallSecond": 24.0408192585597,
+              "outputTokensPerWallSecond": 22.287335958698304,
+              "sessionSeconds": [
+                10.58912870000006,
+                12.318238299999962,
+                12.645156799999995,
+                13.324618400000077
+              ],
+              "metrics": {
+                "loadedChunks": 514.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 1036288.0,
+                "preemptions": 0.0,
+                "draftTokens": 160.0,
+                "acceptedDraftTokens": 160.0,
+                "draftAcceptance": 1.0
+              }
+            }
+          ]
+        }
+      ],
+      "coding": [],
+      "parallel": [],
+      "prefix": {}
+    },
+    {
+      "directory": "results\\opt-20261024-pressure-immediate",
+      "status": "complete",
+      "error": null,
+      "config": {
+        "useVmm": true,
+        "restoreWaitMs": 0,
+        "prefixExperiment": false,
+        "disableMtp": false,
+        "segmented": true,
+        "allowBattery": true,
+        "lmcacheChunkSize": 2048,
+        "demandAdmission": true,
+        "parallelRestore": true,
+        "optimizations": true,
+        "parallelSessions": 2,
+        "parallelContextTokens": 261000,
+        "note": "Both comparison phases use this same precision and KV capacity. FP8 is experimental; not a BF16 quality-equivalence claim.",
+        "eagerPrefetch": false,
+        "agentContextTokens": 131000,
+        "agentTurns": 4,
+        "prefillBatchTokens": 8192,
+        "modelArgs": [
+          "--model",
+          "/model",
+          "--served-model-name",
+          "qwen",
+          "--host",
+          "0.0.0.0",
+          "--port",
+          "8000",
+          "--max-model-len",
+          "262144",
+          "--max-num-seqs",
+          "16",
+          "--gpu-memory-utilization",
+          "0.01",
+          "--kv-cache-memory-bytes",
+          "8589934592",
+          "--load-format",
+          "safetensors",
+          "--safetensors-load-strategy",
+          "lazy",
+          "--enable-prefix-caching",
+          "--enable-chunked-prefill",
+          "--max-num-batched-tokens",
+          "8192",
+          "--mamba-ssm-cache-dtype",
+          "bfloat16",
+          "--kv-cache-dtype",
+          "fp8_e4m3",
+          "--no-enable-flashinfer-autotune",
+          "--enable-auto-tool-choice",
+          "--tool-call-parser",
+          "qwen3_xml",
+          "--reasoning-parser",
+          "qwen3",
+          "-cc.cudagraph_mode=FULL_AND_PIECEWISE",
+          "--config",
+          "/profiles/mtp.yaml",
+          "--block-size",
+          "2048"
+        ],
+        "agentLoops": false,
+        "kvCacheDtype": "fp8_e4m3",
+        "lmcacheL1GiB": 4,
+        "capacityCheck": true,
+        "agentConcurrencySweep": false,
+        "codingWorkload": false
+      },
+      "power": {
+        "timingUse": "Correctness only; battery operation authorized. Not a comparable performance benchmark.",
+        "msiMode": "Eco Mode and Energy Saver (last user-reported mode)",
+        "externalPower": "100 W USB-C supply (user reported; connection state monitored separately)",
+        "note": "Windows PowerLineStatus Online indicates external power. It does not measure USB-C negotiated power or system draw.",
+        "allowBattery": true
+      },
+      "memory": {
+        "runDirectory": "C:\\Users\\michael\\source\\github\\mycall\\n1x-ai\\results\\opt-20261024-pressure-immediate",
+        "pairedServingSamples": 69,
+        "gpuPeakUsedGiB": 85.796875,
+        "gpuReportedCapacityGiB": 88,
+        "gpuUnusedAtPeakGiB": 2.203125,
+        "configuredGpuKvGiB": 8,
+        "configuredLmcacheL1GiB": 4,
+        "lowestWindowsSample": {
+          "timestamp": "2026-10-24T19:33:39.7135250-07:00",
+          "availableGiB": 12.878284454345703,
+          "gpuUsedGiB": 85.5537109375,
+          "guestAvailableGiB": 7.373165130615234,
+          "guestCachedGiB": 3.3109893798828125,
+          "guestSwapUsedGiB": 0.0
+        },
+        "limitations": [
+          "Samples are periodic and fields are collected sequentially, not atomically.",
+          "Guest memory is within host memory; do not add guest and Windows totals.",
+          "Reported GPU unused memory is not a guarantee of successful allocation.",
+          "Guest Cached includes file cache; this capture cannot attribute it to PLE versus other files.",
+          "No per-process PSS or PyTorch reserved/allocated breakdown was recorded."
+        ]
+      },
+      "agents": [],
+      "coding": [],
+      "parallel": [
+        {
+          "stage": "cold",
+          "allCorrect": true,
+          "metrics": {
+            "loadedChunks": 0.0,
+            "prefetchFailureChunks": 0,
+            "externalHitTokens": 0.0,
+            "preemptions": 0.0,
+            "draftTokens": 22.0,
+            "acceptedDraftTokens": 22.0,
+            "draftAcceptance": 1.0
+          }
+        },
+        {
+          "stage": "gpu-warm",
+          "allCorrect": true,
+          "metrics": {
+            "loadedChunks": 0.0,
+            "prefetchFailureChunks": 0,
+            "externalHitTokens": 0.0,
+            "preemptions": 0.0,
+            "draftTokens": 22.0,
+            "acceptedDraftTokens": 22.0,
+            "draftAcceptance": 1.0
+          }
+        },
+        {
+          "stage": "gpu-reset",
+          "allCorrect": true,
+          "metrics": {
+            "loadedChunks": 127.0,
+            "prefetchFailureChunks": 126.0,
+            "externalHitTokens": 258048.0,
+            "preemptions": 0.0,
+            "draftTokens": 22.0,
+            "acceptedDraftTokens": 22.0,
+            "draftAcceptance": 1.0
+          }
+        }
+      ],
+      "prefix": {}
+    },
+    {
+      "directory": "results\\opt-20261024-pressure-wait",
+      "status": "complete",
+      "error": null,
+      "config": {
+        "useVmm": true,
+        "restoreWaitMs": 2000,
+        "prefixExperiment": false,
+        "disableMtp": false,
+        "segmented": true,
+        "allowBattery": true,
+        "lmcacheChunkSize": 2048,
+        "demandAdmission": true,
+        "parallelRestore": true,
+        "optimizations": true,
+        "parallelSessions": 2,
+        "parallelContextTokens": 261000,
+        "note": "Both comparison phases use this same precision and KV capacity. FP8 is experimental; not a BF16 quality-equivalence claim.",
+        "eagerPrefetch": false,
+        "agentContextTokens": 131000,
+        "agentTurns": 4,
+        "prefillBatchTokens": 8192,
+        "modelArgs": [
+          "--model",
+          "/model",
+          "--served-model-name",
+          "qwen",
+          "--host",
+          "0.0.0.0",
+          "--port",
+          "8000",
+          "--max-model-len",
+          "262144",
+          "--max-num-seqs",
+          "16",
+          "--gpu-memory-utilization",
+          "0.01",
+          "--kv-cache-memory-bytes",
+          "8589934592",
+          "--load-format",
+          "safetensors",
+          "--safetensors-load-strategy",
+          "lazy",
+          "--enable-prefix-caching",
+          "--enable-chunked-prefill",
+          "--max-num-batched-tokens",
+          "8192",
+          "--mamba-ssm-cache-dtype",
+          "bfloat16",
+          "--kv-cache-dtype",
+          "fp8_e4m3",
+          "--no-enable-flashinfer-autotune",
+          "--enable-auto-tool-choice",
+          "--tool-call-parser",
+          "qwen3_xml",
+          "--reasoning-parser",
+          "qwen3",
+          "-cc.cudagraph_mode=FULL_AND_PIECEWISE",
+          "--config",
+          "/profiles/mtp.yaml",
+          "--block-size",
+          "2048"
+        ],
+        "agentLoops": false,
+        "kvCacheDtype": "fp8_e4m3",
+        "lmcacheL1GiB": 4,
+        "capacityCheck": true,
+        "agentConcurrencySweep": false,
+        "codingWorkload": false
+      },
+      "power": {
+        "timingUse": "Correctness only; battery operation authorized. Not a comparable performance benchmark.",
+        "msiMode": "Eco Mode and Energy Saver (last user-reported mode)",
+        "externalPower": "100 W USB-C supply (user reported; connection state monitored separately)",
+        "note": "Windows PowerLineStatus Online indicates external power. It does not measure USB-C negotiated power or system draw.",
+        "allowBattery": true
+      },
+      "memory": {
+        "runDirectory": "C:\\Users\\michael\\source\\github\\mycall\\n1x-ai\\results\\opt-20261024-pressure-wait",
+        "pairedServingSamples": 72,
+        "gpuPeakUsedGiB": 85.552734375,
+        "gpuReportedCapacityGiB": 88,
+        "gpuUnusedAtPeakGiB": 2.447265625,
+        "configuredGpuKvGiB": 8,
+        "configuredLmcacheL1GiB": 4,
+        "lowestWindowsSample": {
+          "timestamp": "2026-10-24T19:46:13.8451621-07:00",
+          "availableGiB": 12.69607162475586,
+          "gpuUsedGiB": 85.5361328125,
+          "guestAvailableGiB": 7.255580902099609,
+          "guestCachedGiB": 3.9292564392089844,
+          "guestSwapUsedGiB": 0.0
+        },
+        "limitations": [
+          "Samples are periodic and fields are collected sequentially, not atomically.",
+          "Guest memory is within host memory; do not add guest and Windows totals.",
+          "Reported GPU unused memory is not a guarantee of successful allocation.",
+          "Guest Cached includes file cache; this capture cannot attribute it to PLE versus other files.",
+          "No per-process PSS or PyTorch reserved/allocated breakdown was recorded."
+        ]
+      },
+      "agents": [],
+      "coding": [],
+      "parallel": [
+        {
+          "stage": "cold",
+          "allCorrect": true,
+          "metrics": {
+            "loadedChunks": 0.0,
+            "prefetchFailureChunks": 0,
+            "externalHitTokens": 0.0,
+            "preemptions": 0.0,
+            "draftTokens": 22.0,
+            "acceptedDraftTokens": 22.0,
+            "draftAcceptance": 1.0
+          }
+        },
+        {
+          "stage": "gpu-warm",
+          "allCorrect": true,
+          "metrics": {
+            "loadedChunks": 0.0,
+            "prefetchFailureChunks": 0,
+            "externalHitTokens": 0.0,
+            "preemptions": 0.0,
+            "draftTokens": 22.0,
+            "acceptedDraftTokens": 22.0,
+            "draftAcceptance": 1.0
+          }
+        },
+        {
+          "stage": "gpu-reset",
+          "allCorrect": true,
+          "metrics": {
+            "loadedChunks": 127.0,
+            "prefetchFailureChunks": 126.0,
+            "externalHitTokens": 258048.0,
+            "preemptions": 0.0,
+            "draftTokens": 22.0,
+            "acceptedDraftTokens": 22.0,
+            "draftAcceptance": 1.0
+          }
+        }
+      ],
+      "prefix": {}
+    },
+    {
+      "directory": "results\\opt-20261024-prefill-8192",
+      "status": "complete",
+      "error": null,
+      "config": {
+        "useVmm": true,
+        "restoreWaitMs": 0,
+        "prefixExperiment": false,
+        "disableMtp": false,
+        "segmented": true,
+        "allowBattery": true,
+        "lmcacheChunkSize": 2048,
+        "demandAdmission": true,
+        "parallelRestore": false,
+        "optimizations": true,
+        "parallelSessions": 4,
+        "parallelContextTokens": 129000,
+        "note": "Both comparison phases use this same precision and KV capacity. FP8 is experimental; not a BF16 quality-equivalence claim.",
+        "eagerPrefetch": false,
+        "agentContextTokens": 32000,
+        "agentTurns": 4,
+        "prefillBatchTokens": 8192,
+        "modelArgs": [
+          "--model",
+          "/model",
+          "--served-model-name",
+          "qwen",
+          "--host",
+          "0.0.0.0",
+          "--port",
+          "8000",
+          "--max-model-len",
+          "262144",
+          "--max-num-seqs",
+          "16",
+          "--gpu-memory-utilization",
+          "0.01",
+          "--kv-cache-memory-bytes",
+          "8589934592",
+          "--load-format",
+          "safetensors",
+          "--safetensors-load-strategy",
+          "lazy",
+          "--enable-prefix-caching",
+          "--enable-chunked-prefill",
+          "--max-num-batched-tokens",
+          "8192",
+          "--mamba-ssm-cache-dtype",
+          "bfloat16",
+          "--kv-cache-dtype",
+          "fp8_e4m3",
+          "--no-enable-flashinfer-autotune",
+          "--enable-auto-tool-choice",
+          "--tool-call-parser",
+          "qwen3_xml",
+          "--reasoning-parser",
+          "qwen3",
+          "-cc.cudagraph_mode=FULL_AND_PIECEWISE",
+          "--config",
+          "/profiles/mtp.yaml",
+          "--block-size",
+          "2048"
+        ],
+        "agentLoops": true,
+        "kvCacheDtype": "fp8_e4m3",
+        "lmcacheL1GiB": 8,
+        "capacityCheck": true,
+        "agentConcurrencySweep": true,
+        "codingWorkload": false
+      },
+      "power": {
+        "timingUse": "Correctness only; battery operation authorized. Not a comparable performance benchmark.",
+        "msiMode": "Eco Mode and Energy Saver (last user-reported mode)",
+        "externalPower": "100 W USB-C supply (user reported; connection state monitored separately)",
+        "note": "Windows PowerLineStatus Online indicates external power. It does not measure USB-C negotiated power or system draw.",
+        "allowBattery": true
+      },
+      "memory": {
+        "runDirectory": "C:\\Users\\michael\\source\\github\\mycall\\n1x-ai\\results\\opt-20261024-prefill-8192",
+        "pairedServingSamples": 63,
+        "gpuPeakUsedGiB": 85.6015625,
+        "gpuReportedCapacityGiB": 88,
+        "gpuUnusedAtPeakGiB": 2.3984375,
+        "configuredGpuKvGiB": 8,
+        "configuredLmcacheL1GiB": 8,
+        "lowestWindowsSample": {
+          "timestamp": "2026-10-24T19:57:19.8944549-07:00",
+          "availableGiB": 10.03293228149414,
+          "gpuUsedGiB": 85.5361328125,
+          "guestAvailableGiB": 3.6659164428710938,
+          "guestCachedGiB": 2.8740692138671875,
+          "guestSwapUsedGiB": 0.000362396240234
+        },
+        "limitations": [
+          "Samples are periodic and fields are collected sequentially, not atomically.",
+          "Guest memory is within host memory; do not add guest and Windows totals.",
+          "Reported GPU unused memory is not a guarantee of successful allocation.",
+          "Guest Cached includes file cache; this capture cannot attribute it to PLE versus other files.",
+          "No per-process PSS or PyTorch reserved/allocated breakdown was recorded."
+        ]
+      },
+      "agents": [
+        {
+          "file": "agent-loops-c1.json",
+          "status": "complete",
+          "metrics": {
+            "loadedChunks": 15.0,
+            "prefetchFailureChunks": 0,
+            "externalHitTokens": 28672.0,
+            "preemptions": 0.0,
+            "draftTokens": 164.0,
+            "acceptedDraftTokens": 164.0,
+            "draftAcceptance": 1.0
+          },
+          "turns": [
+            {
+              "turn": 0,
+              "gpuReset": false,
+              "wallSeconds": 15.004298999999719,
+              "allCorrect": true,
+              "completionTokens": 82,
+              "requestWallSeconds": 13.96505069732666,
+              "outputTokensPerRequestWallSecond": 5.871801096697581,
+              "outputTokensPerWallSecond": 5.465100368901042,
+              "sessionSeconds": [
+                13.942696500000238
+              ],
+              "metrics": {
+                "loadedChunks": 0.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 0.0,
+                "preemptions": 0.0,
+                "draftTokens": 41.0,
+                "acceptedDraftTokens": 41.0,
+                "draftAcceptance": 1.0
+              }
+            },
+            {
+              "turn": 1,
+              "gpuReset": false,
+              "wallSeconds": 5.616138699999738,
+              "allCorrect": true,
+              "completionTokens": 82,
+              "requestWallSeconds": 4.558536767959595,
+              "outputTokensPerRequestWallSecond": 17.988228278940323,
+              "outputTokensPerWallSecond": 14.600779001416726,
+              "sessionSeconds": [
+                4.535709599999791
+              ],
+              "metrics": {
+                "loadedChunks": 0.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 0.0,
+                "preemptions": 0.0,
+                "draftTokens": 41.0,
+                "acceptedDraftTokens": 41.0,
+                "draftAcceptance": 1.0
+              }
+            },
+            {
+              "turn": 2,
+              "gpuReset": true,
+              "wallSeconds": 5.7266663000000335,
+              "allCorrect": true,
+              "completionTokens": 82,
+              "requestWallSeconds": 4.674055576324463,
+              "outputTokensPerRequestWallSecond": 17.54365104586162,
+              "outputTokensPerWallSecond": 14.318976469783044,
+              "sessionSeconds": [
+                4.6509087000004
+              ],
+              "metrics": {
+                "loadedChunks": 15.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 28672.0,
+                "preemptions": 0.0,
+                "draftTokens": 41.0,
+                "acceptedDraftTokens": 41.0,
+                "draftAcceptance": 1.0
+              }
+            },
+            {
+              "turn": 3,
+              "gpuReset": false,
+              "wallSeconds": 5.272634500000095,
+              "allCorrect": true,
+              "completionTokens": 82,
+              "requestWallSeconds": 4.216622591018677,
+              "outputTokensPerRequestWallSecond": 19.446843588671747,
+              "outputTokensPerWallSecond": 15.551997772650186,
+              "sessionSeconds": [
+                4.203067700000247
+              ],
+              "metrics": {
+                "loadedChunks": 0.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 0.0,
+                "preemptions": 0.0,
+                "draftTokens": 41.0,
+                "acceptedDraftTokens": 41.0,
+                "draftAcceptance": 1.0
+              }
+            }
+          ]
+        },
+        {
+          "file": "agent-loops-c2.json",
+          "status": "complete",
+          "metrics": {
+            "loadedChunks": 30.0,
+            "prefetchFailureChunks": 0,
+            "externalHitTokens": 57344.0,
+            "preemptions": 0.0,
+            "draftTokens": 328.0,
+            "acceptedDraftTokens": 328.0,
+            "draftAcceptance": 1.0
+          },
+          "turns": [
+            {
+              "turn": 0,
+              "gpuReset": false,
+              "wallSeconds": 27.183321500000147,
+              "allCorrect": true,
+              "completionTokens": 164,
+              "requestWallSeconds": 26.13365602493286,
+              "outputTokensPerRequestWallSecond": 6.27543271571094,
+              "outputTokensPerWallSecond": 6.033111148687224,
+              "sessionSeconds": [
+                25.994480499999554,
+                26.111250200000086
+              ],
+              "metrics": {
+                "loadedChunks": 0.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 0.0,
+                "preemptions": 0.0,
+                "draftTokens": 82.0,
+                "acceptedDraftTokens": 82.0,
+                "draftAcceptance": 1.0
+              }
+            },
+            {
+              "turn": 1,
+              "gpuReset": false,
+              "wallSeconds": 8.8940348000001,
+              "allCorrect": true,
+              "completionTokens": 164,
+              "requestWallSeconds": 7.8573644161224365,
+              "outputTokensPerRequestWallSecond": 20.872138711485785,
+              "outputTokensPerWallSecond": 18.439325198052764,
+              "sessionSeconds": [
+                7.838413100000253,
+                7.698646899999858
+              ],
+              "metrics": {
+                "loadedChunks": 0.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 0.0,
+                "preemptions": 0.0,
+                "draftTokens": 82.0,
+                "acceptedDraftTokens": 82.0,
+                "draftAcceptance": 1.0
+              }
+            },
+            {
+              "turn": 2,
+              "gpuReset": true,
+              "wallSeconds": 9.042535099999895,
+              "allCorrect": true,
+              "completionTokens": 164,
+              "requestWallSeconds": 7.994828224182129,
+              "outputTokensPerRequestWallSecond": 20.51326124855887,
+              "outputTokensPerWallSecond": 18.13650687405149,
+              "sessionSeconds": [
+                7.832626000000346,
+                7.977767800000038
+              ],
+              "metrics": {
+                "loadedChunks": 30.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 57344.0,
+                "preemptions": 0.0,
+                "draftTokens": 82.0,
+                "acceptedDraftTokens": 82.0,
+                "draftAcceptance": 1.0
+              }
+            },
+            {
+              "turn": 3,
+              "gpuReset": false,
+              "wallSeconds": 8.074650699999893,
+              "allCorrect": true,
+              "completionTokens": 164,
+              "requestWallSeconds": 7.032090187072754,
+              "outputTokensPerRequestWallSecond": 23.32165766324852,
+              "outputTokensPerWallSecond": 20.31047609279274,
+              "sessionSeconds": [
+                6.874618199999986,
+                7.014777100000174
+              ],
+              "metrics": {
+                "loadedChunks": 0.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 0.0,
+                "preemptions": 0.0,
+                "draftTokens": 82.0,
+                "acceptedDraftTokens": 82.0,
+                "draftAcceptance": 1.0
+              }
+            }
+          ]
+        },
+        {
+          "file": "agent-loops-c4.json",
+          "status": "complete",
+          "metrics": {
+            "loadedChunks": 60.0,
+            "prefetchFailureChunks": 0,
+            "externalHitTokens": 114688.0,
+            "preemptions": 0.0,
+            "draftTokens": 656.0,
+            "acceptedDraftTokens": 656.0,
+            "draftAcceptance": 1.0
+          },
+          "turns": [
+            {
+              "turn": 0,
+              "gpuReset": false,
+              "wallSeconds": 51.841789999999946,
+              "allCorrect": true,
+              "completionTokens": 328,
+              "requestWallSeconds": 50.792654037475586,
+              "outputTokensPerRequestWallSecond": 6.4576267221239645,
+              "outputTokensPerWallSecond": 6.326942028814984,
+              "sessionSeconds": [
+                49.767113999999765,
+                50.27030220000006,
+                50.44575510000004,
+                50.759451499999614
+              ],
+              "metrics": {
+                "loadedChunks": 0.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 0.0,
+                "preemptions": 0.0,
+                "draftTokens": 164.0,
+                "acceptedDraftTokens": 164.0,
+                "draftAcceptance": 1.0
+              }
+            },
+            {
+              "turn": 1,
+              "gpuReset": false,
+              "wallSeconds": 14.466139799999837,
+              "allCorrect": true,
+              "completionTokens": 328,
+              "requestWallSeconds": 13.427735090255737,
+              "outputTokensPerRequestWallSecond": 24.42705324429759,
+              "outputTokensPerWallSecond": 22.673636819132888,
+              "sessionSeconds": [
+                13.17399469999964,
+                13.360718599999927,
+                13.36075770000025,
+                13.415440499999931
+              ],
+              "metrics": {
+                "loadedChunks": 0.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 0.0,
+                "preemptions": 0.0,
+                "draftTokens": 164.0,
+                "acceptedDraftTokens": 164.0,
+                "draftAcceptance": 1.0
+              }
+            },
+            {
+              "turn": 2,
+              "gpuReset": true,
+              "wallSeconds": 15.532823999999891,
+              "allCorrect": true,
+              "completionTokens": 328,
+              "requestWallSeconds": 14.486637353897095,
+              "outputTokensPerRequestWallSecond": 22.641555247585714,
+              "outputTokensPerWallSecond": 21.11657223438586,
+              "sessionSeconds": [
+                13.796024100000068,
+                14.47112479999987,
+                14.411195700000007,
+                14.310195900000053
+              ],
+              "metrics": {
+                "loadedChunks": 60.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 114688.0,
+                "preemptions": 0.0,
+                "draftTokens": 164.0,
+                "acceptedDraftTokens": 164.0,
+                "draftAcceptance": 1.0
+              }
+            },
+            {
+              "turn": 3,
+              "gpuReset": false,
+              "wallSeconds": 12.44285230000014,
+              "allCorrect": true,
+              "completionTokens": 328,
+              "requestWallSeconds": 11.383104801177979,
+              "outputTokensPerRequestWallSecond": 28.814634120390156,
+              "outputTokensPerWallSecond": 26.360515426193423,
+              "sessionSeconds": [
+                11.360198399999717,
+                11.18506110000044,
+                11.360823699999855,
+                11.361633399999846
+              ],
+              "metrics": {
+                "loadedChunks": 0.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 0.0,
+                "preemptions": 0.0,
+                "draftTokens": 164.0,
+                "acceptedDraftTokens": 164.0,
+                "draftAcceptance": 1.0
+              }
+            }
+          ]
+        }
+      ],
+      "coding": [],
+      "parallel": [],
+      "prefix": {}
+    },
+    {
+      "directory": "results\\opt-20261024-prefill-2048",
+      "status": "complete",
+      "error": null,
+      "config": {
+        "useVmm": true,
+        "restoreWaitMs": 0,
+        "prefixExperiment": false,
+        "disableMtp": false,
+        "segmented": true,
+        "allowBattery": true,
+        "lmcacheChunkSize": 2048,
+        "demandAdmission": true,
+        "parallelRestore": false,
+        "optimizations": true,
+        "parallelSessions": 4,
+        "parallelContextTokens": 129000,
+        "note": "Both comparison phases use this same precision and KV capacity. FP8 is experimental; not a BF16 quality-equivalence claim.",
+        "eagerPrefetch": false,
+        "agentContextTokens": 32000,
+        "agentTurns": 4,
+        "prefillBatchTokens": 2048,
+        "modelArgs": [
+          "--model",
+          "/model",
+          "--served-model-name",
+          "qwen",
+          "--host",
+          "0.0.0.0",
+          "--port",
+          "8000",
+          "--max-model-len",
+          "262144",
+          "--max-num-seqs",
+          "16",
+          "--gpu-memory-utilization",
+          "0.01",
+          "--kv-cache-memory-bytes",
+          "8589934592",
+          "--load-format",
+          "safetensors",
+          "--safetensors-load-strategy",
+          "lazy",
+          "--enable-prefix-caching",
+          "--enable-chunked-prefill",
+          "--max-num-batched-tokens",
+          "2048",
+          "--mamba-ssm-cache-dtype",
+          "bfloat16",
+          "--kv-cache-dtype",
+          "fp8_e4m3",
+          "--no-enable-flashinfer-autotune",
+          "--enable-auto-tool-choice",
+          "--tool-call-parser",
+          "qwen3_xml",
+          "--reasoning-parser",
+          "qwen3",
+          "-cc.cudagraph_mode=FULL_AND_PIECEWISE",
+          "--config",
+          "/profiles/mtp.yaml",
+          "--block-size",
+          "2048"
+        ],
+        "agentLoops": true,
+        "kvCacheDtype": "fp8_e4m3",
+        "lmcacheL1GiB": 8,
+        "capacityCheck": true,
+        "agentConcurrencySweep": true,
+        "codingWorkload": false,
+        "restoreQueueVersion": 1
+      },
+      "power": {
+        "timingUse": "Correctness only; battery operation authorized. Not a comparable performance benchmark.",
+        "msiMode": "Eco Mode and Energy Saver (last user-reported mode)",
+        "externalPower": "100 W USB-C supply (user reported; connection state monitored separately)",
+        "note": "Windows PowerLineStatus Online indicates external power. It does not measure USB-C negotiated power or system draw.",
+        "allowBattery": true
+      },
+      "memory": {
+        "runDirectory": "C:\\Users\\michael\\source\\github\\mycall\\n1x-ai\\results\\opt-20261024-prefill-2048",
+        "pairedServingSamples": 60,
+        "gpuPeakUsedGiB": 82.3681640625,
+        "gpuReportedCapacityGiB": 88,
+        "gpuUnusedAtPeakGiB": 5.6318359375,
+        "configuredGpuKvGiB": 8,
+        "configuredLmcacheL1GiB": 8,
+        "lowestWindowsSample": {
+          "timestamp": "2026-10-24T20:06:02.7708972-07:00",
+          "availableGiB": 10.232921600341797,
+          "gpuUsedGiB": 82.3017578125,
+          "guestAvailableGiB": 3.8606109619140625,
+          "guestCachedGiB": 2.6615028381347656,
+          "guestSwapUsedGiB": 0.000484466552734
+        },
+        "limitations": [
+          "Samples are periodic and fields are collected sequentially, not atomically.",
+          "Guest memory is within host memory; do not add guest and Windows totals.",
+          "Reported GPU unused memory is not a guarantee of successful allocation.",
+          "Guest Cached includes file cache; this capture cannot attribute it to PLE versus other files.",
+          "No per-process PSS or PyTorch reserved/allocated breakdown was recorded."
+        ]
+      },
+      "agents": [
+        {
+          "file": "agent-loops-c1.json",
+          "status": "complete",
+          "metrics": {
+            "loadedChunks": 56.0,
+            "prefetchFailureChunks": 0,
+            "externalHitTokens": 100352.0,
+            "preemptions": 0.0,
+            "draftTokens": 164.0,
+            "acceptedDraftTokens": 164.0,
+            "draftAcceptance": 1.0
+          },
+          "turns": [
+            {
+              "turn": 0,
+              "gpuReset": false,
+              "wallSeconds": 15.416347099999712,
+              "allCorrect": true,
+              "completionTokens": 82,
+              "requestWallSeconds": 14.359819412231445,
+              "outputTokensPerRequestWallSecond": 5.710378218973549,
+              "outputTokensPerWallSecond": 5.3190291752059435,
+              "sessionSeconds": [
+                14.338903700000174
+              ],
+              "metrics": {
+                "loadedChunks": 2.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 2048.0,
+                "preemptions": 0.0,
+                "draftTokens": 41.0,
+                "acceptedDraftTokens": 41.0,
+                "draftAcceptance": 1.0
+              }
+            },
+            {
+              "turn": 1,
+              "gpuReset": false,
+              "wallSeconds": 4.3385025000002315,
+              "allCorrect": true,
+              "completionTokens": 82,
+              "requestWallSeconds": 3.281018018722534,
+              "outputTokensPerRequestWallSecond": 24.992243118471727,
+              "outputTokensPerWallSecond": 18.900530770696946,
+              "sessionSeconds": [
+                3.271628800000599
+              ],
+              "metrics": {
+                "loadedChunks": 4.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 4096.0,
+                "preemptions": 0.0,
+                "draftTokens": 41.0,
+                "acceptedDraftTokens": 41.0,
+                "draftAcceptance": 1.0
+              }
+            },
+            {
+              "turn": 2,
+              "gpuReset": true,
+              "wallSeconds": 4.4555277000004025,
+              "allCorrect": true,
+              "completionTokens": 82,
+              "requestWallSeconds": 3.414679765701294,
+              "outputTokensPerRequestWallSecond": 24.01396488878633,
+              "outputTokensPerWallSecond": 18.404105085014418,
+              "sessionSeconds": [
+                3.3941139000003204
+              ],
+              "metrics": {
+                "loadedChunks": 32.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 61440.0,
+                "preemptions": 0.0,
+                "draftTokens": 41.0,
+                "acceptedDraftTokens": 41.0,
+                "draftAcceptance": 1.0
+              }
+            },
+            {
+              "turn": 3,
+              "gpuReset": false,
+              "wallSeconds": 4.0922005999996145,
+              "allCorrect": true,
+              "completionTokens": 82,
+              "requestWallSeconds": 3.058523178100586,
+              "outputTokensPerRequestWallSecond": 26.810324861073607,
+              "outputTokensPerWallSecond": 20.03811836594905,
+              "sessionSeconds": [
+                3.03669119999995
+              ],
+              "metrics": {
+                "loadedChunks": 18.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 32768.0,
+                "preemptions": 0.0,
+                "draftTokens": 41.0,
+                "acceptedDraftTokens": 41.0,
+                "draftAcceptance": 1.0
+              }
+            }
+          ]
+        },
+        {
+          "file": "agent-loops-c2.json",
+          "status": "complete",
+          "metrics": {
+            "loadedChunks": 112.0,
+            "prefetchFailureChunks": 0,
+            "externalHitTokens": 200704.0,
+            "preemptions": 0.0,
+            "draftTokens": 328.0,
+            "acceptedDraftTokens": 328.0,
+            "draftAcceptance": 1.0
+          },
+          "turns": [
+            {
+              "turn": 0,
+              "gpuReset": false,
+              "wallSeconds": 29.034553400000277,
+              "allCorrect": true,
+              "completionTokens": 164,
+              "requestWallSeconds": 27.989758253097534,
+              "outputTokensPerRequestWallSecond": 5.859286047311633,
+              "outputTokensPerWallSecond": 5.648442314253004,
+              "sessionSeconds": [
+                27.97422649999953,
+                27.07231069999989
+              ],
+              "metrics": {
+                "loadedChunks": 4.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 4096.0,
+                "preemptions": 0.0,
+                "draftTokens": 82.0,
+                "acceptedDraftTokens": 82.0,
+                "draftAcceptance": 1.0
+              }
+            },
+            {
+              "turn": 1,
+              "gpuReset": false,
+              "wallSeconds": 6.454509400000006,
+              "allCorrect": true,
+              "completionTokens": 164,
+              "requestWallSeconds": 5.4141154289245605,
+              "outputTokensPerRequestWallSecond": 30.291190158939102,
+              "outputTokensPerWallSecond": 25.40859263447658,
+              "sessionSeconds": [
+                5.136110300000382,
+                5.386349100000189
+              ],
+              "metrics": {
+                "loadedChunks": 8.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 8192.0,
+                "preemptions": 0.0,
+                "draftTokens": 82.0,
+                "acceptedDraftTokens": 82.0,
+                "draftAcceptance": 1.0
+              }
+            },
+            {
+              "turn": 2,
+              "gpuReset": true,
+              "wallSeconds": 6.796043800000007,
+              "allCorrect": true,
+              "completionTokens": 164,
+              "requestWallSeconds": 5.743104934692383,
+              "outputTokensPerRequestWallSecond": 28.555981801642687,
+              "outputTokensPerWallSecond": 24.131686732213208,
+              "sessionSeconds": [
+                5.449441799999931,
+                5.729769500000202
+              ],
+              "metrics": {
+                "loadedChunks": 64.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 122880.0,
+                "preemptions": 0.0,
+                "draftTokens": 82.0,
+                "acceptedDraftTokens": 82.0,
+                "draftAcceptance": 1.0
+              }
+            },
+            {
+              "turn": 3,
+              "gpuReset": false,
+              "wallSeconds": 6.18067770000016,
+              "allCorrect": true,
+              "completionTokens": 164,
+              "requestWallSeconds": 5.13123345375061,
+              "outputTokensPerRequestWallSecond": 31.961126204485254,
+              "outputTokensPerWallSecond": 26.534307071212556,
+              "sessionSeconds": [
+                4.291418100000556,
+                5.11832830000003
+              ],
+              "metrics": {
+                "loadedChunks": 36.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 65536.0,
+                "preemptions": 0.0,
+                "draftTokens": 82.0,
+                "acceptedDraftTokens": 82.0,
+                "draftAcceptance": 1.0
+              }
+            }
+          ]
+        },
+        {
+          "file": "agent-loops-c4.json",
+          "status": "complete",
+          "metrics": {
+            "loadedChunks": 224.0,
+            "prefetchFailureChunks": 0,
+            "externalHitTokens": 401408.0,
+            "preemptions": 0.0,
+            "draftTokens": 656.0,
+            "acceptedDraftTokens": 656.0,
+            "draftAcceptance": 1.0
+          },
+          "turns": [
+            {
+              "turn": 0,
+              "gpuReset": false,
+              "wallSeconds": 56.21896380000044,
+              "allCorrect": true,
+              "completionTokens": 328,
+              "requestWallSeconds": 55.158995151519775,
+              "outputTokensPerRequestWallSecond": 5.946446252311084,
+              "outputTokensPerWallSecond": 5.834330230042366,
+              "sessionSeconds": [
+                54.353261100000054,
+                54.28422260000025,
+                54.41457760000003,
+                55.14104640000005
+              ],
+              "metrics": {
+                "loadedChunks": 8.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 8192.0,
+                "preemptions": 0.0,
+                "draftTokens": 164.0,
+                "acceptedDraftTokens": 164.0,
+                "draftAcceptance": 1.0
+              }
+            },
+            {
+              "turn": 1,
+              "gpuReset": false,
+              "wallSeconds": 10.055621400000291,
+              "allCorrect": true,
+              "completionTokens": 328,
+              "requestWallSeconds": 9.015796184539795,
+              "outputTokensPerRequestWallSecond": 36.38059171772887,
+              "outputTokensPerWallSecond": 32.618570941820714,
+              "sessionSeconds": [
+                8.956161899999643,
+                8.992336399999658,
+                8.89726470000005,
+                8.535852600000453
+              ],
+              "metrics": {
+                "loadedChunks": 16.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 16384.0,
+                "preemptions": 0.0,
+                "draftTokens": 164.0,
+                "acceptedDraftTokens": 164.0,
+                "draftAcceptance": 1.0
+              }
+            },
+            {
+              "turn": 2,
+              "gpuReset": true,
+              "wallSeconds": 10.719393899999886,
+              "allCorrect": true,
+              "completionTokens": 328,
+              "requestWallSeconds": 9.675388813018799,
+              "outputTokensPerRequestWallSecond": 33.90044641499646,
+              "outputTokensPerWallSecond": 30.598744953294744,
+              "sessionSeconds": [
+                9.66318309999997,
+                9.605289300000095,
+                9.15273840000009,
+                9.545498399999815
+              ],
+              "metrics": {
+                "loadedChunks": 128.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 245760.0,
+                "preemptions": 0.0,
+                "draftTokens": 164.0,
+                "acceptedDraftTokens": 164.0,
+                "draftAcceptance": 1.0
+              }
+            },
+            {
+              "turn": 3,
+              "gpuReset": false,
+              "wallSeconds": 9.753144000000248,
+              "allCorrect": true,
+              "completionTokens": 328,
+              "requestWallSeconds": 8.705709457397461,
+              "outputTokensPerRequestWallSecond": 37.67642391526059,
+              "outputTokensPerWallSecond": 33.630181201055954,
+              "sessionSeconds": [
+                7.910403500000484,
+                7.932370100000298,
+                7.869217599999956,
+                8.692085500000303
+              ],
+              "metrics": {
+                "loadedChunks": 72.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 131072.0,
+                "preemptions": 0.0,
+                "draftTokens": 164.0,
+                "acceptedDraftTokens": 164.0,
+                "draftAcceptance": 1.0
+              }
+            }
+          ]
+        }
+      ],
+      "coding": [],
+      "parallel": [],
+      "prefix": {}
+    },
+    {
+      "directory": "results\\opt-20261024-prefill-4096",
+      "status": "complete",
+      "error": null,
+      "config": {
+        "useVmm": true,
+        "restoreWaitMs": 0,
+        "prefixExperiment": false,
+        "disableMtp": false,
+        "segmented": true,
+        "allowBattery": true,
+        "lmcacheChunkSize": 2048,
+        "demandAdmission": true,
+        "parallelRestore": false,
+        "optimizations": true,
+        "parallelSessions": 4,
+        "parallelContextTokens": 129000,
+        "note": "Both comparison phases use this same precision and KV capacity. FP8 is experimental; not a BF16 quality-equivalence claim.",
+        "eagerPrefetch": false,
+        "agentContextTokens": 32000,
+        "agentTurns": 4,
+        "prefillBatchTokens": 4096,
+        "modelArgs": [
+          "--model",
+          "/model",
+          "--served-model-name",
+          "qwen",
+          "--host",
+          "0.0.0.0",
+          "--port",
+          "8000",
+          "--max-model-len",
+          "262144",
+          "--max-num-seqs",
+          "16",
+          "--gpu-memory-utilization",
+          "0.01",
+          "--kv-cache-memory-bytes",
+          "8589934592",
+          "--load-format",
+          "safetensors",
+          "--safetensors-load-strategy",
+          "lazy",
+          "--enable-prefix-caching",
+          "--enable-chunked-prefill",
+          "--max-num-batched-tokens",
+          "4096",
+          "--mamba-ssm-cache-dtype",
+          "bfloat16",
+          "--kv-cache-dtype",
+          "fp8_e4m3",
+          "--no-enable-flashinfer-autotune",
+          "--enable-auto-tool-choice",
+          "--tool-call-parser",
+          "qwen3_xml",
+          "--reasoning-parser",
+          "qwen3",
+          "-cc.cudagraph_mode=FULL_AND_PIECEWISE",
+          "--config",
+          "/profiles/mtp.yaml",
+          "--block-size",
+          "2048"
+        ],
+        "agentLoops": true,
+        "kvCacheDtype": "fp8_e4m3",
+        "lmcacheL1GiB": 8,
+        "capacityCheck": true,
+        "agentConcurrencySweep": true,
+        "codingWorkload": false,
+        "restoreQueueVersion": 1
+      },
+      "power": {
+        "timingUse": "Correctness only; battery operation authorized. Not a comparable performance benchmark.",
+        "msiMode": "Eco Mode and Energy Saver (last user-reported mode)",
+        "externalPower": "100 W USB-C supply (user reported; connection state monitored separately)",
+        "note": "Windows PowerLineStatus Online indicates external power. It does not measure USB-C negotiated power or system draw.",
+        "allowBattery": true
+      },
+      "memory": {
+        "runDirectory": "C:\\Users\\michael\\source\\github\\mycall\\n1x-ai\\results\\opt-20261024-prefill-4096",
+        "pairedServingSamples": 65,
+        "gpuPeakUsedGiB": 83.197265625,
+        "gpuReportedCapacityGiB": 88,
+        "gpuUnusedAtPeakGiB": 4.802734375,
+        "configuredGpuKvGiB": 8,
+        "configuredLmcacheL1GiB": 8,
+        "lowestWindowsSample": {
+          "timestamp": "2026-10-24T20:22:56.9602341-07:00",
+          "availableGiB": 10.267669677734375,
+          "gpuUsedGiB": 83.193359375,
+          "guestAvailableGiB": 3.577617645263672,
+          "guestCachedGiB": 2.7517242431640625,
+          "guestSwapUsedGiB": 0.000556945800781
+        },
+        "limitations": [
+          "Samples are periodic and fields are collected sequentially, not atomically.",
+          "Guest memory is within host memory; do not add guest and Windows totals.",
+          "Reported GPU unused memory is not a guarantee of successful allocation.",
+          "Guest Cached includes file cache; this capture cannot attribute it to PLE versus other files.",
+          "No per-process PSS or PyTorch reserved/allocated breakdown was recorded."
+        ]
+      },
+      "agents": [
+        {
+          "file": "agent-loops-c1.json",
+          "status": "complete",
+          "metrics": {
+            "loadedChunks": 15.0,
+            "prefetchFailureChunks": 0,
+            "externalHitTokens": 28672.0,
+            "preemptions": 0.0,
+            "draftTokens": 164.0,
+            "acceptedDraftTokens": 164.0,
+            "draftAcceptance": 1.0
+          },
+          "turns": [
+            {
+              "turn": 0,
+              "gpuReset": false,
+              "wallSeconds": 15.423307199999726,
+              "allCorrect": true,
+              "completionTokens": 82,
+              "requestWallSeconds": 14.364760637283325,
+              "outputTokensPerRequestWallSecond": 5.708413949284428,
+              "outputTokensPerWallSecond": 5.316628848578044,
+              "sessionSeconds": [
+                14.337953000000198
+              ],
+              "metrics": {
+                "loadedChunks": 0.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 0.0,
+                "preemptions": 0.0,
+                "draftTokens": 41.0,
+                "acceptedDraftTokens": 41.0,
+                "draftAcceptance": 1.0
+              }
+            },
+            {
+              "turn": 1,
+              "gpuReset": false,
+              "wallSeconds": 5.575890299999628,
+              "allCorrect": true,
+              "completionTokens": 82,
+              "requestWallSeconds": 4.526150465011597,
+              "outputTokensPerRequestWallSecond": 18.116940794143463,
+              "outputTokensPerWallSecond": 14.706171676298128,
+              "sessionSeconds": [
+                4.502110900000844
+              ],
+              "metrics": {
+                "loadedChunks": 0.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 0.0,
+                "preemptions": 0.0,
+                "draftTokens": 41.0,
+                "acceptedDraftTokens": 41.0,
+                "draftAcceptance": 1.0
+              }
+            },
+            {
+              "turn": 2,
+              "gpuReset": true,
+              "wallSeconds": 5.728359400000045,
+              "allCorrect": true,
+              "completionTokens": 82,
+              "requestWallSeconds": 4.66810417175293,
+              "outputTokensPerRequestWallSecond": 17.566017591507176,
+              "outputTokensPerWallSecond": 14.314744287867022,
+              "sessionSeconds": [
+                4.655843700000332
+              ],
+              "metrics": {
+                "loadedChunks": 15.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 28672.0,
+                "preemptions": 0.0,
+                "draftTokens": 41.0,
+                "acceptedDraftTokens": 41.0,
+                "draftAcceptance": 1.0
+              }
+            },
+            {
+              "turn": 3,
+              "gpuReset": false,
+              "wallSeconds": 5.331826099999489,
+              "allCorrect": true,
+              "completionTokens": 82,
+              "requestWallSeconds": 4.277415037155151,
+              "outputTokensPerRequestWallSecond": 19.17045675664362,
+              "outputTokensPerWallSecond": 15.379346299386594,
+              "sessionSeconds": [
+                4.253407799999877
+              ],
+              "metrics": {
+                "loadedChunks": 0.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 0.0,
+                "preemptions": 0.0,
+                "draftTokens": 41.0,
+                "acceptedDraftTokens": 41.0,
+                "draftAcceptance": 1.0
+              }
+            }
+          ]
+        },
+        {
+          "file": "agent-loops-c2.json",
+          "status": "complete",
+          "metrics": {
+            "loadedChunks": 30.0,
+            "prefetchFailureChunks": 0,
+            "externalHitTokens": 57344.0,
+            "preemptions": 0.0,
+            "draftTokens": 328.0,
+            "acceptedDraftTokens": 328.0,
+            "draftAcceptance": 1.0
+          },
+          "turns": [
+            {
+              "turn": 0,
+              "gpuReset": false,
+              "wallSeconds": 28.831377900000007,
+              "allCorrect": true,
+              "completionTokens": 164,
+              "requestWallSeconds": 27.779690980911255,
+              "outputTokensPerRequestWallSecond": 5.903593388158716,
+              "outputTokensPerWallSecond": 5.688247040041745,
+              "sessionSeconds": [
+                27.763611800000035,
+                27.05004150000059
+              ],
+              "metrics": {
+                "loadedChunks": 0.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 0.0,
+                "preemptions": 0.0,
+                "draftTokens": 82.0,
+                "acceptedDraftTokens": 82.0,
+                "draftAcceptance": 1.0
+              }
+            },
+            {
+              "turn": 1,
+              "gpuReset": false,
+              "wallSeconds": 8.757304000000659,
+              "allCorrect": true,
+              "completionTokens": 164,
+              "requestWallSeconds": 7.724895000457764,
+              "outputTokensPerRequestWallSecond": 21.230062025474993,
+              "outputTokensPerWallSecond": 18.727224725781777,
+              "sessionSeconds": [
+                7.703314700000192,
+                7.574424700000236
+              ],
+              "metrics": {
+                "loadedChunks": 0.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 0.0,
+                "preemptions": 0.0,
+                "draftTokens": 82.0,
+                "acceptedDraftTokens": 82.0,
+                "draftAcceptance": 1.0
+              }
+            },
+            {
+              "turn": 2,
+              "gpuReset": true,
+              "wallSeconds": 9.118419000000358,
+              "allCorrect": true,
+              "completionTokens": 164,
+              "requestWallSeconds": 8.072102546691895,
+              "outputTokensPerRequestWallSecond": 20.316887583051134,
+              "outputTokensPerWallSecond": 17.985574034269927,
+              "sessionSeconds": [
+                8.057045799999287,
+                7.877054199999293
+              ],
+              "metrics": {
+                "loadedChunks": 30.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 57344.0,
+                "preemptions": 0.0,
+                "draftTokens": 82.0,
+                "acceptedDraftTokens": 82.0,
+                "draftAcceptance": 1.0
+              }
+            },
+            {
+              "turn": 3,
+              "gpuReset": false,
+              "wallSeconds": 8.122302000000673,
+              "allCorrect": true,
+              "completionTokens": 164,
+              "requestWallSeconds": 7.0756659507751465,
+              "outputTokensPerRequestWallSecond": 23.17803032830198,
+              "outputTokensPerWallSecond": 20.191320145444777,
+              "sessionSeconds": [
+                6.918505599999662,
+                7.058308599999691
+              ],
+              "metrics": {
+                "loadedChunks": 0.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 0.0,
+                "preemptions": 0.0,
+                "draftTokens": 82.0,
+                "acceptedDraftTokens": 82.0,
+                "draftAcceptance": 1.0
+              }
+            }
+          ]
+        },
+        {
+          "file": "agent-loops-c4.json",
+          "status": "complete",
+          "metrics": {
+            "loadedChunks": 60.0,
+            "prefetchFailureChunks": 0,
+            "externalHitTokens": 114688.0,
+            "preemptions": 0.0,
+            "draftTokens": 672.0,
+            "acceptedDraftTokens": 672.0,
+            "draftAcceptance": 1.0
+          },
+          "turns": [
+            {
+              "turn": 0,
+              "gpuReset": false,
+              "wallSeconds": 56.69037930000013,
+              "allCorrect": true,
+              "completionTokens": 337,
+              "requestWallSeconds": 55.62830305099487,
+              "outputTokensPerRequestWallSecond": 6.058067234067335,
+              "outputTokensPerWallSecond": 5.9445712687267065,
+              "sessionSeconds": [
+                54.69785730000058,
+                55.610059900000124,
+                54.92919619999975,
+                55.07217519999904
+              ],
+              "metrics": {
+                "loadedChunks": 0.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 0.0,
+                "preemptions": 0.0,
+                "draftTokens": 168.0,
+                "acceptedDraftTokens": 168.0,
+                "draftAcceptance": 1.0
+              }
+            },
+            {
+              "turn": 1,
+              "gpuReset": false,
+              "wallSeconds": 15.12022800000068,
+              "allCorrect": true,
+              "completionTokens": 337,
+              "requestWallSeconds": 14.062511444091797,
+              "outputTokensPerRequestWallSecond": 23.964424942145502,
+              "outputTokensPerWallSecond": 22.28802369911253,
+              "sessionSeconds": [
+                13.59260440000071,
+                13.844113799998922,
+                13.777097899999717,
+                14.04589119999946
+              ],
+              "metrics": {
+                "loadedChunks": 0.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 0.0,
+                "preemptions": 0.0,
+                "draftTokens": 168.0,
+                "acceptedDraftTokens": 168.0,
+                "draftAcceptance": 1.0
+              }
+            },
+            {
+              "turn": 2,
+              "gpuReset": true,
+              "wallSeconds": 15.849105399999644,
+              "allCorrect": true,
+              "completionTokens": 337,
+              "requestWallSeconds": 14.792447805404663,
+              "outputTokensPerRequestWallSecond": 22.781895493785115,
+              "outputTokensPerWallSecond": 21.263029773277143,
+              "sessionSeconds": [
+                13.914469000000281,
+                14.401856399999815,
+                14.57564689999981,
+                14.773501699999542
+              ],
+              "metrics": {
+                "loadedChunks": 60.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 114688.0,
+                "preemptions": 0.0,
+                "draftTokens": 168.0,
+                "acceptedDraftTokens": 168.0,
+                "draftAcceptance": 1.0
+              }
+            },
+            {
+              "turn": 3,
+              "gpuReset": false,
+              "wallSeconds": 13.786231199999747,
+              "allCorrect": true,
+              "completionTokens": 337,
+              "requestWallSeconds": 12.74348521232605,
+              "outputTokensPerRequestWallSecond": 26.444884926302503,
+              "outputTokensPerWallSecond": 24.44467926810963,
+              "sessionSeconds": [
+                12.297203900001477,
+                12.496340800000326,
+                12.632943300000079,
+                12.727314399999159
+              ],
+              "metrics": {
+                "loadedChunks": 0.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 0.0,
+                "preemptions": 0.0,
+                "draftTokens": 168.0,
+                "acceptedDraftTokens": 168.0,
+                "draftAcceptance": 1.0
+              }
+            }
+          ]
+        }
+      ],
+      "coding": [],
+      "parallel": [],
+      "prefix": {}
+    },
+    {
+      "directory": "results\\opt-20261024-mtp-on",
+      "status": "complete",
+      "error": null,
+      "config": {
+        "useVmm": true,
+        "restoreWaitMs": 0,
+        "prefixExperiment": false,
+        "disableMtp": false,
+        "segmented": true,
+        "allowBattery": true,
+        "lmcacheChunkSize": 2048,
+        "demandAdmission": true,
+        "parallelRestore": false,
+        "optimizations": true,
+        "parallelSessions": 2,
+        "parallelContextTokens": 129000,
+        "note": "Both comparison phases use this same precision and KV capacity. FP8 is experimental; not a BF16 quality-equivalence claim.",
+        "eagerPrefetch": false,
+        "agentContextTokens": 32000,
+        "agentTurns": 4,
+        "prefillBatchTokens": 8192,
+        "modelArgs": [
+          "--model",
+          "/model",
+          "--served-model-name",
+          "qwen",
+          "--host",
+          "0.0.0.0",
+          "--port",
+          "8000",
+          "--max-model-len",
+          "262144",
+          "--max-num-seqs",
+          "16",
+          "--gpu-memory-utilization",
+          "0.01",
+          "--kv-cache-memory-bytes",
+          "8589934592",
+          "--load-format",
+          "safetensors",
+          "--safetensors-load-strategy",
+          "lazy",
+          "--enable-prefix-caching",
+          "--enable-chunked-prefill",
+          "--max-num-batched-tokens",
+          "8192",
+          "--mamba-ssm-cache-dtype",
+          "bfloat16",
+          "--kv-cache-dtype",
+          "fp8_e4m3",
+          "--no-enable-flashinfer-autotune",
+          "--enable-auto-tool-choice",
+          "--tool-call-parser",
+          "qwen3_xml",
+          "--reasoning-parser",
+          "qwen3",
+          "-cc.cudagraph_mode=FULL_AND_PIECEWISE",
+          "--config",
+          "/profiles/mtp.yaml",
+          "--block-size",
+          "2048"
+        ],
+        "agentLoops": true,
+        "kvCacheDtype": "fp8_e4m3",
+        "lmcacheL1GiB": 8,
+        "capacityCheck": true,
+        "agentConcurrencySweep": false,
+        "codingWorkload": true,
+        "restoreQueueVersion": 1
+      },
+      "power": {
+        "timingUse": "Correctness only; battery operation authorized. Not a comparable performance benchmark.",
+        "msiMode": "Eco Mode and Energy Saver (last user-reported mode)",
+        "externalPower": "100 W USB-C supply (user reported; connection state monitored separately)",
+        "note": "Windows PowerLineStatus Online indicates external power. It does not measure USB-C negotiated power or system draw.",
+        "allowBattery": true
+      },
+      "memory": {
+        "runDirectory": "C:\\Users\\michael\\source\\github\\mycall\\n1x-ai\\results\\opt-20261024-mtp-on",
+        "pairedServingSamples": 41,
+        "gpuPeakUsedGiB": 85.5771484375,
+        "gpuReportedCapacityGiB": 88,
+        "gpuUnusedAtPeakGiB": 2.4228515625,
+        "configuredGpuKvGiB": 8,
+        "configuredLmcacheL1GiB": 8,
+        "lowestWindowsSample": {
+          "timestamp": "2026-10-24T20:32:53.8476612-07:00",
+          "availableGiB": 10.108558654785156,
+          "gpuUsedGiB": 85.5419921875,
+          "guestAvailableGiB": 3.4980010986328125,
+          "guestCachedGiB": 2.8212242126464844,
+          "guestSwapUsedGiB": 0.000556945800781
+        },
+        "limitations": [
+          "Samples are periodic and fields are collected sequentially, not atomically.",
+          "Guest memory is within host memory; do not add guest and Windows totals.",
+          "Reported GPU unused memory is not a guarantee of successful allocation.",
+          "Guest Cached includes file cache; this capture cannot attribute it to PLE versus other files.",
+          "No per-process PSS or PyTorch reserved/allocated breakdown was recorded."
+        ]
+      },
+      "agents": [
+        {
+          "file": "agent-loops-c2.json",
+          "status": "complete",
+          "metrics": {
+            "loadedChunks": 30.0,
+            "prefetchFailureChunks": 0,
+            "externalHitTokens": 57344.0,
+            "preemptions": 0.0,
+            "draftTokens": 328.0,
+            "acceptedDraftTokens": 328.0,
+            "draftAcceptance": 1.0
+          },
+          "turns": [
+            {
+              "turn": 0,
+              "gpuReset": false,
+              "wallSeconds": 27.557092699999885,
+              "allCorrect": true,
+              "completionTokens": 164,
+              "requestWallSeconds": 26.515818119049072,
+              "outputTokensPerRequestWallSecond": 6.1849873635308175,
+              "outputTokensPerWallSecond": 5.9512809201386,
+              "sessionSeconds": [
+                26.37349709999944,
+                26.501636699999835
+              ],
+              "metrics": {
+                "loadedChunks": 0.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 0.0,
+                "preemptions": 0.0,
+                "draftTokens": 82.0,
+                "acceptedDraftTokens": 82.0,
+                "draftAcceptance": 1.0
+              }
+            },
+            {
+              "turn": 1,
+              "gpuReset": false,
+              "wallSeconds": 8.917391499999212,
+              "allCorrect": true,
+              "completionTokens": 164,
+              "requestWallSeconds": 7.869209051132202,
+              "outputTokensPerRequestWallSecond": 20.840722229434746,
+              "outputTokensPerWallSecond": 18.391028362948344,
+              "sessionSeconds": [
+                7.853954399999566,
+                7.710232599999472
+              ],
+              "metrics": {
+                "loadedChunks": 0.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 0.0,
+                "preemptions": 0.0,
+                "draftTokens": 82.0,
+                "acceptedDraftTokens": 82.0,
+                "draftAcceptance": 1.0
+              }
+            },
+            {
+              "turn": 2,
+              "gpuReset": true,
+              "wallSeconds": 9.22102360000008,
+              "allCorrect": true,
+              "completionTokens": 164,
+              "requestWallSeconds": 8.18394923210144,
+              "outputTokensPerRequestWallSecond": 20.03922499381008,
+              "outputTokensPerWallSecond": 17.78544412357849,
+              "sessionSeconds": [
+                7.998858299999483,
+                8.15932150000026
+              ],
+              "metrics": {
+                "loadedChunks": 30.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 57344.0,
+                "preemptions": 0.0,
+                "draftTokens": 82.0,
+                "acceptedDraftTokens": 82.0,
+                "draftAcceptance": 1.0
+              }
+            },
+            {
+              "turn": 3,
+              "gpuReset": false,
+              "wallSeconds": 8.197229000000334,
+              "allCorrect": true,
+              "completionTokens": 164,
+              "requestWallSeconds": 7.158125162124634,
+              "outputTokensPerRequestWallSecond": 22.911027159424865,
+              "outputTokensPerWallSecond": 20.00676082124744,
+              "sessionSeconds": [
+                7.008874300000571,
+                7.140684000000874
+              ],
+              "metrics": {
+                "loadedChunks": 0.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 0.0,
+                "preemptions": 0.0,
+                "draftTokens": 82.0,
+                "acceptedDraftTokens": 82.0,
+                "draftAcceptance": 1.0
+              }
+            }
+          ]
+        }
+      ],
+      "coding": [
+        {
+          "concurrency": 1,
+          "originalAllCorrect": true,
+          "allCorrect": true,
+          "validation": "saved-program recheck",
+          "wallSeconds": 5.459356999999727,
+          "completionTokens": 210,
+          "outputTokensPerWallSecond": 38.46606843992992,
+          "metrics": {
+            "loadedChunks": 0.0,
+            "prefetchFailureChunks": 0,
+            "externalHitTokens": 0.0,
+            "preemptions": 0.0,
+            "draftTokens": 104.0,
+            "acceptedDraftTokens": 104.0,
+            "draftAcceptance": 1.0
+          }
+        },
+        {
+          "concurrency": 2,
+          "originalAllCorrect": true,
+          "allCorrect": true,
+          "validation": "saved-program recheck",
+          "wallSeconds": 3.4906166000000667,
+          "completionTokens": 210,
+          "outputTokensPerWallSecond": 60.16129070147549,
+          "metrics": {
+            "loadedChunks": 0.0,
+            "prefetchFailureChunks": 0,
+            "externalHitTokens": 0.0,
+            "preemptions": 0.0,
+            "draftTokens": 104.0,
+            "acceptedDraftTokens": 104.0,
+            "draftAcceptance": 1.0
+          }
+        },
+        {
+          "concurrency": 4,
+          "originalAllCorrect": true,
+          "allCorrect": true,
+          "validation": "saved-program recheck",
+          "wallSeconds": 3.3991179000004195,
+          "completionTokens": 225,
+          "outputTokensPerWallSecond": 66.19364394508712,
+          "metrics": {
+            "loadedChunks": 0.0,
+            "prefetchFailureChunks": 0,
+            "externalHitTokens": 0.0,
+            "preemptions": 0.0,
+            "draftTokens": 111.0,
+            "acceptedDraftTokens": 111.0,
+            "draftAcceptance": 1.0
+          }
+        }
+      ],
+      "parallel": [],
+      "prefix": {}
+    },
+    {
+      "directory": "results\\opt-20261024-mtp-off",
+      "status": "complete",
+      "error": null,
+      "config": {
+        "useVmm": true,
+        "restoreWaitMs": 0,
+        "prefixExperiment": false,
+        "disableMtp": true,
+        "segmented": true,
+        "allowBattery": true,
+        "lmcacheChunkSize": 2048,
+        "demandAdmission": true,
+        "parallelRestore": false,
+        "optimizations": true,
+        "parallelSessions": 2,
+        "parallelContextTokens": 129000,
+        "note": "Both comparison phases use this same precision and KV capacity. FP8 is experimental; not a BF16 quality-equivalence claim.",
+        "eagerPrefetch": false,
+        "agentContextTokens": 32000,
+        "agentTurns": 4,
+        "prefillBatchTokens": 8192,
+        "modelArgs": [
+          "--model",
+          "/model",
+          "--served-model-name",
+          "qwen",
+          "--host",
+          "0.0.0.0",
+          "--port",
+          "8000",
+          "--max-model-len",
+          "262144",
+          "--max-num-seqs",
+          "16",
+          "--gpu-memory-utilization",
+          "0.01",
+          "--kv-cache-memory-bytes",
+          "8589934592",
+          "--load-format",
+          "safetensors",
+          "--safetensors-load-strategy",
+          "lazy",
+          "--enable-prefix-caching",
+          "--enable-chunked-prefill",
+          "--max-num-batched-tokens",
+          "8192",
+          "--mamba-ssm-cache-dtype",
+          "bfloat16",
+          "--kv-cache-dtype",
+          "fp8_e4m3",
+          "--no-enable-flashinfer-autotune",
+          "--enable-auto-tool-choice",
+          "--tool-call-parser",
+          "qwen3_xml",
+          "--reasoning-parser",
+          "qwen3",
+          "-cc.cudagraph_mode=FULL_AND_PIECEWISE",
+          "--block-size",
+          "2048"
+        ],
+        "agentLoops": true,
+        "kvCacheDtype": "fp8_e4m3",
+        "lmcacheL1GiB": 8,
+        "capacityCheck": true,
+        "agentConcurrencySweep": false,
+        "codingWorkload": true,
+        "restoreQueueVersion": 1
+      },
+      "power": {
+        "timingUse": "Correctness only; battery operation authorized. Not a comparable performance benchmark.",
+        "msiMode": "Eco Mode and Energy Saver (last user-reported mode)",
+        "externalPower": "100 W USB-C supply (user reported; connection state monitored separately)",
+        "note": "Windows PowerLineStatus Online indicates external power. It does not measure USB-C negotiated power or system draw.",
+        "allowBattery": true
+      },
+      "memory": {
+        "runDirectory": "C:\\Users\\michael\\source\\github\\mycall\\n1x-ai\\results\\opt-20261024-mtp-off",
+        "pairedServingSamples": 40,
+        "gpuPeakUsedGiB": 79.4638671875,
+        "gpuReportedCapacityGiB": 88,
+        "gpuUnusedAtPeakGiB": 8.5361328125,
+        "configuredGpuKvGiB": 8,
+        "configuredLmcacheL1GiB": 8,
+        "lowestWindowsSample": {
+          "timestamp": "2026-10-24T20:38:37.6931706-07:00",
+          "availableGiB": 9.76016616821289,
+          "gpuUsedGiB": 79.4619140625,
+          "guestAvailableGiB": 3.862232208251953,
+          "guestCachedGiB": 3.428173065185547,
+          "guestSwapUsedGiB": 0.000556945800781
+        },
+        "limitations": [
+          "Samples are periodic and fields are collected sequentially, not atomically.",
+          "Guest memory is within host memory; do not add guest and Windows totals.",
+          "Reported GPU unused memory is not a guarantee of successful allocation.",
+          "Guest Cached includes file cache; this capture cannot attribute it to PLE versus other files.",
+          "No per-process PSS or PyTorch reserved/allocated breakdown was recorded."
+        ]
+      },
+      "agents": [
+        {
+          "file": "agent-loops-c2.json",
+          "status": "complete",
+          "metrics": {
+            "loadedChunks": 32.0,
+            "prefetchFailureChunks": 0,
+            "externalHitTokens": 61440.0,
+            "preemptions": 0.0,
+            "draftTokens": 0,
+            "acceptedDraftTokens": 0,
+            "draftAcceptance": null
+          },
+          "turns": [
+            {
+              "turn": 0,
+              "gpuReset": false,
+              "wallSeconds": 26.278550400000313,
+              "allCorrect": true,
+              "completionTokens": 164,
+              "requestWallSeconds": 25.233370065689087,
+              "outputTokensPerRequestWallSecond": 6.4993300368941975,
+              "outputTokensPerWallSecond": 6.240831305519731,
+              "sessionSeconds": [
+                25.105204100000265,
+                25.219543199999862
+              ],
+              "metrics": {
+                "loadedChunks": 0.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 0.0,
+                "preemptions": 0.0,
+                "draftTokens": 0,
+                "acceptedDraftTokens": 0,
+                "draftAcceptance": null
+              }
+            },
+            {
+              "turn": 1,
+              "gpuReset": false,
+              "wallSeconds": 6.912261299999955,
+              "allCorrect": true,
+              "completionTokens": 164,
+              "requestWallSeconds": 5.864765405654907,
+              "outputTokensPerRequestWallSecond": 27.96360786091604,
+              "outputTokensPerWallSecond": 23.72595492013606,
+              "sessionSeconds": [
+                5.842766299999312,
+                5.740139499999714
+              ],
+              "metrics": {
+                "loadedChunks": 0.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 0.0,
+                "preemptions": 0.0,
+                "draftTokens": 0,
+                "acceptedDraftTokens": 0,
+                "draftAcceptance": null
+              }
+            },
+            {
+              "turn": 2,
+              "gpuReset": true,
+              "wallSeconds": 7.2118115000002945,
+              "allCorrect": true,
+              "completionTokens": 164,
+              "requestWallSeconds": 6.17598295211792,
+              "outputTokensPerRequestWallSecond": 26.554477444559613,
+              "outputTokensPerWallSecond": 22.74047234872865,
+              "sessionSeconds": [
+                6.057885999999598,
+                6.151813200000106
+              ],
+              "metrics": {
+                "loadedChunks": 32.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 61440.0,
+                "preemptions": 0.0,
+                "draftTokens": 0,
+                "acceptedDraftTokens": 0,
+                "draftAcceptance": null
+              }
+            },
+            {
+              "turn": 3,
+              "gpuReset": false,
+              "wallSeconds": 6.253130200000669,
+              "allCorrect": true,
+              "completionTokens": 164,
+              "requestWallSeconds": 5.2127625942230225,
+              "outputTokensPerRequestWallSecond": 31.461244788272328,
+              "outputTokensPerWallSecond": 26.226864746872288,
+              "sessionSeconds": [
+                5.032825700000103,
+                5.191519199999675
+              ],
+              "metrics": {
+                "loadedChunks": 0.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 0.0,
+                "preemptions": 0.0,
+                "draftTokens": 0,
+                "acceptedDraftTokens": 0,
+                "draftAcceptance": null
+              }
+            }
+          ]
+        }
+      ],
+      "coding": [
+        {
+          "concurrency": 1,
+          "originalAllCorrect": true,
+          "allCorrect": true,
+          "validation": "saved-program recheck",
+          "wallSeconds": 7.5426392999997915,
+          "completionTokens": 225,
+          "outputTokensPerWallSecond": 29.830406977038688,
+          "metrics": {
+            "loadedChunks": 0.0,
+            "prefetchFailureChunks": 0,
+            "externalHitTokens": 0.0,
+            "preemptions": 0.0,
+            "draftTokens": 0,
+            "acceptedDraftTokens": 0,
+            "draftAcceptance": null
+          }
+        },
+        {
+          "concurrency": 2,
+          "originalAllCorrect": true,
+          "allCorrect": true,
+          "validation": "saved-program recheck",
+          "wallSeconds": 4.827098099999603,
+          "completionTokens": 210,
+          "outputTokensPerWallSecond": 43.504398636526005,
+          "metrics": {
+            "loadedChunks": 0.0,
+            "prefetchFailureChunks": 0,
+            "externalHitTokens": 0.0,
+            "preemptions": 0.0,
+            "draftTokens": 0,
+            "acceptedDraftTokens": 0,
+            "draftAcceptance": null
+          }
+        },
+        {
+          "concurrency": 4,
+          "originalAllCorrect": true,
+          "allCorrect": true,
+          "validation": "saved-program recheck",
+          "wallSeconds": 3.9502337000003536,
+          "completionTokens": 225,
+          "outputTokensPerWallSecond": 56.95865538283972,
+          "metrics": {
+            "loadedChunks": 0.0,
+            "prefetchFailureChunks": 0,
+            "externalHitTokens": 0.0,
+            "preemptions": 0.0,
+            "draftTokens": 0,
+            "acceptedDraftTokens": 0,
+            "draftAcceptance": null
+          }
+        }
+      ],
+      "parallel": [],
+      "prefix": {}
+    }
+  ],
+  "limitations": [
+    "Screening allowed battery operation and did not fix the request seed. Treat timing differences as candidate selection, not controlled performance claims.",
+    "The pressure-wait prototype did not exercise waiting and remains unqualified.",
+    "Controlled near-131K comparisons are running separately; no new serving defaults have been promoted."
+  ]
+}

@@ -197,6 +197,8 @@ class Suite:
                 'max_tokens': LONGBENCH_MAX_NEW_TOKENS if score_answer else 128,
                 'stream': True, 'stream_options': {'include_usage': True},
                 'cache_salt': salt, 'chat_template_kwargs': {'enable_thinking': False}}
+        if getattr(self, 'request_seed', None) is not None:
+            body['seed'] = self.request_seed
         started = time.perf_counter()
         content, reasoning, usage, finish, first = '', '', {}, None, None
         req = urllib.request.Request(BASE + '/v1/chat/completions',
@@ -299,7 +301,7 @@ class Suite:
             mtp = {'drafted': group_after.get(draft_key, 0) - group_before.get(draft_key, 0),
                    'accepted': group_after.get(accept_key, 0) - group_before.get(accept_key, 0)}
             self.save(f'{self.phase}-{case_id}-mtp.json', mtp)
-            if mtp['drafted'] <= 0:
+            if mtp['drafted'] <= 0 and not getattr(self, 'disable_mtp', False):
                 raise RuntimeError(f'No measured MTP drafts for {case_id}')
         return messages, expected, salt
 
@@ -310,6 +312,8 @@ class Suite:
             body = {'model': 'qwen', 'messages': messages, 'max_tokens': 256,
                     'temperature': 0, 'chat_template_kwargs': {'enable_thinking': False}}
             body.update(kwargs)
+            if self.request_seed is not None:
+                body['seed'] = self.request_seed
             return request('/v1/chat/completions', body)
         def check(name, response, passed):
             evidence.append({'test': name, 'passed': bool(passed), 'response': response})
@@ -390,11 +394,18 @@ class Suite:
                     'allCorrect': all(row['correct'] for row in rows),
                     'metricsDelta': {key: value-before.get(key, 0) for key, value in after.items()},
                     'note': 'Global counters overlap per-request intervals; use this group delta once.'})
+        if getattr(self, 'optimization_config', None):
+            from optimization_workloads import run_experiments
+            run_experiments(self, self.optimization_config)
         return persisted
 
     def run(self):
         started = time.monotonic()
         config = json.loads(Path(self.args.config).read_text())
+        self.disable_mtp = config.get('disableMtp', False)
+        self.request_seed = config.get('requestSeed')
+        self.optimization_config = config if config.get('optimizations') else None
+        os.environ['N1X_RESTORE_WAIT_MS'] = str(config.get('restoreWaitMs', 0))
         self.allow_battery = config.get('allowBattery', False)
         self.parallel_context_tokens = config.get('parallelContextTokens', 129000)
         self.parallel_sessions = config.get('parallelSessions', 2)
@@ -433,6 +444,8 @@ class Suite:
                                  'kv_connector_extra_config': {'lmcache.mp.host': '127.0.0.1', 'lmcache.mp.port': 5555}}
                     if config.get('useVmm'):
                         connector['kv_connector_extra_config']['lmcache.mp.use_vmm_api'] = True
+                    if config.get('eagerPrefetch'):
+                        connector['kv_connector_extra_config']['lmcache.mp.eager_prefetch'] = True
                     argv += ['--mamba-cache-mode', 'align', '--kv-transfer-config', json.dumps(connector)]
                 model = self.start(phase + '-model', argv)
                 self.wait_ready(model, BASE, '/health')
