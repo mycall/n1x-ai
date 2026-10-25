@@ -36,18 +36,17 @@ wslc run --rm --gpus all --volume "${PWD}/tests:/tests:ro" `
 
 The segmented test checks shared aliases, physical segment boundaries, and byte integrity. The cache roundtrip test checks concurrent restore admission and exact restored bytes.
 
-For the full service:
+## Service validation
+
+With the [service running](Configuration.md#lifecycle):
 
 ```powershell
-.\n1x.ps1 start
-.\n1x.ps1 wait
 .\n1x.ps1 test
 .\n1x.ps1 test -Suite features
 .\n1x.ps1 test -Suite context
-.\n1x.ps1 stop
 ```
 
-Context checks use bounded default lengths. Larger application contexts, simultaneous restores, and vision workloads need their own capacity validation. Keep generated evidence local; repository documentation describes current operation rather than experiment history.
+Context checks use bounded default lengths. Validate larger contexts, simultaneous restores, and combined vision workloads against application requirements. Test output stays in ignored `.state/checks`; see [Benchmarks](Benchmarks.md#run) for performance and accuracy suites.
 
 ## Repository layout
 
@@ -58,5 +57,6 @@ Context checks use bounded default lengths. Larger application contexts, simulta
 | `profiles/` | Serving profiles and MTP configuration |
 | `runtime/lmcache/` | Cache supervisor, compatibility modules, patch scripts, constraints |
 | `tests/`, `test.ps1`, `check.ps1` | Focused validation |
+| `benchmarks/`, `benchmark.ps1` | Separate API benchmark client; [usage and results](Benchmarks.md) |
 | `wiki/` | User and maintenance documentation |
 | `licenses/`, `NOTICE.md` | Third-party notices |

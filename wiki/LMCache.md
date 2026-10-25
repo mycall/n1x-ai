@@ -4,11 +4,11 @@ The cache profiles run vLLM and LMCache together in one container. LMCache uses 
 
 ## Compatibility
 
-The image pins LMCache 0.5.6, vLLM 0.32.0, PyTorch 2.13.0, and FlashInfer 0.7.0.post1. Local patches provide exportable CUDA VMM allocations, physical segments capped at 2 GiB, alias-safe sharing, staged transfers, bounded admission, and an optional restore queue for WSLC. These are experimental platform adaptations, not an upstream support guarantee. Patch application checks the expected source.
+Local patches provide exportable CUDA VMM allocations, physical segments capped at 512 MiB, alias-safe sharing, staged transfers, bounded admission, and an optional restore queue for WSLC. Smaller physical segments preserve the full KV pool while reducing individual driver allocation sizes. These are experimental platform adaptations, not an upstream support guarantee. See [Development](Development.md#builds) for pinned builds and patch validation.
 
 ## Memory budget
 
-On the target 128 GiB system, use the 88 GiB dedicated GPU partition with the supplied 8 GiB GPU KV and 8 GiB host L1 settings. Leave at least 4 GiB Windows memory available; aim for 6 GiB for browsing and a harness.
+Use the [recommended hardware partition](Installation.md#requirements) with the supplied cache settings. Leave at least 4 GiB Windows memory available; aim for 6 GiB for browsing and a harness.
 
 A hidden PowerShell monitor updates the latest Windows headroom every five seconds while the cache container runs. The supervisor stops both services if available memory drops below `WindowsMinimumGiB` (default 4), or the snapshot becomes unavailable/stale. This guard cannot reserve memory or prevent every transient allocation failure.
 
@@ -24,9 +24,9 @@ For less host-cache pressure, edit `config.local.psd1`:
 
 The restore queue can wait briefly for space released by another restore. It does not increase capacity. The default wait is zero; cold recomputation remains possible on a cache miss or admission failure. Apply changes with `n1x.ps1 recreate`.
 
-## Agent reuse
+## Cache reuse
 
-Keep reusable prompt prefixes and cache salts stable. Append messages rather than rewriting earlier content. Correctness, actual cache hits, and end-to-end latency should all be checked in the consuming application. Chunk size is 2,048 tokens; partial chunks and changed prefixes affect reuse.
+Chunk size is 2,048 tokens; partial chunks and changed prefixes affect reuse. See [API guidance](../AGENTS.md) for prompt construction and cache salts, and [benchmark results](Benchmarks.md#feature-and-cache-validation) for verified restores.
 
 ## Ports and privacy
 

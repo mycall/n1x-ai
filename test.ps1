@@ -3,7 +3,8 @@ param(
     [int[]]$ContextTokens = @(4096, 16384, 31744),
     [string[]]$Tests = @(),
     [int]$Port = 0,
-    [string]$ResultName = 'qualification'
+    [string]$ResultName = 'qualification',
+    [string]$CacheSalt = ''
 )
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
@@ -24,6 +25,7 @@ function Post-Json([string]$Path, $Body) {
 }
 function Chat($Messages, $Extra = @{}) {
     $body = @{model='qwen'; messages=@($Messages); temperature=0; max_tokens=256; chat_template_kwargs=@{enable_thinking=$false}}
+    if($CacheSalt){$body.cache_salt=$CacheSalt}
     foreach ($key in $Extra.Keys) { $body[$key] = $Extra[$key] }
     Post-Json '/v1/chat/completions' $body
 }

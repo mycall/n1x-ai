@@ -9,7 +9,7 @@ from n1x_vmm import checked
 from n1x_vmm_ipc import publish, resolve, withdraw
 
 POOLS = weakref.WeakValueDictionary()
-SEGMENT_BYTES = 2 * 1024**3
+SEGMENT_BYTES = 512 * 1024**2
 
 
 def identity():
@@ -51,7 +51,13 @@ class SegmentedAllocation:
         try:
             while offset < self.size:
                 length = min(segment_max, self.size - offset)
-                handle = checked(cu.cuMemCreate(length, prop, 0))
+                try:
+                    handle = checked(cu.cuMemCreate(length, prop, 0))
+                except RuntimeError as error:
+                    raise RuntimeError(
+                        f'KV VMM allocation failed at {offset}/{self.size} bytes; '
+                        f'segment={length} bytes: {error}'
+                    ) from error
                 try:
                     checked(cu.cuMemMap(self.ptr + offset, length, 0, handle, 0))
                 except RuntimeError:

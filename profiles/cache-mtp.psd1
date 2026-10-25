@@ -5,7 +5,7 @@
     MaxSequences = 16
     KvCacheBytes = '8589934592'
     KvCacheDtype = 'fp8_e4m3'
-    BatchedTokens = 2048
+    BatchedTokens = 4096
     PleWorkers = 32
     CudaGraphMode = 'FULL_AND_PIECEWISE'
     UseLMCache = $true

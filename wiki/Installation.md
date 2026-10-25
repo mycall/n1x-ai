@@ -30,11 +30,4 @@ With `-WithLMCache`, setup selects `cache-mtp`. Omit it to build and select `bas
 
 ## Start and verify
 
-```powershell
-.\n1x.ps1 start
-.\n1x.ps1 wait -TimeoutSeconds 3600
-.\n1x.ps1 test
-.\n1x.ps1 test -Suite features
-```
-
-Initial loading and compilation can take several minutes. Runtime model access is offline after setup. Stop the service with `.\n1x.ps1 stop`.
+Follow the [README quick start](../README.md#quick-start) to start the service and send a request. Runtime model access is offline after setup. See [Troubleshooting](Troubleshooting.md#api-is-not-ready) for startup delays and [Development](Development.md#service-validation) for feature checks.

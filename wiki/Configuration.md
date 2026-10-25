@@ -19,9 +19,15 @@ Settings merge in this order: `config.psd1`, the selected profile in `profiles/`
 | cache | 262,144 | Off | On | 8 GiB FP8 |
 | cache-mtp | 262,144 | One draft token, Triton | On | 8 GiB FP8 |
 
-Cache profiles allow up to 16 scheduled sequences; this is not a guarantee that 16 maximum-length histories fit. KV capacity is shared. Two near-262K or four near-131K text sessions with short replies are useful capacity targets; output length, simultaneous prefill, vision, and other host applications change memory demand.
+Context includes input and output. Cache profiles allow up to 16 scheduled sequences, but concurrent requests share the KV pool. Output length, simultaneous prefill, vision, and host applications affect capacity. See [LMCache](LMCache.md#memory-budget) for memory controls and [Benchmarks](Benchmarks.md) for measured workloads.
 
 MTP changes acceptance and throughput with workload. Choose the profile using representative application requests rather than assuming more draft tokens are faster.
+
+## Scheduling
+
+`BatchedTokens` is the scheduler's per-step token budget, not the number of sessions. The `cache-mtp` profile uses 4,096 so running decodes can share a step with a 2,048-token prefill block. A budget of one block can serialize admission. The non-MTP `cache` profile uses 2,048.
+
+Set `BatchedTokens` in `config.local.psd1` and recreate the service to apply an override; keep the cache block size unchanged. Larger budgets require memory validation. See [overlapping-request measurements](Benchmarks.md#overlapping-requests) for the `cache-mtp` profile.
 
 ## Lifecycle
 

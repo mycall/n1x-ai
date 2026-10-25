@@ -12,7 +12,7 @@ Cold loading and compilation can take minutes. A WSLC transport timeout alone do
 
 If settings differ from the existing container, run `recreate`, then `wait`. Check that another profile is stopped and that your selected Windows port is free.
 
-After a cache container exits unsuccessfully, `start` and `restart` replace it while preserving the model and named volumes. Use `recreate` explicitly if a startup allocation failure persists. The memory monitor must remain active throughout loading; a stale snapshot stops the services.
+After a cache container exits unsuccessfully, `start` and `restart` replace it while preserving the model and named volumes. Use `recreate` explicitly if a startup allocation failure persists.
 
 ## Missing models or PLE table
 
@@ -26,14 +26,14 @@ The launch validates a pinned-revision native-volume manifest. It does not autom
 
 ## Memory or cache failures
 
-Check Windows available memory, the GPU partition, and container logs. Close unnecessary applications, reduce `LmcacheL1GiB`, concurrency, or context demand, then recreate. The memory guard message distinguishes low host memory from a stale/missing monitor. Restart the profile to refresh the monitor; do not disable the guard as a memory fix.
+Check Windows available memory, the GPU partition, and container logs. Adjust the [memory budget](LMCache.md#memory-budget), then recreate. For a stale or missing memory-monitor message, restart the profile to refresh the monitor; do not disable the guard as a memory fix.
 
 For `invalid resource handle` during cache sharing, verify that the cache profile uses the project's patched `n1x-ai:lmcache` image. Rebuild it with `build.ps1 -CacheOnly`. An unpatched upstream image does not include this platform's VMM adaptations.
 
 ## Unexpected responses
 
-Run `n1x.ps1 test` and `n1x.ps1 test -Suite features`. Focused checks cover streaming, JSON, tools, reasoning, and vision; they do not establish general accuracy. Inspect `finish_reason`, give reasoning enough output budget, and validate tool arguments. OCR may emit HTML or truncate. Validate long-context vision separately.
+Run the [service validation checks](Development.md#service-validation), then review the [API guidance](../AGENTS.md) for output budgets, tool calls, and vision responses.
 
 ## Diagnostics
 
-`n1x.ps1 doctor` reports WSLC, images, GPU status, and the configured model path. Local checks write their current output under ignored `.state/checks`. Do not publish model requests or cache contents when sharing diagnostics.
+`n1x.ps1 doctor` reports WSLC, images, GPU status, and the configured model path. Do not publish model requests or cache contents when sharing diagnostics.
