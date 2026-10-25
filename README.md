@@ -9,7 +9,7 @@ See [requirements and installation](wiki/Installation.md) before starting. The L
 Install Git, WSLC with GPU support, and the [Hugging Face CLI](https://huggingface.co/docs/huggingface_hub/guides/cli), then run these commands from the repository in PowerShell:
 
 ```powershell
-.\setup.ps1 -WithLMCache
+.\n1x.ps1 setup
 .\n1x.ps1 start
 .\n1x.ps1 wait
 .\n1x.ps1 test
@@ -18,7 +18,7 @@ Install Git, WSLC with GPU support, and the [Hugging Face CLI](https://huggingfa
 Setup downloads pinned model revisions into `$HOME\models`, builds the images, copies the PLE table into a native volume, and selects the `cache-dflash` profile. Allow substantial disk space and time for downloads and the initial build. To reuse downloaded models:
 
 ```powershell
-.\setup.ps1 -WithLMCache -ModelRoot D:\Models -SkipDownload
+.\n1x.ps1 setup -ModelRoot D:\Models
 ```
 
 The API is OpenAI compatible: **`http://127.0.0.1:8000/v1`**, model **`qwen`**.

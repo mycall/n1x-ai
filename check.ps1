@@ -11,4 +11,5 @@ foreach($file in $files){
 if($LASTEXITCODE -ne 0){throw 'Python tests failed'}
 & "$root/tests/test_configuration.ps1"
 & "$root/tests/test_recovery.ps1"
+& "$root/tests/test_maintenance.ps1"
 Write-Host 'All local checks passed. GPU integration tests are separate; see wiki/Development.md.'

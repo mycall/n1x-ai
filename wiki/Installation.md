@@ -7,12 +7,12 @@
 - Git and the [Hugging Face CLI](https://huggingface.co/docs/huggingface_hub/guides/cli) (`hf`) on PATH. The host Python installation serves tooling; the container has its own pinned Python/runtime environment.
 - Enough SSD space for both downloaded models, the native PLE copy, container images/build layers, and the growing SSD cache. Inspect the model repository sizes before downloading; installation retains the source PLE table as well as its native copy.
 
-Use PowerShell from the repository root. If local script execution is blocked, use the execution policy permitted on your machine, for example `powershell -ExecutionPolicy Bypass -File .\setup.ps1 -WithLMCache`.
+Use PowerShell from the repository root. If local script execution is blocked, use the execution policy permitted on your machine, for example `powershell -ExecutionPolicy Bypass -File .\n1x.ps1 setup`.
 
 ## Setup
 
 ```powershell
-.\setup.ps1 -WithLMCache
+.\n1x.ps1 setup
 ```
 
 Setup downloads these pinned revisions:
@@ -23,11 +23,11 @@ Setup downloads these pinned revisions:
 | [PLE table](https://huggingface.co/Saren/Qwen3.8-Flash-Next-ple-table-fp8) | `50511b0a41aa1d34b8beb7e5d4bb06a0b650dc14` | `ple-table-fp8` |
 | [DFlash2 drafter](https://huggingface.co/incoai/Qwen3.8-Flash-Next-DFlash2), with LMCache setup | `a22a1744e85c17364dcc54a6a420af7135d4c7f6` | `Qwen3.8-Flash-Next-DFlash2` |
 
-The default ModelRoot is the current user's `models` directory. Use `-ModelRoot D:\Models` to change it. Rerun setup after interrupted downloads; `hf` reuses completed files and available partial data.
+This calls `setup.ps1 -WithLMCache`, including DFlash2 preparation. The default ModelRoot is `~\Models`; an existing local ModelRoot is retained. Use `-ModelRoot D:\Models` to change it. Setup skips downloads when required files and Hugging Face metadata match the pinned revision and the files have not been modified since download. This is a fast completeness check, not a full checksum audit. Missing files or metadata fall back to `hf download`, which reuses completed files and available partial data.
 
 For existing downloads, add `-SkipDownload`. Advanced reuse options are `-SkipBuild` and `-SkipPleCopy`; use them only when the required images and verified native PLE volume already exist.
 
-With `-WithLMCache`, setup selects `cache-dflash`. Omit it to build and select `baseline`. Settings are saved in ignored `config.local.psd1`.
+`n1x.ps1 setup` builds LMCache and selects `cache-dflash`. For the smaller baseline installation, use `setup.ps1` directly without `-WithLMCache`. Settings are saved in ignored `config.local.psd1`. Stop the service before setup prepares the native PLE volume.
 
 ## Start and verify
 
@@ -35,4 +35,4 @@ Follow the [README quick start](../README.md#quick-start) to start the service a
 
 ## DFlash2 drafter
 
-LMCache setup includes the DFlash2 drafter. For an existing installation, `prepare-dflash.ps1` downloads the same pinned revision separately into the configured ModelRoot. The BF16 weights require about 1.2 GB of disk space. See the [profile configuration](Configuration.md#dflash2).
+Setup includes the DFlash2 drafter; no separate preparation command is needed. `prepare-dflash.ps1` remains an optional download-only helper for an existing installation. The BF16 weights require about 1.2 GB of disk space. See the [profile configuration](Configuration.md#dflash2).

@@ -61,7 +61,7 @@ At this context limit, vLLM reports approximately 520K tokens of capacity (1.99 
 Both DFlash2 and MTP pass the synthetic multi-turn agent check with thinking enabled and fail it with thinking disabled; see [agent qualification](Benchmarks.md#agent-and-restore-qualification). DFlash2 at concurrency 4 has the highest measured correct-work throughput in that check. Validate your application's tasks; this narrow qualification does not establish general agent reliability.
 
 ```powershell
-.\prepare-dflash.ps1
+# Setup already prepares DFlash2. To switch an existing MTP service:
 .\n1x.ps1 stop -Profile cache-mtp
 .\n1x.ps1 start -Profile cache-dflash
 .\n1x.ps1 wait -Profile cache-dflash -TimeoutSeconds 1800
@@ -79,3 +79,23 @@ The first start compiles additional FlashInfer kernels. Use `-Profile cache-dfla
 - `.state/`: ignored current host-memory snapshot, monitor identity, and local test output.
 
 Named volumes survive stop and recreate. The [SSD cache budget](LMCache.md#ssd-budget) bounds stored KV files; model weights, images, and compilation caches are separate. Cache reuse across engine restarts is not guaranteed by this project.
+
+## Cleanup and disk reclamation
+
+```powershell
+.\n1x.ps1 clean -PrintOnly
+.\n1x.ps1 stop
+.\n1x.ps1 clean
+```
+
+`clean` deletes Git-ignored build sources, environments, logs, benchmark results, and Python caches, including ignored nested checkouts. It preserves tracked and ordinary untracked files, `config.local.psd1`, `.state`, the configured ModelRoot, container images, and named volumes (PLE, compiled kernels, and LMCache). Export any raw benchmark results you want to keep first. Linked paths are refused. Other profiles must also be stopped; cleanup does not stop services automatically.
+
+The command then runs `fstrim -av` in the default WSLC session to release unused Linux blocks. Run from an interactive terminal if WSLC reports an invalid handle. TRIM does not guarantee that Windows immediately reclaims the backing VHDX's physical space.
+
+For offline compaction, first stop every workload using the backing disk and terminate its WSLC session. Then use an **elevated PowerShell** with the actual disk path:
+
+```powershell
+.\n1x.ps1 clean -VhdPath 'D:\WSLC\actual-backing-disk.vhdx'
+```
+
+The path is explicit because WSLC storage can be shared with unrelated containers. This mode requires a detached VHDX and skips WSLC commands to avoid reattaching it. It uses `Optimize-VHD` when available, otherwise Windows DiskPart. DiskPart success detection expects English output; other locales may require manual verification. Compaction preserves data and cannot reclaim blocks still occupied by images or cache volumes. No global image or volume prune is performed.

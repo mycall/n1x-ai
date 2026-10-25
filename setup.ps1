@@ -2,21 +2,20 @@ param([string]$ModelRoot='', [switch]$WithLMCache, [switch]$SkipDownload, [switc
 $ErrorActionPreference='Stop'
 Set-StrictMode -Version Latest
 . "$PSScriptRoot/scripts/config.ps1"
+. "$PSScriptRoot/scripts/models.ps1"
 $config=Get-N1xConfig -Root $PSScriptRoot -Profile baseline -ModelRoot $ModelRoot
 foreach($command in @('git','wslc')){if(-not(Get-Command $command -ErrorAction SilentlyContinue)){throw "Install $command and add it to PATH before setup"}}
-if(-not $SkipDownload -and -not(Get-Command hf -ErrorAction SilentlyContinue)){throw 'Install the Hugging Face CLI (hf) first; see wiki/Installation.md'}
 $models=@(
-    @('Saren/Qwen3.8-Flash-Next-W4A16-AutoRound-hybrid','8b82f0b7abe3d1150a7827d298c75e86267636ae','Qwen3.8-Flash-Next-W4A16-AutoRound-hybrid'),
-    @('Saren/Qwen3.8-Flash-Next-ple-table-fp8','50511b0a41aa1d34b8beb7e5d4bb06a0b650dc14','ple-table-fp8')
+    @('Saren/Qwen3.8-Flash-Next-W4A16-AutoRound-hybrid','8b82f0b7abe3d1150a7827d298c75e86267636ae','Qwen3.8-Flash-Next-W4A16-AutoRound-hybrid','main'),
+    @('Saren/Qwen3.8-Flash-Next-ple-table-fp8','50511b0a41aa1d34b8beb7e5d4bb06a0b650dc14','ple-table-fp8','ple')
 )
 if($WithLMCache){
-    $models+=,@('incoai/Qwen3.8-Flash-Next-DFlash2','a22a1744e85c17364dcc54a6a420af7135d4c7f6','Qwen3.8-Flash-Next-DFlash2')
+    $models+=,@('incoai/Qwen3.8-Flash-Next-DFlash2','a22a1744e85c17364dcc54a6a420af7135d4c7f6','Qwen3.8-Flash-Next-DFlash2','drafter')
 }
 if(-not $SkipDownload){
     New-Item -ItemType Directory -Force $config.ModelRoot|Out-Null
     foreach($model in $models){
-        & hf download $model[0] --revision $model[1] --local-dir (Join-Path $config.ModelRoot $model[2])
-        if($LASTEXITCODE -ne 0){throw 'Model download failed; rerun setup to resume'}
+        Get-N1xModelDownload $model[0] $model[1] (Join-Path $config.ModelRoot $model[2]) $model[3]
     }
 }
 if(-not $SkipBuild){& "$PSScriptRoot/build.ps1" -WithLMCache:$WithLMCache}

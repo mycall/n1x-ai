@@ -15,6 +15,7 @@ function Get-N1xConfig {
     foreach($key in $local.Keys){$config[$key]=$local[$key]}
     if($ModelRoot){$config.ModelRoot=$ModelRoot}
     if(-not $config.ModelRoot){$config.ModelRoot=Join-Path ([Environment]::GetFolderPath('UserProfile')) 'models'}
+    if($config.ModelRoot -match '^~[\\/]'){$config.ModelRoot=Join-Path ([Environment]::GetFolderPath('UserProfile')) $config.ModelRoot.Substring(2)}
     $config.ModelRoot=[IO.Path]::GetFullPath($config.ModelRoot)
     if($Port){$config.Port=$Port}
     if($config.Port -lt 1 -or $config.Port -gt 65535){throw 'Port must be between 1 and 65535'}

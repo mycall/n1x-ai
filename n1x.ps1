@@ -1,5 +1,5 @@
 param(
-    [ValidateSet('start', 'stop', 'restart', 'recreate', 'status', 'wait', 'logs', 'test', 'doctor')]
+    [ValidateSet('setup', 'clean', 'start', 'stop', 'restart', 'recreate', 'status', 'wait', 'logs', 'test', 'doctor')]
     [string]$Action = 'status',
     [string]$Profile = '',
     [string]$ModelRoot = '',
@@ -8,12 +8,25 @@ param(
     [string]$Suite = 'smoke',
     [ValidateRange(1, 86400)]
     [int]$TimeoutSeconds = 3600,
-    [switch]$PrintOnly
+    [switch]$PrintOnly,
+    [switch]$SkipDownload,
+    [switch]$SkipBuild,
+    [switch]$SkipPleCopy,
+    [string]$VhdPath = ''
 )
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 . "$PSScriptRoot/scripts/config.ps1"
+if($Action -eq 'setup'){
+    if($PrintOnly){Write-Output '.\setup.ps1 -WithLMCache -ModelRoot <configured ModelRoot or ~/Models>'; return}
+    & "$PSScriptRoot/setup.ps1" -WithLMCache -ModelRoot $ModelRoot -SkipDownload:$SkipDownload -SkipBuild:$SkipBuild -SkipPleCopy:$SkipPleCopy
+    return
+}
 $config = Get-N1xConfig -Root $PSScriptRoot -Profile $Profile -ModelRoot $ModelRoot -Port $Port
+if($Action -eq 'clean'){
+    & "$PSScriptRoot/scripts/clean.ps1" -Root $PSScriptRoot -ModelRoot $config.ModelRoot -PrintOnly:$PrintOnly -VhdPath $VhdPath
+    return
+}
 $Profile=$config.Profile
 function Get-ConfigFingerprint([string]$LegacyDefault='') {
     $canonical=[ordered]@{}
@@ -134,7 +147,7 @@ switch ($Action) {
         if($config.DFlash -and $config.Mtp){throw 'Select either MTP or DFlash, not both'}
         $drafter = Join-Path $config.ModelRoot 'Qwen3.8-Flash-Next-DFlash2'
         if($config.DFlash -and -not $PrintOnly -and -not(Test-Path "$drafter/model.safetensors")){
-            throw 'Download the DFlash2 checkpoint with prepare-dflash.ps1 first'
+            throw 'Run .\n1x.ps1 setup to prepare the DFlash2 checkpoint'
         }
         if(-not $PrintOnly){
         foreach ($file in @("$model/config.json", "$model/model.safetensors.index.json")) {
