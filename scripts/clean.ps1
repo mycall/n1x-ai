@@ -7,7 +7,7 @@ $prefix=$rootPath+[IO.Path]::DirectorySeparatorChar
 $modelPath=[IO.Path]::GetFullPath($ModelRoot).TrimEnd('\','/')
 # Enumerate files through Git, but delete through PowerShell using literal paths.
 # Never recursively traverse an ignored junction, or remove local configuration.
-$raw=& git -C $rootPath -c core.quotepath=false ls-files --others --ignored --exclude-standard -z
+$raw=& git -C $rootPath -c core.quotepath=false ls-files --others --ignored --exclude-standard --directory -z
 if($LASTEXITCODE -ne 0){throw 'Cannot enumerate ignored files'}
 $files=[Collections.Generic.List[IO.FileInfo]]::new()
 $directories=[Collections.Generic.List[string]]::new()
@@ -17,7 +17,7 @@ $checked=[Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgn
 while($pending.Count){
     $path=[IO.Path]::GetFullPath($pending.Pop()).TrimEnd('\','/')
     if(-not $path.StartsWith($prefix,[StringComparison]::OrdinalIgnoreCase)){throw "Path outside repository: $path"}
-    if($path -eq "$rootPath\config.local.psd1" -or $path -eq "$rootPath\.state" -or $path.StartsWith("$rootPath\.state\",[StringComparison]::OrdinalIgnoreCase) -or
+    if($path -eq "$rootPath\config.local.psd1" -or ($VhdPath -and ($path -eq "$rootPath\.state" -or $path.StartsWith("$rootPath\.state\",[StringComparison]::OrdinalIgnoreCase))) -or
         $path -eq $modelPath -or $path.StartsWith($modelPath+'\',[StringComparison]::OrdinalIgnoreCase)){continue}
     $cursor=$path
     while($cursor -ne $rootPath -and -not $checked.Contains($cursor)){
@@ -46,6 +46,7 @@ foreach($file in $files){$bytes+=$file.Length}
 Write-Host "Ignored files: $($files.Count); bytes: $bytes"
 if($PrintOnly){
     $files | ForEach-Object {Write-Output "Delete: $($_.FullName)"}
+    $directories | Sort-Object Length -Descending | ForEach-Object {Write-Output "Remove if empty: $_"}
     Write-Output 'Trim: wslc system session run /usr/sbin/fstrim -av (skipped during offline VHDX compaction)'
     if($VhdPath){Write-Output "Compact offline: $VhdPath"}
     return
@@ -93,4 +94,4 @@ if($VhdPath){
     if($LASTEXITCODE -ne 0){Write-Warning 'Ignored files cleaned, but WSLC trim failed. Retry from an interactive terminal. No physical disk reclamation is claimed.'}
     Write-Host 'TRIM releases unused Linux blocks; physical Windows reclamation may require offline clean -VhdPath <backing.vhdx> in elevated PowerShell.'
 }
-Write-Host 'Repository cleanup preserved Models, local configuration, and runtime state.'
+Write-Host 'Repository cleanup preserved Models and local configuration.'

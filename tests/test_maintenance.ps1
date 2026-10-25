@@ -9,10 +9,11 @@ New-Item -ItemType Directory -Path $temporary | Out-Null
 try {
     & git init --quiet $temporary
     if($LASTEXITCODE -ne 0){throw 'Fixture git init failed'}
-    [IO.File]::WriteAllText("$temporary/.gitignore","results/`nconfig.local.psd1`nmodels/`n.state/`nnested/`n")
+    [IO.File]::WriteAllText("$temporary/.gitignore",".build/`nresults/`nconfig.local.psd1`nmodels/`n.state/`nnested/`n")
     & git init --quiet "$temporary/nested"
     [IO.File]::WriteAllText("$temporary/nested/source.txt",'ignored checkout')
     foreach($directory in @('results','models','.state')){New-Item -ItemType Directory "$temporary/$directory" | Out-Null}
+    New-Item -ItemType Directory -Force "$temporary/results/empty/child","$temporary/.build/empty/.git/objects/info" | Out-Null
     foreach($file in @('results/disposable.txt','config.local.psd1','models/weights.bin','.state/host.json','untracked.txt')){
         [IO.File]::WriteAllText("$temporary/$file",'keep or clean')
     }
@@ -31,10 +32,20 @@ try {
     if(Test-Path "$temporary/results/disposable.txt"){throw 'Ignored file retained'}
     if(Test-Path "$temporary/nested/source.txt"){throw 'Ignored checkout retained'}
     if(Test-Path "$temporary/nested/.git"){throw 'Empty Git directories retained'}
+    foreach($directory in @('.build','.state','results')){
+        if(Test-Path "$temporary/$directory"){throw "Generated directory retained: $directory"}
+    }
     & "$root/scripts/clean.ps1" -Root $temporary -ModelRoot "$temporary/models" -PrintOnly | Out-Null
-    foreach($file in @('config.local.psd1','models/weights.bin','.state/host.json','untracked.txt')){
+    foreach($file in @('config.local.psd1','models/weights.bin','untracked.txt')){
         if(-not(Test-Path "$temporary/$file")){throw "Protected file deleted: $file"}
     }
+    New-Item -ItemType Directory "$temporary/.build" | Out-Null
+    [IO.File]::WriteAllText("$temporary/.build/tracked.txt",'tracked exception')
+    [IO.File]::WriteAllText("$temporary/.build/disposable.txt",'generated')
+    & git -C $temporary add -f .build/tracked.txt
+    if($LASTEXITCODE -ne 0){throw 'Cannot create tracked-file fixture'}
+    & "$root/scripts/clean.ps1" -Root $temporary -ModelRoot "$temporary/models"
+    if(-not(Test-Path "$temporary/.build/tracked.txt") -or (Test-Path "$temporary/.build/disposable.txt")){throw 'Tracked file inside ignored directory not protected'}
     $model="$temporary/models"
     New-Item -ItemType Directory -Force "$model/.cache/huggingface/download" | Out-Null
     foreach($file in @('config.json','model.safetensors')){
