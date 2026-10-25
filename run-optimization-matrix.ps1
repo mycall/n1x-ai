@@ -17,7 +17,7 @@ if ($LASTEXITCODE -ne 0 -or [int]$gpuMiB -ne 90112) { throw 'This comparison mat
 if (-not $SkipBuild) {
     & wslc build -t n1x-ai:lmcache-optimization-test -f "$PSScriptRoot/cache-tests/Dockerfile.optimizations" "$PSScriptRoot/cache-tests"
     if ($LASTEXITCODE -ne 0) { throw 'Optimization image build failed' }
-    if ($Cases -contains 'pressure-wait-v2') { & "$PSScriptRoot/build-restore-queue-v2.ps1" }
+    if (($Cases -contains 'pressure-wait') -or ($Cases -contains 'pressure-wait-v2')) { & "$PSScriptRoot/build-restore-queue-v2.ps1" }
 }
 # Sequential launches: one model resident at a time. Every run gets a distinct
 # persistent-cache namespace; baseline/eager comparisons cannot inherit hits.
@@ -48,13 +48,7 @@ foreach ($case in $Cases) {
             $options.ParallelRestore=$true; $options.ParallelSessions=2;
             $options.ParallelContextTokens=261000; $options.LmcacheL1GiB=4
         }
-        'pressure-wait' {
-            $options.AgentLoops=$false; $options.SkipConcurrency=$false;
-            $options.ParallelRestore=$true; $options.ParallelSessions=2;
-            $options.ParallelContextTokens=261000; $options.LmcacheL1GiB=4;
-            $options.RestoreWaitMs=2000
-        }
-        'pressure-wait-v2' {
+        { $_ -in @('pressure-wait','pressure-wait-v2') } {
             $options.AgentLoops=$false; $options.SkipConcurrency=$false;
             $options.ParallelRestore=$true; $options.ParallelSessions=2;
             $options.ParallelContextTokens=261000; $options.LmcacheL1GiB=4;
@@ -70,7 +64,7 @@ foreach ($case in $Cases) {
             $options.CodingWorkload=$true; $options.DisableMtp=($case -eq 'mtp-off')
         }
     }
-    if ($case -eq 'pressure-wait-v2') {
+    if ($case -in @('pressure-wait','pressure-wait-v2')) {
         $running=@(& wslc list --format json | Where-Object { $_.Trim() })
         if ($LASTEXITCODE -ne 0 -or $running.Count) { throw 'Queue preflight requires no running containers' }
         $probeLog=Join-Path $PSScriptRoot "results/$($options.RunName)-preflight.log"
@@ -86,4 +80,9 @@ foreach ($case in $Cases) {
     }
     & "$PSScriptRoot/run-cache-tests.ps1" @options
     & "$PSScriptRoot/summarize-memory.ps1" -RunDirectory "$PSScriptRoot/results/$($options.RunName)"
+    if ($case -like 'mtp-*') {
+        $validated=& wslc run --rm --volume "${PSScriptRoot}/cache-tests:/probes:ro" --volume "${PSScriptRoot}/results:/results:ro" --entrypoint python $matrixImage -P /probes/validate_coding_results.py "/results/$($options.RunName)"
+        if($LASTEXITCODE -ne 0){throw 'Saved-program validation failed to execute'}
+        [IO.File]::WriteAllText("$PSScriptRoot/results/$($options.RunName)/coding-validation.json",($validated -join "`n"),[Text.UTF8Encoding]::new($false))
+    }
 }

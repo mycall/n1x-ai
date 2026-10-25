@@ -37,7 +37,7 @@ is user-reported 100 W USB-C. Check `wslc list` for the active container.
 
 ## Runtime
 
-The ongoing agent/cache comparisons are specified in
+The agent/cache comparisons are specified in
 [`OPTIMIZATION_PLAN.md`](OPTIMIZATION_PLAN.md) and launched with
 `run-optimization-matrix.ps1`. Each comparison records its exact image digest.
 For future agent harnesses, keep system instructions, tool definitions, and
@@ -88,8 +88,7 @@ are open. These thresholds are recorded in `memory-budget.psd1`; memory captures
 and benchmark summaries report violations. They are qualification criteria,
 not an operating-system reservation. Browser and harness growth must fit within
 this headroom. Windows and guest available memory must not be added together.
-LMCache qualification takes priority over the next one- and two-session context
-tests. Its RAM pool, transfer buffers, process overhead, and filesystem cache must
+LMCache's RAM pool, transfer buffers, process overhead, and filesystem cache must
 all fit this budget; no large host cache is assumed affordable. LMCache is
 installed in a separate test image and is not qualified as the serving default.
 
@@ -114,6 +113,47 @@ directly and does not install Docker Engine.
 ## Build and run
 
 ### Unified cache qualification
+
+The verified experimental cache path uses **88 GiB dedicated GPU, 8 GiB GPU KV,
+and 8 GiB host L1**, with segmented VMM sharing, bounded demand admission,
+FP8-e4m3 KV, BF16 recurrent state, and 2,048-token blocks. Batch 2048 delivered
+38–48% more correct warm agent turns per second than batch 8192 at four
+near-131K sessions. MTP helps the short coding fixtures; MTP-off was modestly
+faster in the four-agent inventory loop. Both passed focused vision checks and
+two near-262K restores. OCR has also failed intermittently; validate responses.
+
+The [core audit](optimization-audit.json) and
+[controlled results](efficiency-results.json) record the measured scope.
+The [optimization plan](OPTIMIZATION_PLAN.md) covers interpretation and limits;
+[AGENTS.md](AGENTS.md) gives minimal API-consumer guidance.
+
+After preparing the downloaded models, native PLE volume, stopped
+`candidate-16` container definition, and segmented/admission/optimization images,
+repeat the controlled comparison with external USB-C power connected:
+
+```powershell
+.\run-efficiency-tests.ps1
+```
+
+The runner uses one model at a time, a fixed request seed, unique cache
+namespaces, and the 4 GiB Windows guard / 6 GiB headroom target. It scores
+checked tool/answer turns, reporting cold and forced-restore costs separately.
+The completed [MTP-off follow-up](efficiency-followup-results.json) covers its
+smaller-concurrency and long-context checks. At batch 2048, MTP-on was faster
+with one or two agents; MTP-off gave a modest 4–6% advantage at four. Both
+modes passed twelve growing turns at concurrency 1/2/3/4 and two near-262K
+restores. Four clients were the fastest tested point for this work unit.
+See the full table in the optimization plan. These qualification
+containers stop after completion; they do not provide a persistent service.
+
+With only 4 GiB host L1, the experimental sparse restore queue admitted a
+second near-262K restore after 53 ms and avoided recomputation: both requests
+completed in about five seconds. This path requires the revision-2 child
+image; `run-optimization-matrix.ps1` selects it for `pressure-wait`. The normal
+8 GiB-L1 comparisons keep waiting disabled.
+
+<details>
+<summary>Earlier LMCache investigation and qualification history</summary>
 
 **Two near-262K sessions tested:** `results/cache-two-262k-20261024-172717`
 completed 18 recorded requests. Two 260,988-token prompts returned correct
@@ -329,14 +369,6 @@ the resolved package list is stored in `/opt/lmcache-runtime-packages.txt`.
 The original serving image is preserved. This is an experimental qualification
 runner, not a promoted default profile.
 
-Warm-agent tuning uses correct tool/answer turns per second as its primary
-score. See [the controlled protocol](efficiency-protocol.json),
-[screening evidence](optimization-results.json), and
-[the optimization plan](OPTIMIZATION_PLAN.md). `run-efficiency-tests.ps1`
-compares growing near-131K sessions at concurrency 1/2/3/4 with fixed seed
-and external power required; cold and forced-restore turns are scored
-separately. The controlled follow-up is still running.
-
 The current test-runner default is **FP8-e4m3 KV with a 4,000 MiB pool and
 2,048-token blocks**;
 this does not change `n1x.ps1` serving defaults. The first BF16/10 GB LMCache
@@ -384,6 +416,8 @@ configuration, but its engine restart was followed by container-launch
 timeouts in this session. Terminating the idle WSLC session and letting WSLC
 start its normal engine restored launches. Local-image builds with proxy
 secrets do not require that engine restart.
+
+</details>
 
 ### Normal serving
 

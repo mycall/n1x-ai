@@ -74,7 +74,11 @@ def summarize(root):
     for stage in ('cold','gpu-warm','gpu-reset'):
         data = read(root/f'lmcache-parallel-{stage}.json')
         if data:
+            responses=[requests.get(identifier,{}) for identifier in data['requests']]
             record['parallel'].append({'stage': stage, 'allCorrect': data['allCorrect'],
+                                      'requestCount':len(responses),
+                                      'promptTokens':[row.get('usage',{}).get('prompt_tokens',0) for row in responses],
+                                      'allResponsesCorrect':all(row.get('correct') is True and row.get('finishReason')=='stop' for row in responses),
                                       'metrics': cache_metrics(data['metricsDelta'])})
     return record
 

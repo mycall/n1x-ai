@@ -2,6 +2,34 @@
 
 Baseline local commit: `b1cb162`. No push requested or performed.
 
+All seven experiment groups, the controlled primary comparison, and the MTP-off
+follow-up are complete. The core audit passes with no missing checks; both
+controlled reports are qualified. Evidence is in `optimization-audit.json`,
+`optimization-results.json`, `efficiency-results.json`, and
+`efficiency-followup-results.json`.
+
+Batch 2048 is the clear warm-workload improvement. At concurrency four it
+outperformed batch 8192 by 38–48%, with about 3.1 GiB less GPU memory; five
+warm turns amortized the observed cold penalty. MTP choice depends on workload:
+it improved one- and two-agent throughput and the short coding fixtures,
+while disabling it gave a modest 4–6% advantage in the four-agent inventory loop.
+
+Correct inventory/tool turns per second at batch 2048 (before / after resume):
+
+| Concurrent clients | MTP on | MTP off |
+| --- | --- | --- |
+| 1 | 0.3073 / 0.2546 | 0.2543 / 0.2221 |
+| 2 | 0.3415 / 0.2935 | 0.3034 / 0.2665 |
+| 3 | 0.3876 / 0.3130 | 0.3608 / 0.3241 |
+| 4 | 0.4080 / 0.3326 | 0.4231 / 0.3540 |
+
+Four clients are the fastest tested point for this fixed work unit and memory
+budget. Each turn includes a real tool-call/result and checked JSON answer.
+Resume cohorts can use different cache paths; these are not pure decode rates.
+Both MTP modes passed twelve growing turns at every concurrency and two
+near-262K restores. The experimental revision-2 queue also restored both
+near-262K requests with only 4 GiB host L1, avoiding the earlier recomputation.
+
 Preserve 88 GiB dedicated GPU, 8 GiB GPU KV, 8 GiB LMCache host L1, MTP1,
 FP8 KV, BF16 recurrent state, max sequences 16, native SSD PLE, and outbound
 telemetry disabled. Windows availability floor remains 4 GiB, target 6 GiB.
@@ -59,7 +87,7 @@ measured DRAM bandwidth against the published 300 GB/s ceiling.
    configured deadline, then use existing bounded admission/fallback. Only the
    single-L1 topology is covered. Metadata snapshot uses private manager fields;
    test-image source guards and probes are required on upgrades. Unit tests and
-   actual 64 MiB L1 probe pass; full controller/model comparison pending. Initial
+   actual 64 MiB L1 probe pass; the full-model result is recorded below. Initial
    probe caught misuse of unsafe_read as a residency query; fixed with a locked
    metadata snapshot. Evidence: `results/restore-queue-probe.log`.
    Matched pressure baseline `opt-20261024-pressure-immediate` completed all
@@ -77,14 +105,27 @@ measured DRAM bandwidth against the published 300 GB/s ceiling.
    Four new unit tests and an actual L1/native-bitmap probe pass: 192 MiB logical
    demand becomes 32 MiB selected demand in a 64 MiB pool; locked buffers cause
    deferral and release permits admission. Evidence:
-   `results/restore-queue-v2-probe.log`. Full-model follow-up pending after the
-   original matrix. Use `run-optimization-worker.ps1 -RunPrefix opt-20261024
-   -CaseList pressure-wait-v2 -AllowBattery -SkipBuild` once the current worker
-   finishes. The separate queue child image records the original comparison
+   `results/restore-queue-v2-probe.log`. To repeat the full-model case on an idle
+   GPU, use `run-optimization-worker.ps1 -RunPrefix opt-queue-followup
+   -CaseList pressure-wait-v2 -SkipBuild`. The separate queue child image records the original comparison
    image as its parent; it does not replace the frozen batching/MTP image.
    That case first runs `probe_mp_restore_queue_v2.py` with no full model loaded:
    two real MP/SSD restores must wait/release correctly in a 64 MiB L1, and both
-   GPU destinations must match their original bytes. This preflight is pending.
+   GPU destinations must match their original bytes. The corrected preflight
+   passed in `results/queue-preflight-nonzero.log`: two byte-correct restores,
+   with the second admitted 0.104 seconds after waiting for the first release.
+   The full-model pressure comparison also passed in
+   `opt-20261024-queue-after-collect-pressure-wait-v2`: both near-262K sessions
+   restored correctly with 254 chunks / 516,096 external-hit tokens, zero
+   declined prefetch chunks and zero preemptions. A real 3.46 GiB load plan
+   waited 53 ms for L1 space, then was admitted before its 2-second deadline.
+   Reset requests completed in 4.59 / 4.95 seconds, compared with about 92.3
+   seconds and only one restored prefix in the immediate-admission baseline.
+   This verifies the bounded queue in the tested single-L1 topology; it does
+   not establish arbitrary concurrent-load behavior. Future matrix
+   `pressure-wait` runs use revision 2; the earlier revision-1 result is retained
+   as a failed prototype. The original matrix audit now passes all checks:
+   `optimization-audit.json`.
 6. **Prefill batches at concurrency 1/2/4.** Run 8192, 2048 and 4096 batched
    tokens with the same 32K agent-loop sweep. Compare throughput and per-session
    latency, including cache restore, and record peak memory. One model load per
@@ -102,13 +143,13 @@ measured DRAM bandwidth against the published 300 GB/s ceiling.
    seconds for 2048, 4.40 / 7.40 / 13.40 for 4096, and 4.39 / 7.44 / 12.41 for
    8192. Peak sampled GPU memory was 82.37 / 83.20 / 85.60 GiB respectively.
    Evidence: `results/prefill-comparison.json`. The warm-heavy preference favors
-   2048 in these measurements; long-context requalification is still pending.
+   2048 in these measurements; long-context requalification is recorded below.
    The same 31,983-token retrieval at 2048 restored 30,720 tokens,
    versus 28,672 at batch 8192. Its GPU-warm path reused 28,672 GPU tokens plus
    2,048 external tokens. The extra reusable checkpoint leaves one fewer block
    to recompute. Single-client agent warm/resume harness times were 4.09–4.46
-   seconds versus 5.27–5.73 at 8192. Final profile conclusions await the controlled
-   long-context comparisons. If the selected profile changes the reference
+   seconds versus 5.27–5.73 at 8192. Controlled long-context conclusions are
+   recorded below. If a future selected profile changes the reference
    settings, requalify it with two near-262K clients and growing near-131K
    agent histories before recommending it for those capacities.
    User preference: optimize the warm-heavy agent workflow. In the four-client
@@ -153,15 +194,46 @@ solely because it schedules through LMCache. Explicit concurrency
 concurrency 4. `run-efficiency-tests.ps1` uses a distinct image descended from
 the frozen comparison image; only the client controls/validator change.
 This bounded search does not establish theoretical FLOP utilization or a
-global optimum. Four simultaneous near-131K sessions and two near-262K
-sessions must still qualify at the candidate batch before promotion.
+global optimum. Long-context capacity and growing agent histories must qualify
+at a candidate setting before promotion.
 
 Controlled candidate `eff-20261024-batch2048-mtp` has passed the two near-262K
 cold/warm/reset check: both restored answers were correct, with 256 loaded
 chunks, 520,192 external-hit tokens, no prefetch failures, and no preemptions.
-Restored total latencies were 2.51 and 3.75 seconds. The growing near-131K
-concurrency sweep is still running; these partial results do not promote a
-serving default.
+Restored total latencies were 2.51 and 3.75 seconds. The entire growing
+near-131K sweep at concurrency 1/2/3/4 also passed all twelve turns and forced
+restores (258 tracked requests overall). Warm correct turns per second before /
+after GPU reset were 0.3073 / 0.2546, 0.3415 / 0.2935, 0.3876 / 0.3130,
+and 0.4080 / 0.3326 respectively. Four clients lead the tested MTP concurrency
+settings by about 5–6% over three, with higher per-session latency. The
+four-client run accepted all 1,968 draft tokens, with no measured preemptions
+or declined prefetch chunks. Sampled GPU peak was 82.49/88 GiB and paired
+Windows availability stayed above 9.80 GiB. The completed controlled batch-8192
+reference passed all twelve agent turns and all six feature checks on its
+latest attempt. At concurrency four, its before/after-resume rates were
+0.2766 / 0.2403 correct turns per second, versus 0.4080 / 0.3326 at batch 2048:
+about 48% / 38% more throughput with the smaller batch. Cold HTTP group spans
+were 184.44 versus 203.68 seconds, while warm groups saved about 4.6 seconds
+each at 2048; five warm turns amortize this observed cold penalty. Each
+tool/answer group at 2048 reused 16,384 more prefix tokens, with only tiny
+input-token-count differences, consistent with less suffix recomputation.
+The MTP-off four-client run also completed all twelve turns and all six feature
+checks. Its rates were 0.4231 / 0.3540 correct turns per second, about 3.7% /
+6.4% above MTP-on at batch 2048. GPU peak was 77.31 GiB and paired Windows
+availability stayed above 9.67 GiB. This is a modest tool-loop improvement;
+it does not meet the primary protocol's strong-preference threshold in both
+cohorts, and MTP helped the separate short coding fixtures.
+
+`efficiency-followup-protocol.json` completes the MTP-off concurrency 1/2/3
+points and two near-262K restores, reusing its completed concurrency-four
+result. It uses the same frozen image, seed, 8 GiB KV and 8 GiB L1 budgets.
+The follow-up completed after the full-model sparse-queue pressure comparison:
+162 tracked requests, all six feature checks, all twelve turns at concurrency
+1/2/3, and two near-262K cold/warm/reset sessions passed. The reset stage loaded
+256 chunks / 520,192 external-hit tokens; both responses were correct, with no
+declined prefetch chunks or preemptions. Its stopping rule excludes new memory
+budgets and tuning dimensions. The work establishes experimental qualification;
+sustained production use and combined near-limit vision remain unqualified.
 
 The completed single-agent candidate loop shows a useful distinction: turns
 1–5 reuse 258,048 GPU tokens plus 4,096 external tokens across each tool/answer
@@ -179,16 +251,36 @@ to thermals or treat host-cache hits as local GPU hits.
 The original nine-case screening matrix completed. Exact saved programs from
 both MTP runs passed all twelve corrected executable checks. The initial
 pressure-wait prototype did not actually wait, so it remains an unqualified
-optimization. Its replacement must pass a real MP/SSD byte-correctness
-preflight before another full-model trial.
+optimization. Its revision-2 replacement passed the real MP/SSD byte-correctness
+preflight and the full-model pressure trial described above.
 
 The first MP/SSD queue preflights timed out waiting for two stored chunks:
 the fixture used GPU block zero, which the installed LMCache treats as a null
 sentinel. Only one chunk was committed. The corrected fixture uses nonzero
-source and destination blocks; it still needs to pass on an idle GPU. These
+source and destination blocks; it passed on the idle GPU. Those initial
 failures did not exercise or validate the replacement queue. The controlled
 warm-throughput runs use the ordinary bounded cache path with restore waiting
 disabled.
+
+The first controlled batch-8192 reference, `eff-20261024-batch8192-mtp`,
+stopped at OCR with HTML output and finish reason `length`. No agent timing
+comparison ran in that attempt. The unchanged retry
+`eff-20261024-retry-batch8192-mtp` reproduced the failure. The next collection,
+`eff-20261024-collect-batch8192-mtp`, retains the same frozen image and text
+request code, with an explicit read-only wrapper that catches only this exact
+OCR rejection. Its SHA is captured and checked. The failure remains in the
+feature artifact, later feature checks are unattempted, and a rejected reference
+is excluded from recommendations while its text-agent timing is collected.
+Memory guards and other feature failures still stop the run. The report
+separates experiment completion from profile qualification. On this collection,
+OCR and all other feature gates passed, so the exception wrapper was not used
+to bypass any rejection. Earlier failed attempts remain recorded as an
+intermittent OCR limitation. MTP-off retains
+the normal gates. The completed batch-2048 candidate is reused
+by immutable image identity. `run-efficiency-tests.ps1 -CaseList` and
+`results/<prefix>-overrides.json` preserve failed attempts without rerunning
+completed cases. All six feature gates remain required for a recommended
+profile; failures are not converted into passes.
 
 `run-cache-tests.ps1 -Optimizations -Segmented -Admission -Vmm` selects the
 separate `n1x-ai:lmcache-optimization-test` image. Other controls:
@@ -199,8 +291,8 @@ separate `n1x-ai:lmcache-optimization-test` image. Other controls:
 - `-EagerPrefetch`, `-RestoreWaitMs 1000`, `-PrefillBatchTokens 4096`, `-DisableMtp`
 - `-SkipConcurrency` skips the older fixed parallel workload; agent loops still run.
 
-All experimental defaults are off. Keep the qualified serving defaults unchanged
-until these comparisons and sustained-use checks provide evidence for promotion.
+Experimental options remain opt-in. The tested configuration and measured
+workload limits should accompany any later serving-profile promotion.
 
 The matrix paused after its first successful run because memory postprocessing
 accessed an absent `server` property under inherited PowerShell strict mode.

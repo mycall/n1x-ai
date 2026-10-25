@@ -8,6 +8,7 @@ param(
     [switch]$Optimizations,
     [switch]$AgentLoops,
     [switch]$AgentConcurrencySweep,
+    [switch]$CollectRejectedReference,
     [ValidateRange(1,16)][int[]]$AgentConcurrencies = @(),
     [int]$RequestSeed = 0,
     [switch]$PrefixExperiment,
@@ -42,6 +43,7 @@ if (($Optimizations -or $AgentLoops -or $AgentConcurrencySweep -or $PrefixExperi
     throw 'Optimization experiments require -Optimizations -Segmented -Admission -Vmm'
 }
 if (($TestImageOverride -or $RestoreQueueVersion -ne 1) -and -not $Optimizations) { throw 'Image/queue overrides require -Optimizations' }
+if ($CollectRejectedReference -and -not $Optimizations) { throw 'Rejected-reference collection requires optimization mode' }
 $root = $PSScriptRoot
 $out = Join-Path $root "results/$RunName"
 if (Test-Path $out) { throw 'RunName already exists; choose a new name. Completed evidence will not be overwritten.' }
@@ -101,6 +103,7 @@ if ($BlockSize -gt 0) { $modelArgs += @('--block-size',[string]$BlockSize) }
     agentTurns=$AgentTurns; agentContextTokens=$AgentContextTokens; eagerPrefetch=[bool]$EagerPrefetch; disableMtp=[bool]$DisableMtp;
     agentConcurrencySweep=[bool]$AgentConcurrencySweep;
     agentConcurrencies=@($AgentConcurrencies); requestSeed=$RequestSeed;
+    collectRejectedReference=[bool]$CollectRejectedReference;
     restoreWaitMs=$RestoreWaitMs; restoreQueueVersion=$RestoreQueueVersion; prefillBatchTokens=$PrefillBatchTokens;
     lmcacheChunkSize=$(if ($BlockSize -gt 0) { $BlockSize } elseif ($KvCacheDtype -eq 'fp8_e4m3') { 1616 } else { 816 });
     note='Both comparison phases use this same precision and KV capacity. FP8 is experimental; not a BF16 quality-equivalence claim.'} | ConvertTo-Json -Depth 10), $utf8)
@@ -113,6 +116,10 @@ $arguments = @('run','-d','--name',$name,'--label','n1x-ai.managed=true','--labe
     '--volume','n1x-ple-native:/ple-table-fp8:ro','--volume','n1x-qwen38-cache:/root/.cache',
     '--volume','n1x-lmcache-tests:/lmcache','--volume',"${root}/profiles:/profiles:ro",
     '--volume',"${data}:/data:ro",'--volume',"${out}:/results")
+if ($CollectRejectedReference) {
+    Copy-Item -LiteralPath "$root/cache-tests/collect_rejected_reference.py" -Destination "$out/collect_rejected_reference.py"
+    $arguments+=@('--volume',"${out}/collect_rejected_reference.py:/suite/collect_rejected_reference.py:ro",'--entrypoint','python')
+}
 foreach ($environment in $old.Config.Env) { $arguments += @('--env', $environment) }
 # Local test-only cache reset API; the published port is restricted to loopback.
 $arguments += @('--env','VLLM_SERVER_DEV_MODE=1')
@@ -125,12 +132,15 @@ $imageRaw = & wslc image inspect $testImage
 if ($LASTEXITCODE -ne 0) { throw 'Cannot resolve test image' }
 $imageInfo = @(($imageRaw -join "`n") | ConvertFrom-Json)[0]
 $imageRecord=@{tag=$testImage; id=$imageInfo.Id}
+if ($CollectRejectedReference) { $imageRecord.clientWrapperSha256=(Get-FileHash "$out/collect_rejected_reference.py" -Algorithm SHA256).Hash.ToLowerInvariant() }
 if ($RestoreQueueVersion -eq 2) {
     $imageRecord.baseImageId=$imageInfo.Config.Labels.'n1x-ai.comparison-base'
     if ($imageInfo.Config.Labels.'n1x-ai.restore-queue-version' -ne '2') { throw 'Queue-version label does not match requested revision' }
 }
 [IO.File]::WriteAllText((Join-Path $out 'test-image.json'), ($imageRecord | ConvertTo-Json), $utf8)
-$arguments += @($imageInfo.Id,'--run-id',$RunName,'--config','/results/run-config.json','--lengths')
+$arguments += @($imageInfo.Id)
+if ($CollectRejectedReference) { $arguments+=@('/suite/collect_rejected_reference.py') }
+$arguments += @('--run-id',$RunName,'--config','/results/run-config.json','--lengths')
 $arguments += @($ContextTokens | ForEach-Object { [string]$_ })
 if (-not $SkipConcurrency) { $arguments += '--concurrency' }
 $stop = Join-Path $out 'host-monitor.stop'

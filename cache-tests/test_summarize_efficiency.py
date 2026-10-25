@@ -1,14 +1,70 @@
 """The primary score counts correct turns, independent of verbosity and pauses."""
 import json
+import copy
 from pathlib import Path
 import tempfile
 import unittest
 from datetime import datetime, timezone
 
-from summarize_efficiency import score
+from summarize_efficiency import score, qualify
 
 
 class ScoreTests(unittest.TestCase):
+    def test_qualification_checks_launch_context_and_restore_evidence(self):
+        protocol={'requestSeed':0,'agentTurns':12,
+            'fixed':{'lmcacheL1GiB':8,'gpuKvGiB':8,'agentContextTarget':131000},
+            'constraints':{'windowsGuardGiB':4,'windowsTargetGiB':6},
+            'profiles':[{'batch':2048,'mtp':True,'concurrencies':[1],'twoNear262K':True}]}
+        run={'directory':'fixture','status':'complete','config':{
+            'requestSeed':0,'agentTurns':12,'prefillBatchTokens':2048,'disableMtp':False,
+            'lmcacheL1GiB':8,'parallelSessions':2,'parallelContextTokens':261000,
+            'modelArgs':['--max-num-batched-tokens','2048','--max-model-len','262144',
+                '--max-num-seqs','16','--kv-cache-memory-bytes','8589934592',
+                '--kv-cache-dtype','fp8_e4m3','--mamba-ssm-cache-dtype','bfloat16']},
+            'image':{'id':'sha256:'+'a'*64},'powerStates':['Online'],'powerSamples':5,
+            'featuresPassed':True,'allWindowsMinimumGiB':9,
+            'memory':{'gpuReportedCapacityGiB':88,'lowestWindowsSample':{'availableGiB':9}},
+            'agents':[{'concurrency':1,'complete':True,'allCorrect':True,
+                'historyPromptTokens':{'0':list(range(131000,131012))},
+                'metrics':{'draftTokens':12,'preemptions':0,'prefetchFailureChunks':0},
+                'restore':[{'turn':6,'metrics':{'loadedChunks':1}}]}],
+            'parallel':[{'stage':stage,'allCorrect':True,'allResponsesCorrect':True,
+                'requestCount':2,'promptTokens':[260988,260988],
+                'metrics':{'externalHitTokens':520192,'loadedChunks':256}}
+                for stage in ('cold','gpu-warm','gpu-reset')]}
+        self.assertEqual(qualify([run],protocol),([],[]))
+        invalid=copy.deepcopy(run)
+        invalid['config']['modelArgs'][3]='32768'
+        invalid['parallel'][2]['promptTokens']=[32000,32000]
+        invalid['parallel'][2]['metrics']['externalHitTokens']=258048
+        invalid['agents'][0]['historyPromptTokens']['0']=[131000]*12
+        invalid['agents'][0]['restore'][0]['turn']=7
+        invalid['allWindowsMinimumGiB']=3.9
+        errors,_=qualify([invalid],protocol)
+        for fragment in ('launch argument','direct response','two full external',
+                         'growing histories','required turn','below guard'):
+            self.assertTrue(any(fragment in error for error in errors),errors)
+        # Correct bounded fallback remains eligible, with its measured cost.
+        pressure=copy.deepcopy(run)
+        pressure['agents'][0]['metrics'].update(preemptions=2,prefetchFailureChunks=3)
+        errors,warnings=qualify([pressure],protocol)
+        self.assertEqual(errors,[])
+        self.assertEqual(len(warnings),2)
+        reference=copy.deepcopy(run)
+        reference['featuresPassed']=False
+        reference['config'].update(collectRejectedReference=True,prefillBatchTokens=8192)
+        reference['config']['modelArgs'][1]='8192'
+        reference['referenceWrapperVerified']=True
+        reference['referenceFeatureRejection']={'qualified':False,'error':'Feature check failed: vision_ocr'}
+        reference_protocol=copy.deepcopy(protocol)
+        reference_protocol['profiles'][0].update(name='batch8192-mtp',batch=8192)
+        errors,_=qualify([reference],reference_protocol)
+        self.assertEqual(errors,[])
+        self.assertFalse(reference['qualified'])
+        reference['referenceWrapperVerified']=False
+        errors,_=qualify([reference],reference_protocol)
+        self.assertTrue(any('feature checks incomplete' in error for error in errors))
+
     def test_warm_score_excludes_cold_restore_and_metrics_pause(self):
         with tempfile.TemporaryDirectory() as directory:
             root=Path(directory)

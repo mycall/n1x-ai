@@ -1,0 +1,67 @@
+{
+  "complete": true,
+  "errors": [],
+  "cases": {
+    "agents": {
+      "directory": "results\\opt-20261024-agents",
+      "status": "complete",
+      "error": null,
+      "windowsMinimumGiB": 10.084686279296875
+    },
+    "eager": {
+      "directory": "results\\opt-20261024-eager-retry",
+      "status": "complete",
+      "error": null,
+      "windowsMinimumGiB": 9.08150863647461
+    },
+    "pressure-immediate": {
+      "directory": "results\\opt-20261024-pressure-immediate",
+      "status": "complete",
+      "error": null,
+      "windowsMinimumGiB": 11.099536895751953
+    },
+    "pressure-wait": {
+      "directory": "results\\opt-20261024-queue-after-collect-pressure-wait-v2",
+      "status": "complete",
+      "error": null,
+      "queueImage": "sha256:acb42feea33f88513ae3317ea02715b1b30463c7016a0593857e96ed060a5fca",
+      "queueVersion": 2,
+      "windowsMinimumGiB": 10.554191589355469
+    },
+    "prefill-8192": {
+      "directory": "results\\opt-20261024-prefill-8192",
+      "status": "complete",
+      "error": null,
+      "windowsMinimumGiB": 9.443580627441406
+    },
+    "prefill-2048": {
+      "directory": "results\\opt-20261024-prefill-2048",
+      "status": "complete",
+      "error": null,
+      "windowsMinimumGiB": 9.399673461914062
+    },
+    "prefill-4096": {
+      "directory": "results\\opt-20261024-prefill-4096",
+      "status": "complete",
+      "error": null,
+      "windowsMinimumGiB": 9.420516967773438
+    },
+    "mtp-on": {
+      "directory": "results\\opt-20261024-mtp-on",
+      "status": "complete",
+      "error": null,
+      "windowsMinimumGiB": 9.30154800415039,
+      "codingAllCorrect": true,
+      "codingVerifiedAllCorrect": true
+    },
+    "mtp-off": {
+      "directory": "results\\opt-20261024-mtp-off",
+      "status": "complete",
+      "error": null,
+      "windowsMinimumGiB": 9.426471710205078,
+      "codingAllCorrect": true,
+      "codingVerifiedAllCorrect": true
+    }
+  },
+  "note": "Completion means comparisons executed and evidence exists. Accuracy regressions and power limits still require interpretation."
+}

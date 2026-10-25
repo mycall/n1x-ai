@@ -1,6 +1,73 @@
 {
-  "stage": "screening-complete-controlled-follow-up-running",
+  "stage": "complete",
   "primaryObjective": "Correct warm agent turns per second",
+  "audit": {
+    "complete": true,
+    "errors": [],
+    "cases": {
+      "agents": {
+        "directory": "results\\opt-20261024-agents",
+        "status": "complete",
+        "error": null,
+        "windowsMinimumGiB": 10.084686279296875
+      },
+      "eager": {
+        "directory": "results\\opt-20261024-eager-retry",
+        "status": "complete",
+        "error": null,
+        "windowsMinimumGiB": 9.08150863647461
+      },
+      "pressure-immediate": {
+        "directory": "results\\opt-20261024-pressure-immediate",
+        "status": "complete",
+        "error": null,
+        "windowsMinimumGiB": 11.099536895751953
+      },
+      "pressure-wait": {
+        "directory": "results\\opt-20261024-queue-after-collect-pressure-wait-v2",
+        "status": "complete",
+        "error": null,
+        "queueImage": "sha256:acb42feea33f88513ae3317ea02715b1b30463c7016a0593857e96ed060a5fca",
+        "queueVersion": 2,
+        "windowsMinimumGiB": 10.554191589355469
+      },
+      "prefill-8192": {
+        "directory": "results\\opt-20261024-prefill-8192",
+        "status": "complete",
+        "error": null,
+        "windowsMinimumGiB": 9.443580627441406
+      },
+      "prefill-2048": {
+        "directory": "results\\opt-20261024-prefill-2048",
+        "status": "complete",
+        "error": null,
+        "windowsMinimumGiB": 9.399673461914062
+      },
+      "prefill-4096": {
+        "directory": "results\\opt-20261024-prefill-4096",
+        "status": "complete",
+        "error": null,
+        "windowsMinimumGiB": 9.420516967773438
+      },
+      "mtp-on": {
+        "directory": "results\\opt-20261024-mtp-on",
+        "status": "complete",
+        "error": null,
+        "windowsMinimumGiB": 9.30154800415039,
+        "codingAllCorrect": true,
+        "codingVerifiedAllCorrect": true
+      },
+      "mtp-off": {
+        "directory": "results\\opt-20261024-mtp-off",
+        "status": "complete",
+        "error": null,
+        "windowsMinimumGiB": 9.426471710205078,
+        "codingAllCorrect": true,
+        "codingVerifiedAllCorrect": true
+      }
+    },
+    "note": "Completion means comparisons executed and evidence exists. Accuracy regressions and power limits still require interpretation."
+  },
   "runs": [
     {
       "directory": "results\\opt-20261024-agents",
@@ -109,6 +176,8 @@
           "status": "complete",
           "metrics": {
             "loadedChunks": 1472.0,
+            "gpuHitTokens": 645120.0,
+            "gpuQueriedTokens": 4210976.0,
             "prefetchFailureChunks": 0,
             "externalHitTokens": 2967552.0,
             "preemptions": 0.0,
@@ -134,6 +203,8 @@
               ],
               "metrics": {
                 "loadedChunks": 64.0,
+                "gpuHitTokens": 387072.0,
+                "gpuQueriedTokens": 1050980.0,
                 "prefetchFailureChunks": 0,
                 "externalHitTokens": 129024.0,
                 "preemptions": 0.0,
@@ -159,6 +230,8 @@
               ],
               "metrics": {
                 "loadedChunks": 448.0,
+                "gpuHitTokens": 129024.0,
+                "gpuQueriedTokens": 1052156.0,
                 "prefetchFailureChunks": 0,
                 "externalHitTokens": 903168.0,
                 "preemptions": 0.0,
@@ -184,6 +257,8 @@
               ],
               "metrics": {
                 "loadedChunks": 512.0,
+                "gpuHitTokens": 0.0,
+                "gpuQueriedTokens": 1053332.0,
                 "prefetchFailureChunks": 0,
                 "externalHitTokens": 1032192.0,
                 "preemptions": 0.0,
@@ -209,6 +284,8 @@
               ],
               "metrics": {
                 "loadedChunks": 448.0,
+                "gpuHitTokens": 129024.0,
+                "gpuQueriedTokens": 1054508.0,
                 "prefetchFailureChunks": 0,
                 "externalHitTokens": 903168.0,
                 "preemptions": 0.0,
@@ -391,6 +468,8 @@
           "status": "complete",
           "metrics": {
             "loadedChunks": 1606.0,
+            "gpuHitTokens": 387072.0,
+            "gpuQueriedTokens": 4210892.0,
             "prefetchFailureChunks": 0,
             "externalHitTokens": 3237888.0,
             "preemptions": 0.0,
@@ -416,6 +495,8 @@
               ],
               "metrics": {
                 "loadedChunks": 192.0,
+                "gpuHitTokens": 129024.0,
+                "gpuQueriedTokens": 1050980.0,
                 "prefetchFailureChunks": 0,
                 "externalHitTokens": 387072.0,
                 "preemptions": 0.0,
@@ -441,6 +522,8 @@
               ],
               "metrics": {
                 "loadedChunks": 386.0,
+                "gpuHitTokens": 258048.0,
+                "gpuQueriedTokens": 1052142.0,
                 "prefetchFailureChunks": 0,
                 "externalHitTokens": 778240.0,
                 "preemptions": 0.0,
@@ -466,6 +549,8 @@
               ],
               "metrics": {
                 "loadedChunks": 514.0,
+                "gpuHitTokens": 0.0,
+                "gpuQueriedTokens": 1053304.0,
                 "prefetchFailureChunks": 0,
                 "externalHitTokens": 1036288.0,
                 "preemptions": 0.0,
@@ -491,6 +576,8 @@
               ],
               "metrics": {
                 "loadedChunks": 514.0,
+                "gpuHitTokens": 0.0,
+                "gpuQueriedTokens": 1054466.0,
                 "prefetchFailureChunks": 0,
                 "externalHitTokens": 1036288.0,
                 "preemptions": 0.0,
@@ -613,8 +700,16 @@
         {
           "stage": "cold",
           "allCorrect": true,
+          "requestCount": 2,
+          "promptTokens": [
+            260988,
+            260988
+          ],
+          "allResponsesCorrect": true,
           "metrics": {
             "loadedChunks": 0.0,
+            "gpuHitTokens": 0.0,
+            "gpuQueriedTokens": 521976.0,
             "prefetchFailureChunks": 0,
             "externalHitTokens": 0.0,
             "preemptions": 0.0,
@@ -626,8 +721,16 @@
         {
           "stage": "gpu-warm",
           "allCorrect": true,
+          "requestCount": 2,
+          "promptTokens": [
+            260988,
+            260988
+          ],
+          "allResponsesCorrect": true,
           "metrics": {
             "loadedChunks": 0.0,
+            "gpuHitTokens": 516096.0,
+            "gpuQueriedTokens": 521976.0,
             "prefetchFailureChunks": 0,
             "externalHitTokens": 0.0,
             "preemptions": 0.0,
@@ -639,8 +742,16 @@
         {
           "stage": "gpu-reset",
           "allCorrect": true,
+          "requestCount": 2,
+          "promptTokens": [
+            260988,
+            260988
+          ],
+          "allResponsesCorrect": true,
           "metrics": {
             "loadedChunks": 127.0,
+            "gpuHitTokens": 0.0,
+            "gpuQueriedTokens": 521976.0,
             "prefetchFailureChunks": 126.0,
             "externalHitTokens": 258048.0,
             "preemptions": 0.0,
@@ -653,27 +764,22 @@
       "prefix": {}
     },
     {
-      "directory": "results\\opt-20261024-pressure-wait",
+      "directory": "results\\opt-20261024-queue-after-collect-pressure-wait-v2",
       "status": "complete",
       "error": null,
       "config": {
-        "useVmm": true,
-        "restoreWaitMs": 2000,
-        "prefixExperiment": false,
-        "disableMtp": false,
-        "segmented": true,
-        "allowBattery": true,
-        "lmcacheChunkSize": 2048,
         "demandAdmission": true,
+        "kvCacheDtype": "fp8_e4m3",
         "parallelRestore": true,
-        "optimizations": true,
-        "parallelSessions": 2,
-        "parallelContextTokens": 261000,
         "note": "Both comparison phases use this same precision and KV capacity. FP8 is experimental; not a BF16 quality-equivalence claim.",
-        "eagerPrefetch": false,
-        "agentContextTokens": 131000,
-        "agentTurns": 4,
+        "parallelSessions": 2,
         "prefillBatchTokens": 8192,
+        "agentTurns": 4,
+        "disableMtp": false,
+        "eagerPrefetch": false,
+        "prefixExperiment": false,
+        "requestSeed": 0,
+        "restoreWaitMs": 2000,
         "modelArgs": [
           "--model",
           "/model",
@@ -715,35 +821,44 @@
           "--block-size",
           "2048"
         ],
-        "agentLoops": false,
-        "kvCacheDtype": "fp8_e4m3",
-        "lmcacheL1GiB": 4,
+        "optimizations": true,
+        "agentConcurrencies": [],
         "capacityCheck": true,
+        "segmented": true,
+        "restoreQueueVersion": 2,
+        "allowBattery": false,
+        "agentContextTokens": 131000,
+        "agentLoops": false,
+        "lmcacheChunkSize": 2048,
+        "useVmm": true,
+        "collectRejectedReference": false,
+        "lmcacheL1GiB": 4,
+        "codingWorkload": false,
         "agentConcurrencySweep": false,
-        "codingWorkload": false
+        "parallelContextTokens": 261000
       },
       "power": {
-        "timingUse": "Correctness only; battery operation authorized. Not a comparable performance benchmark.",
+        "timingUse": "Requires external power Online.",
         "msiMode": "Eco Mode and Energy Saver (last user-reported mode)",
         "externalPower": "100 W USB-C supply (user reported; connection state monitored separately)",
         "note": "Windows PowerLineStatus Online indicates external power. It does not measure USB-C negotiated power or system draw.",
-        "allowBattery": true
+        "allowBattery": false
       },
       "memory": {
-        "runDirectory": "C:\\Users\\michael\\source\\github\\mycall\\n1x-ai\\results\\opt-20261024-pressure-wait",
-        "pairedServingSamples": 72,
-        "gpuPeakUsedGiB": 85.552734375,
+        "runDirectory": "C:\\Users\\michael\\source\\github\\mycall\\n1x-ai\\results\\opt-20261024-queue-after-collect-pressure-wait-v2",
+        "pairedServingSamples": 53,
+        "gpuPeakUsedGiB": 85.6240234375,
         "gpuReportedCapacityGiB": 88,
-        "gpuUnusedAtPeakGiB": 2.447265625,
+        "gpuUnusedAtPeakGiB": 2.3759765625,
         "configuredGpuKvGiB": 8,
         "configuredLmcacheL1GiB": 4,
         "lowestWindowsSample": {
-          "timestamp": "2026-10-24T19:46:13.8451621-07:00",
-          "availableGiB": 12.69607162475586,
-          "gpuUsedGiB": 85.5361328125,
-          "guestAvailableGiB": 7.255580902099609,
-          "guestCachedGiB": 3.9292564392089844,
-          "guestSwapUsedGiB": 0.0
+          "timestamp": "2026-10-24T22:18:18.5291680-07:00",
+          "availableGiB": 12.232608795166016,
+          "gpuUsedGiB": 85.611328125,
+          "guestAvailableGiB": 7.471698760986328,
+          "guestCachedGiB": 3.904827117919922,
+          "guestSwapUsedGiB": 6.4849853515e-05
         },
         "limitations": [
           "Samples are periodic and fields are collected sequentially, not atomically.",
@@ -759,8 +874,16 @@
         {
           "stage": "cold",
           "allCorrect": true,
+          "requestCount": 2,
+          "promptTokens": [
+            260988,
+            260988
+          ],
+          "allResponsesCorrect": true,
           "metrics": {
             "loadedChunks": 0.0,
+            "gpuHitTokens": 0.0,
+            "gpuQueriedTokens": 521976.0,
             "prefetchFailureChunks": 0,
             "externalHitTokens": 0.0,
             "preemptions": 0.0,
@@ -772,8 +895,16 @@
         {
           "stage": "gpu-warm",
           "allCorrect": true,
+          "requestCount": 2,
+          "promptTokens": [
+            260988,
+            260988
+          ],
+          "allResponsesCorrect": true,
           "metrics": {
             "loadedChunks": 0.0,
+            "gpuHitTokens": 516096.0,
+            "gpuQueriedTokens": 521976.0,
             "prefetchFailureChunks": 0,
             "externalHitTokens": 0.0,
             "preemptions": 0.0,
@@ -785,10 +916,18 @@
         {
           "stage": "gpu-reset",
           "allCorrect": true,
+          "requestCount": 2,
+          "promptTokens": [
+            260988,
+            260988
+          ],
+          "allResponsesCorrect": true,
           "metrics": {
-            "loadedChunks": 127.0,
-            "prefetchFailureChunks": 126.0,
-            "externalHitTokens": 258048.0,
+            "loadedChunks": 254.0,
+            "gpuHitTokens": 0.0,
+            "gpuQueriedTokens": 521976.0,
+            "prefetchFailureChunks": 0,
+            "externalHitTokens": 516096.0,
             "preemptions": 0.0,
             "draftTokens": 22.0,
             "acceptedDraftTokens": 22.0,
@@ -905,6 +1044,8 @@
           "status": "complete",
           "metrics": {
             "loadedChunks": 15.0,
+            "gpuHitTokens": 174080.0,
+            "gpuQueriedTokens": 260744.0,
             "prefetchFailureChunks": 0,
             "externalHitTokens": 28672.0,
             "preemptions": 0.0,
@@ -927,6 +1068,8 @@
               ],
               "metrics": {
                 "loadedChunks": 0.0,
+                "gpuHitTokens": 28672.0,
+                "gpuQueriedTokens": 64745.0,
                 "prefetchFailureChunks": 0,
                 "externalHitTokens": 0.0,
                 "preemptions": 0.0,
@@ -949,6 +1092,8 @@
               ],
               "metrics": {
                 "loadedChunks": 0.0,
+                "gpuHitTokens": 57344.0,
+                "gpuQueriedTokens": 65039.0,
                 "prefetchFailureChunks": 0,
                 "externalHitTokens": 0.0,
                 "preemptions": 0.0,
@@ -971,6 +1116,8 @@
               ],
               "metrics": {
                 "loadedChunks": 15.0,
+                "gpuHitTokens": 28672.0,
+                "gpuQueriedTokens": 65333.0,
                 "prefetchFailureChunks": 0,
                 "externalHitTokens": 28672.0,
                 "preemptions": 0.0,
@@ -993,6 +1140,8 @@
               ],
               "metrics": {
                 "loadedChunks": 0.0,
+                "gpuHitTokens": 59392.0,
+                "gpuQueriedTokens": 65627.0,
                 "prefetchFailureChunks": 0,
                 "externalHitTokens": 0.0,
                 "preemptions": 0.0,
@@ -1008,6 +1157,8 @@
           "status": "complete",
           "metrics": {
             "loadedChunks": 30.0,
+            "gpuHitTokens": 348160.0,
+            "gpuQueriedTokens": 521488.0,
             "prefetchFailureChunks": 0,
             "externalHitTokens": 57344.0,
             "preemptions": 0.0,
@@ -1031,6 +1182,8 @@
               ],
               "metrics": {
                 "loadedChunks": 0.0,
+                "gpuHitTokens": 57344.0,
+                "gpuQueriedTokens": 129490.0,
                 "prefetchFailureChunks": 0,
                 "externalHitTokens": 0.0,
                 "preemptions": 0.0,
@@ -1054,6 +1207,8 @@
               ],
               "metrics": {
                 "loadedChunks": 0.0,
+                "gpuHitTokens": 114688.0,
+                "gpuQueriedTokens": 130078.0,
                 "prefetchFailureChunks": 0,
                 "externalHitTokens": 0.0,
                 "preemptions": 0.0,
@@ -1077,6 +1232,8 @@
               ],
               "metrics": {
                 "loadedChunks": 30.0,
+                "gpuHitTokens": 57344.0,
+                "gpuQueriedTokens": 130666.0,
                 "prefetchFailureChunks": 0,
                 "externalHitTokens": 57344.0,
                 "preemptions": 0.0,
@@ -1100,6 +1257,8 @@
               ],
               "metrics": {
                 "loadedChunks": 0.0,
+                "gpuHitTokens": 118784.0,
+                "gpuQueriedTokens": 131254.0,
                 "prefetchFailureChunks": 0,
                 "externalHitTokens": 0.0,
                 "preemptions": 0.0,
@@ -1115,6 +1274,8 @@
           "status": "complete",
           "metrics": {
             "loadedChunks": 60.0,
+            "gpuHitTokens": 696320.0,
+            "gpuQueriedTokens": 1042976.0,
             "prefetchFailureChunks": 0,
             "externalHitTokens": 114688.0,
             "preemptions": 0.0,
@@ -1140,6 +1301,8 @@
               ],
               "metrics": {
                 "loadedChunks": 0.0,
+                "gpuHitTokens": 114688.0,
+                "gpuQueriedTokens": 258980.0,
                 "prefetchFailureChunks": 0,
                 "externalHitTokens": 0.0,
                 "preemptions": 0.0,
@@ -1165,6 +1328,8 @@
               ],
               "metrics": {
                 "loadedChunks": 0.0,
+                "gpuHitTokens": 229376.0,
+                "gpuQueriedTokens": 260156.0,
                 "prefetchFailureChunks": 0,
                 "externalHitTokens": 0.0,
                 "preemptions": 0.0,
@@ -1190,6 +1355,8 @@
               ],
               "metrics": {
                 "loadedChunks": 60.0,
+                "gpuHitTokens": 114688.0,
+                "gpuQueriedTokens": 261332.0,
                 "prefetchFailureChunks": 0,
                 "externalHitTokens": 114688.0,
                 "preemptions": 0.0,
@@ -1215,6 +1382,8 @@
               ],
               "metrics": {
                 "loadedChunks": 0.0,
+                "gpuHitTokens": 237568.0,
+                "gpuQueriedTokens": 262508.0,
                 "prefetchFailureChunks": 0,
                 "externalHitTokens": 0.0,
                 "preemptions": 0.0,
@@ -1338,6 +1507,8 @@
           "status": "complete",
           "metrics": {
             "loadedChunks": 56.0,
+            "gpuHitTokens": 116736.0,
+            "gpuQueriedTokens": 260744.0,
             "prefetchFailureChunks": 0,
             "externalHitTokens": 100352.0,
             "preemptions": 0.0,
@@ -1360,6 +1531,8 @@
               ],
               "metrics": {
                 "loadedChunks": 2.0,
+                "gpuHitTokens": 28672.0,
+                "gpuQueriedTokens": 64745.0,
                 "prefetchFailureChunks": 0,
                 "externalHitTokens": 2048.0,
                 "preemptions": 0.0,
@@ -1382,6 +1555,8 @@
               ],
               "metrics": {
                 "loadedChunks": 4.0,
+                "gpuHitTokens": 57344.0,
+                "gpuQueriedTokens": 65039.0,
                 "prefetchFailureChunks": 0,
                 "externalHitTokens": 4096.0,
                 "preemptions": 0.0,
@@ -1404,6 +1579,8 @@
               ],
               "metrics": {
                 "loadedChunks": 32.0,
+                "gpuHitTokens": 0.0,
+                "gpuQueriedTokens": 65333.0,
                 "prefetchFailureChunks": 0,
                 "externalHitTokens": 61440.0,
                 "preemptions": 0.0,
@@ -1426,6 +1603,8 @@
               ],
               "metrics": {
                 "loadedChunks": 18.0,
+                "gpuHitTokens": 30720.0,
+                "gpuQueriedTokens": 65627.0,
                 "prefetchFailureChunks": 0,
                 "externalHitTokens": 32768.0,
                 "preemptions": 0.0,
@@ -1441,6 +1620,8 @@
           "status": "complete",
           "metrics": {
             "loadedChunks": 112.0,
+            "gpuHitTokens": 233472.0,
+            "gpuQueriedTokens": 521488.0,
             "prefetchFailureChunks": 0,
             "externalHitTokens": 200704.0,
             "preemptions": 0.0,
@@ -1464,6 +1645,8 @@
               ],
               "metrics": {
                 "loadedChunks": 4.0,
+                "gpuHitTokens": 57344.0,
+                "gpuQueriedTokens": 129490.0,
                 "prefetchFailureChunks": 0,
                 "externalHitTokens": 4096.0,
                 "preemptions": 0.0,
@@ -1487,6 +1670,8 @@
               ],
               "metrics": {
                 "loadedChunks": 8.0,
+                "gpuHitTokens": 114688.0,
+                "gpuQueriedTokens": 130078.0,
                 "prefetchFailureChunks": 0,
                 "externalHitTokens": 8192.0,
                 "preemptions": 0.0,
@@ -1510,6 +1695,8 @@
               ],
               "metrics": {
                 "loadedChunks": 64.0,
+                "gpuHitTokens": 0.0,
+                "gpuQueriedTokens": 130666.0,
                 "prefetchFailureChunks": 0,
                 "externalHitTokens": 122880.0,
                 "preemptions": 0.0,
@@ -1533,6 +1720,8 @@
               ],
               "metrics": {
                 "loadedChunks": 36.0,
+                "gpuHitTokens": 61440.0,
+                "gpuQueriedTokens": 131254.0,
                 "prefetchFailureChunks": 0,
                 "externalHitTokens": 65536.0,
                 "preemptions": 0.0,
@@ -1548,6 +1737,8 @@
           "status": "complete",
           "metrics": {
             "loadedChunks": 224.0,
+            "gpuHitTokens": 466944.0,
+            "gpuQueriedTokens": 1042976.0,
             "prefetchFailureChunks": 0,
             "externalHitTokens": 401408.0,
             "preemptions": 0.0,
@@ -1573,6 +1764,8 @@
               ],
               "metrics": {
                 "loadedChunks": 8.0,
+                "gpuHitTokens": 114688.0,
+                "gpuQueriedTokens": 258980.0,
                 "prefetchFailureChunks": 0,
                 "externalHitTokens": 8192.0,
                 "preemptions": 0.0,
@@ -1598,6 +1791,8 @@
               ],
               "metrics": {
                 "loadedChunks": 16.0,
+                "gpuHitTokens": 229376.0,
+                "gpuQueriedTokens": 260156.0,
                 "prefetchFailureChunks": 0,
                 "externalHitTokens": 16384.0,
                 "preemptions": 0.0,
@@ -1623,6 +1818,8 @@
               ],
               "metrics": {
                 "loadedChunks": 128.0,
+                "gpuHitTokens": 0.0,
+                "gpuQueriedTokens": 261332.0,
                 "prefetchFailureChunks": 0,
                 "externalHitTokens": 245760.0,
                 "preemptions": 0.0,
@@ -1648,6 +1845,8 @@
               ],
               "metrics": {
                 "loadedChunks": 72.0,
+                "gpuHitTokens": 122880.0,
+                "gpuQueriedTokens": 262508.0,
                 "prefetchFailureChunks": 0,
                 "externalHitTokens": 131072.0,
                 "preemptions": 0.0,
@@ -1771,6 +1970,8 @@
           "status": "complete",
           "metrics": {
             "loadedChunks": 15.0,
+            "gpuHitTokens": 174080.0,
+            "gpuQueriedTokens": 260744.0,
             "prefetchFailureChunks": 0,
             "externalHitTokens": 28672.0,
             "preemptions": 0.0,
@@ -1793,6 +1994,8 @@
               ],
               "metrics": {
                 "loadedChunks": 0.0,
+                "gpuHitTokens": 28672.0,
+                "gpuQueriedTokens": 64745.0,
                 "prefetchFailureChunks": 0,
                 "externalHitTokens": 0.0,
                 "preemptions": 0.0,
@@ -1815,6 +2018,8 @@
               ],
               "metrics": {
                 "loadedChunks": 0.0,
+                "gpuHitTokens": 57344.0,
+                "gpuQueriedTokens": 65039.0,
                 "prefetchFailureChunks": 0,
                 "externalHitTokens": 0.0,
                 "preemptions": 0.0,
@@ -1837,6 +2042,8 @@
               ],
               "metrics": {
                 "loadedChunks": 15.0,
+                "gpuHitTokens": 28672.0,
+                "gpuQueriedTokens": 65333.0,
                 "prefetchFailureChunks": 0,
                 "externalHitTokens": 28672.0,
                 "preemptions": 0.0,
@@ -1859,6 +2066,8 @@
               ],
               "metrics": {
                 "loadedChunks": 0.0,
+                "gpuHitTokens": 59392.0,
+                "gpuQueriedTokens": 65627.0,
                 "prefetchFailureChunks": 0,
                 "externalHitTokens": 0.0,
                 "preemptions": 0.0,
@@ -1874,6 +2083,8 @@
           "status": "complete",
           "metrics": {
             "loadedChunks": 30.0,
+            "gpuHitTokens": 348160.0,
+            "gpuQueriedTokens": 521488.0,
             "prefetchFailureChunks": 0,
             "externalHitTokens": 57344.0,
             "preemptions": 0.0,
@@ -1897,6 +2108,8 @@
               ],
               "metrics": {
                 "loadedChunks": 0.0,
+                "gpuHitTokens": 57344.0,
+                "gpuQueriedTokens": 129490.0,
                 "prefetchFailureChunks": 0,
                 "externalHitTokens": 0.0,
                 "preemptions": 0.0,
@@ -1920,6 +2133,8 @@
               ],
               "metrics": {
                 "loadedChunks": 0.0,
+                "gpuHitTokens": 114688.0,
+                "gpuQueriedTokens": 130078.0,
                 "prefetchFailureChunks": 0,
                 "externalHitTokens": 0.0,
                 "preemptions": 0.0,
@@ -1943,6 +2158,8 @@
               ],
               "metrics": {
                 "loadedChunks": 30.0,
+                "gpuHitTokens": 57344.0,
+                "gpuQueriedTokens": 130666.0,
                 "prefetchFailureChunks": 0,
                 "externalHitTokens": 57344.0,
                 "preemptions": 0.0,
@@ -1966,6 +2183,8 @@
               ],
               "metrics": {
                 "loadedChunks": 0.0,
+                "gpuHitTokens": 118784.0,
+                "gpuQueriedTokens": 131254.0,
                 "prefetchFailureChunks": 0,
                 "externalHitTokens": 0.0,
                 "preemptions": 0.0,
@@ -1981,6 +2200,8 @@
           "status": "complete",
           "metrics": {
             "loadedChunks": 60.0,
+            "gpuHitTokens": 696320.0,
+            "gpuQueriedTokens": 1043084.0,
             "prefetchFailureChunks": 0,
             "externalHitTokens": 114688.0,
             "preemptions": 0.0,
@@ -2006,6 +2227,8 @@
               ],
               "metrics": {
                 "loadedChunks": 0.0,
+                "gpuHitTokens": 114688.0,
+                "gpuQueriedTokens": 258980.0,
                 "prefetchFailureChunks": 0,
                 "externalHitTokens": 0.0,
                 "preemptions": 0.0,
@@ -2031,6 +2254,8 @@
               ],
               "metrics": {
                 "loadedChunks": 0.0,
+                "gpuHitTokens": 229376.0,
+                "gpuQueriedTokens": 260174.0,
                 "prefetchFailureChunks": 0,
                 "externalHitTokens": 0.0,
                 "preemptions": 0.0,
@@ -2056,6 +2281,8 @@
               ],
               "metrics": {
                 "loadedChunks": 60.0,
+                "gpuHitTokens": 114688.0,
+                "gpuQueriedTokens": 261368.0,
                 "prefetchFailureChunks": 0,
                 "externalHitTokens": 114688.0,
                 "preemptions": 0.0,
@@ -2081,6 +2308,8 @@
               ],
               "metrics": {
                 "loadedChunks": 0.0,
+                "gpuHitTokens": 237568.0,
+                "gpuQueriedTokens": 262562.0,
                 "prefetchFailureChunks": 0,
                 "externalHitTokens": 0.0,
                 "preemptions": 0.0,
@@ -2204,6 +2433,8 @@
           "status": "complete",
           "metrics": {
             "loadedChunks": 30.0,
+            "gpuHitTokens": 348160.0,
+            "gpuQueriedTokens": 521488.0,
             "prefetchFailureChunks": 0,
             "externalHitTokens": 57344.0,
             "preemptions": 0.0,
@@ -2227,6 +2458,8 @@
               ],
               "metrics": {
                 "loadedChunks": 0.0,
+                "gpuHitTokens": 57344.0,
+                "gpuQueriedTokens": 129490.0,
                 "prefetchFailureChunks": 0,
                 "externalHitTokens": 0.0,
                 "preemptions": 0.0,
@@ -2250,6 +2483,8 @@
               ],
               "metrics": {
                 "loadedChunks": 0.0,
+                "gpuHitTokens": 114688.0,
+                "gpuQueriedTokens": 130078.0,
                 "prefetchFailureChunks": 0,
                 "externalHitTokens": 0.0,
                 "preemptions": 0.0,
@@ -2273,6 +2508,8 @@
               ],
               "metrics": {
                 "loadedChunks": 30.0,
+                "gpuHitTokens": 57344.0,
+                "gpuQueriedTokens": 130666.0,
                 "prefetchFailureChunks": 0,
                 "externalHitTokens": 57344.0,
                 "preemptions": 0.0,
@@ -2296,6 +2533,8 @@
               ],
               "metrics": {
                 "loadedChunks": 0.0,
+                "gpuHitTokens": 118784.0,
+                "gpuQueriedTokens": 131254.0,
                 "prefetchFailureChunks": 0,
                 "externalHitTokens": 0.0,
                 "preemptions": 0.0,
@@ -2318,6 +2557,8 @@
           "outputTokensPerWallSecond": 38.46606843992992,
           "metrics": {
             "loadedChunks": 0.0,
+            "gpuHitTokens": 0.0,
+            "gpuQueriedTokens": 242.0,
             "prefetchFailureChunks": 0,
             "externalHitTokens": 0.0,
             "preemptions": 0.0,
@@ -2336,6 +2577,8 @@
           "outputTokensPerWallSecond": 60.16129070147549,
           "metrics": {
             "loadedChunks": 0.0,
+            "gpuHitTokens": 0.0,
+            "gpuQueriedTokens": 242.0,
             "prefetchFailureChunks": 0,
             "externalHitTokens": 0.0,
             "preemptions": 0.0,
@@ -2354,6 +2597,8 @@
           "outputTokensPerWallSecond": 66.19364394508712,
           "metrics": {
             "loadedChunks": 0.0,
+            "gpuHitTokens": 0.0,
+            "gpuQueriedTokens": 242.0,
             "prefetchFailureChunks": 0,
             "externalHitTokens": 0.0,
             "preemptions": 0.0,
@@ -2472,6 +2717,8 @@
           "status": "complete",
           "metrics": {
             "loadedChunks": 32.0,
+            "gpuHitTokens": 372736.0,
+            "gpuQueriedTokens": 521488.0,
             "prefetchFailureChunks": 0,
             "externalHitTokens": 61440.0,
             "preemptions": 0.0,
@@ -2495,6 +2742,8 @@
               ],
               "metrics": {
                 "loadedChunks": 0.0,
+                "gpuHitTokens": 61440.0,
+                "gpuQueriedTokens": 129490.0,
                 "prefetchFailureChunks": 0,
                 "externalHitTokens": 0.0,
                 "preemptions": 0.0,
@@ -2518,6 +2767,8 @@
               ],
               "metrics": {
                 "loadedChunks": 0.0,
+                "gpuHitTokens": 122880.0,
+                "gpuQueriedTokens": 130078.0,
                 "prefetchFailureChunks": 0,
                 "externalHitTokens": 0.0,
                 "preemptions": 0.0,
@@ -2541,6 +2792,8 @@
               ],
               "metrics": {
                 "loadedChunks": 32.0,
+                "gpuHitTokens": 61440.0,
+                "gpuQueriedTokens": 130666.0,
                 "prefetchFailureChunks": 0,
                 "externalHitTokens": 61440.0,
                 "preemptions": 0.0,
@@ -2564,6 +2817,8 @@
               ],
               "metrics": {
                 "loadedChunks": 0.0,
+                "gpuHitTokens": 126976.0,
+                "gpuQueriedTokens": 131254.0,
                 "prefetchFailureChunks": 0,
                 "externalHitTokens": 0.0,
                 "preemptions": 0.0,
@@ -2586,6 +2841,8 @@
           "outputTokensPerWallSecond": 29.830406977038688,
           "metrics": {
             "loadedChunks": 0.0,
+            "gpuHitTokens": 0.0,
+            "gpuQueriedTokens": 242.0,
             "prefetchFailureChunks": 0,
             "externalHitTokens": 0.0,
             "preemptions": 0.0,
@@ -2604,6 +2861,8 @@
           "outputTokensPerWallSecond": 43.504398636526005,
           "metrics": {
             "loadedChunks": 0.0,
+            "gpuHitTokens": 0.0,
+            "gpuQueriedTokens": 242.0,
             "prefetchFailureChunks": 0,
             "externalHitTokens": 0.0,
             "preemptions": 0.0,
@@ -2622,6 +2881,8 @@
           "outputTokensPerWallSecond": 56.95865538283972,
           "metrics": {
             "loadedChunks": 0.0,
+            "gpuHitTokens": 0.0,
+            "gpuQueriedTokens": 242.0,
             "prefetchFailureChunks": 0,
             "externalHitTokens": 0.0,
             "preemptions": 0.0,
@@ -2635,9 +2896,209 @@
       "prefix": {}
     }
   ],
+  "rejectedPrototype": {
+    "directory": "results\\opt-20261024-pressure-wait",
+    "status": "complete",
+    "error": null,
+    "config": {
+      "useVmm": true,
+      "restoreWaitMs": 2000,
+      "prefixExperiment": false,
+      "disableMtp": false,
+      "segmented": true,
+      "allowBattery": true,
+      "lmcacheChunkSize": 2048,
+      "demandAdmission": true,
+      "parallelRestore": true,
+      "optimizations": true,
+      "parallelSessions": 2,
+      "parallelContextTokens": 261000,
+      "note": "Both comparison phases use this same precision and KV capacity. FP8 is experimental; not a BF16 quality-equivalence claim.",
+      "eagerPrefetch": false,
+      "agentContextTokens": 131000,
+      "agentTurns": 4,
+      "prefillBatchTokens": 8192,
+      "modelArgs": [
+        "--model",
+        "/model",
+        "--served-model-name",
+        "qwen",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8000",
+        "--max-model-len",
+        "262144",
+        "--max-num-seqs",
+        "16",
+        "--gpu-memory-utilization",
+        "0.01",
+        "--kv-cache-memory-bytes",
+        "8589934592",
+        "--load-format",
+        "safetensors",
+        "--safetensors-load-strategy",
+        "lazy",
+        "--enable-prefix-caching",
+        "--enable-chunked-prefill",
+        "--max-num-batched-tokens",
+        "8192",
+        "--mamba-ssm-cache-dtype",
+        "bfloat16",
+        "--kv-cache-dtype",
+        "fp8_e4m3",
+        "--no-enable-flashinfer-autotune",
+        "--enable-auto-tool-choice",
+        "--tool-call-parser",
+        "qwen3_xml",
+        "--reasoning-parser",
+        "qwen3",
+        "-cc.cudagraph_mode=FULL_AND_PIECEWISE",
+        "--config",
+        "/profiles/mtp.yaml",
+        "--block-size",
+        "2048"
+      ],
+      "agentLoops": false,
+      "kvCacheDtype": "fp8_e4m3",
+      "lmcacheL1GiB": 4,
+      "capacityCheck": true,
+      "agentConcurrencySweep": false,
+      "codingWorkload": false
+    },
+    "power": {
+      "timingUse": "Correctness only; battery operation authorized. Not a comparable performance benchmark.",
+      "msiMode": "Eco Mode and Energy Saver (last user-reported mode)",
+      "externalPower": "100 W USB-C supply (user reported; connection state monitored separately)",
+      "note": "Windows PowerLineStatus Online indicates external power. It does not measure USB-C negotiated power or system draw.",
+      "allowBattery": true
+    },
+    "memory": {
+      "runDirectory": "C:\\Users\\michael\\source\\github\\mycall\\n1x-ai\\results\\opt-20261024-pressure-wait",
+      "pairedServingSamples": 72,
+      "gpuPeakUsedGiB": 85.552734375,
+      "gpuReportedCapacityGiB": 88,
+      "gpuUnusedAtPeakGiB": 2.447265625,
+      "configuredGpuKvGiB": 8,
+      "configuredLmcacheL1GiB": 4,
+      "lowestWindowsSample": {
+        "timestamp": "2026-10-24T19:46:13.8451621-07:00",
+        "availableGiB": 12.69607162475586,
+        "gpuUsedGiB": 85.5361328125,
+        "guestAvailableGiB": 7.255580902099609,
+        "guestCachedGiB": 3.9292564392089844,
+        "guestSwapUsedGiB": 0.0
+      },
+      "limitations": [
+        "Samples are periodic and fields are collected sequentially, not atomically.",
+        "Guest memory is within host memory; do not add guest and Windows totals.",
+        "Reported GPU unused memory is not a guarantee of successful allocation.",
+        "Guest Cached includes file cache; this capture cannot attribute it to PLE versus other files.",
+        "No per-process PSS or PyTorch reserved/allocated breakdown was recorded."
+      ]
+    },
+    "agents": [],
+    "coding": [],
+    "parallel": [
+      {
+        "stage": "cold",
+        "allCorrect": true,
+        "requestCount": 2,
+        "promptTokens": [
+          260988,
+          260988
+        ],
+        "allResponsesCorrect": true,
+        "metrics": {
+          "loadedChunks": 0.0,
+          "gpuHitTokens": 0.0,
+          "gpuQueriedTokens": 521976.0,
+          "prefetchFailureChunks": 0,
+          "externalHitTokens": 0.0,
+          "preemptions": 0.0,
+          "draftTokens": 22.0,
+          "acceptedDraftTokens": 22.0,
+          "draftAcceptance": 1.0
+        }
+      },
+      {
+        "stage": "gpu-warm",
+        "allCorrect": true,
+        "requestCount": 2,
+        "promptTokens": [
+          260988,
+          260988
+        ],
+        "allResponsesCorrect": true,
+        "metrics": {
+          "loadedChunks": 0.0,
+          "gpuHitTokens": 516096.0,
+          "gpuQueriedTokens": 521976.0,
+          "prefetchFailureChunks": 0,
+          "externalHitTokens": 0.0,
+          "preemptions": 0.0,
+          "draftTokens": 22.0,
+          "acceptedDraftTokens": 22.0,
+          "draftAcceptance": 1.0
+        }
+      },
+      {
+        "stage": "gpu-reset",
+        "allCorrect": true,
+        "requestCount": 2,
+        "promptTokens": [
+          260988,
+          260988
+        ],
+        "allResponsesCorrect": true,
+        "metrics": {
+          "loadedChunks": 127.0,
+          "gpuHitTokens": 0.0,
+          "gpuQueriedTokens": 521976.0,
+          "prefetchFailureChunks": 126.0,
+          "externalHitTokens": 258048.0,
+          "preemptions": 0.0,
+          "draftTokens": 22.0,
+          "acceptedDraftTokens": 22.0,
+          "draftAcceptance": 1.0
+        }
+      }
+    ],
+    "prefix": {}
+  },
   "limitations": [
-    "Screening allowed battery operation and did not fix the request seed. Treat timing differences as candidate selection, not controlled performance claims.",
-    "The pressure-wait prototype did not exercise waiting and remains unqualified.",
-    "Controlled near-131K comparisons are running separately; no new serving defaults have been promoted."
+    "Screening allowed battery operation and did not fix the request seed; those timing differences are observational. Controlled follow-up evidence is separate in efficiency-results.json.",
+    "The revision-1 pressure-wait prototype did not exercise waiting. The completed revision-2 trial is the pressure-wait entry in the accepted matrix.",
+    "No general model-quality, BF16-equivalence, restart, or combined near-limit vision qualification is implied."
+  ],
+  "controlledPrimary": "efficiency-results.json",
+  "controlledFollowup": "efficiency-followup-results.json",
+  "priorControlledFailures": [
+    {
+      "directory": "results/eff-20261024-batch8192-mtp",
+      "status": "failed",
+      "error": "RuntimeError('Feature check failed: vision_ocr')",
+      "failedFeature": "vision_ocr",
+      "finishReason": "length",
+      "completionTokens": 256,
+      "outputKind": "HTML instead of transcription",
+      "image": {
+        "id": "sha256:b68afc72ebd6e40644f5af330bb2dfec69d954308f089e2b03eb76738495c11e",
+        "tag": "sha256:b68afc72ebd6e40644f5af330bb2dfec69d954308f089e2b03eb76738495c11e"
+      }
+    },
+    {
+      "directory": "results/eff-20261024-retry-batch8192-mtp",
+      "status": "failed",
+      "error": "RuntimeError('Feature check failed: vision_ocr')",
+      "failedFeature": "vision_ocr",
+      "finishReason": "stop",
+      "completionTokens": 18,
+      "outputKind": "HTML instead of transcription",
+      "image": {
+        "id": "sha256:b68afc72ebd6e40644f5af330bb2dfec69d954308f089e2b03eb76738495c11e",
+        "tag": "sha256:b68afc72ebd6e40644f5af330bb2dfec69d954308f089e2b03eb76738495c11e"
+      }
+    }
   ]
 }

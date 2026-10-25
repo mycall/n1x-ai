@@ -1,0 +1,675 @@
+{
+  "protocol": {
+    "version": 1,
+    "objective": "Complete capacity and concurrency qualification for the modestly faster MTP-off warm-agent option",
+    "workUnit": "Same checked tool call and JSON answer with growing near-131K archive history",
+    "requestSeed": 0,
+    "agentTurns": 12,
+    "excludedTurns": [
+      0,
+      6
+    ],
+    "warmCohorts": [
+      [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      [
+        7,
+        8,
+        9,
+        10,
+        11
+      ]
+    ],
+    "profiles": [
+      {
+        "name": "batch2048-no-mtp-followup",
+        "batch": 2048,
+        "mtp": false,
+        "concurrencies": [
+          1,
+          2,
+          3
+        ],
+        "twoNear262K": true
+      }
+    ],
+    "fixed": {
+      "gpuPartitionGiB": 88,
+      "gpuKvGiB": 8,
+      "lmcacheL1GiB": 8,
+      "agentContextTarget": 131000,
+      "eagerPrefetch": false,
+      "restoreWaitMs": 0
+    },
+    "constraints": {
+      "externalPowerRequired": true,
+      "windowsGuardGiB": 4,
+      "windowsTargetGiB": 6,
+      "allAnswersCorrect": true,
+      "cacheRestoreRequired": true
+    },
+    "existingConcurrencyFourRun": "results/eff-20261024-collect-batch2048-no-mtp",
+    "stoppingRule": "Complete the MTP-off 1/2/3 points and two near-262K restores. Compare with the completed 4-client run and MTP-on grid; do not expand memory budgets or add new tuning dimensions in this follow-up.",
+    "limitations": [
+      "Same fixed-seed and sequential-profile limits as the primary protocol.",
+      "MTP-off was only 4\u20136 percent faster at four clients; retain the distinction between a modest measured gain and a strong general recommendation."
+    ]
+  },
+  "experimentsComplete": true,
+  "qualified": true,
+  "eligibleProfiles": [
+    "batch2048-no-mtp-followup"
+  ],
+  "errors": [],
+  "warnings": [],
+  "runs": [
+    {
+      "directory": "C:\\Users\\michael\\source\\github\\mycall\\n1x-ai\\results\\eff-20261024-followup-run-batch2048-no-mtp-followup",
+      "status": "complete",
+      "config": {
+        "demandAdmission": true,
+        "kvCacheDtype": "fp8_e4m3",
+        "parallelRestore": true,
+        "note": "Both comparison phases use this same precision and KV capacity. FP8 is experimental; not a BF16 quality-equivalence claim.",
+        "parallelSessions": 2,
+        "prefillBatchTokens": 2048,
+        "agentTurns": 12,
+        "disableMtp": true,
+        "eagerPrefetch": false,
+        "prefixExperiment": false,
+        "requestSeed": 0,
+        "restoreWaitMs": 0,
+        "modelArgs": [
+          "--model",
+          "/model",
+          "--served-model-name",
+          "qwen",
+          "--host",
+          "0.0.0.0",
+          "--port",
+          "8000",
+          "--max-model-len",
+          "262144",
+          "--max-num-seqs",
+          "16",
+          "--gpu-memory-utilization",
+          "0.01",
+          "--kv-cache-memory-bytes",
+          "8589934592",
+          "--load-format",
+          "safetensors",
+          "--safetensors-load-strategy",
+          "lazy",
+          "--enable-prefix-caching",
+          "--enable-chunked-prefill",
+          "--max-num-batched-tokens",
+          "2048",
+          "--mamba-ssm-cache-dtype",
+          "bfloat16",
+          "--kv-cache-dtype",
+          "fp8_e4m3",
+          "--no-enable-flashinfer-autotune",
+          "--enable-auto-tool-choice",
+          "--tool-call-parser",
+          "qwen3_xml",
+          "--reasoning-parser",
+          "qwen3",
+          "-cc.cudagraph_mode=FULL_AND_PIECEWISE",
+          "--block-size",
+          "2048"
+        ],
+        "optimizations": true,
+        "agentConcurrencies": [
+          1,
+          2,
+          3
+        ],
+        "capacityCheck": true,
+        "segmented": true,
+        "restoreQueueVersion": 1,
+        "allowBattery": false,
+        "agentContextTokens": 131000,
+        "agentLoops": true,
+        "lmcacheChunkSize": 2048,
+        "useVmm": true,
+        "collectRejectedReference": false,
+        "lmcacheL1GiB": 8,
+        "codingWorkload": false,
+        "agentConcurrencySweep": false,
+        "parallelContextTokens": 261000
+      },
+      "image": {
+        "id": "sha256:b68afc72ebd6e40644f5af330bb2dfec69d954308f089e2b03eb76738495c11e",
+        "tag": "sha256:b68afc72ebd6e40644f5af330bb2dfec69d954308f089e2b03eb76738495c11e"
+      },
+      "memory": {
+        "runDirectory": "C:\\Users\\michael\\source\\github\\mycall\\n1x-ai\\results\\eff-20261024-followup-run-batch2048-no-mtp-followup",
+        "pairedServingSamples": 174,
+        "gpuPeakUsedGiB": 77.322265625,
+        "gpuReportedCapacityGiB": 88,
+        "gpuUnusedAtPeakGiB": 10.677734375,
+        "configuredGpuKvGiB": 8,
+        "configuredLmcacheL1GiB": 8,
+        "lowestWindowsSample": {
+          "timestamp": "2026-10-24T22:26:45.0048464-07:00",
+          "availableGiB": 9.12778091430664,
+          "gpuUsedGiB": 77.322265625,
+          "guestAvailableGiB": 3.9629440307617188,
+          "guestCachedGiB": 3.9554977416992188,
+          "guestSwapUsedGiB": 6.4849853515e-05
+        },
+        "limitations": [
+          "Samples are periodic and fields are collected sequentially, not atomically.",
+          "Guest memory is within host memory; do not add guest and Windows totals.",
+          "Reported GPU unused memory is not a guarantee of successful allocation.",
+          "Guest Cached includes file cache; this capture cannot attribute it to PLE versus other files.",
+          "No per-process PSS or PyTorch reserved/allocated breakdown was recorded."
+        ]
+      },
+      "referenceFeatureRejection": {},
+      "referenceWrapperVerified": false,
+      "powerCondition": {
+        "timingUse": "Requires external power Online.",
+        "msiMode": "Eco Mode and Energy Saver (last user-reported); no mode changes by harness",
+        "externalPower": "100 W USB-C supply (user reported; connection state monitored separately)",
+        "note": "Windows PowerLineStatus Online indicates external power. It does not measure USB-C negotiated power or system draw.",
+        "allowBattery": false
+      },
+      "powerSamples": 236,
+      "powerStates": [
+        "Online"
+      ],
+      "allWindowsMinimumGiB": 9.113624572753906,
+      "agents": [
+        {
+          "concurrency": 1,
+          "cohorts": [
+            {
+              "turns": [
+                1,
+                2,
+                3,
+                4,
+                5
+              ],
+              "correctTurns": 5,
+              "httpWallSeconds": 19.65993022918701,
+              "correctTurnsPerSecond": 0.2543244020559661,
+              "latencyP50Seconds": 3.9253429000000324,
+              "latencyP95Seconds": 4.0735680999996475,
+              "allCorrect": true,
+              "cachePath": "gpu",
+              "gpuHitTokens": 1310720.0,
+              "externalHitTokens": 0.0,
+              "loadedChunks": 0.0
+            },
+            {
+              "turns": [
+                7,
+                8,
+                9,
+                10,
+                11
+              ],
+              "correctTurns": 5,
+              "httpWallSeconds": 22.511144161224365,
+              "correctTurnsPerSecond": 0.2221122109205156,
+              "latencyP50Seconds": 4.373535100000026,
+              "latencyP95Seconds": 4.767948099999558,
+              "allCorrect": true,
+              "cachePath": "gpu",
+              "gpuHitTokens": 1310720.0,
+              "externalHitTokens": 0.0,
+              "loadedChunks": 0.0
+            }
+          ],
+          "complete": true,
+          "historyPromptTokens": {
+            "0": [
+              131403,
+              131550,
+              131697,
+              131844,
+              131991,
+              132138,
+              132285,
+              132432,
+              132579,
+              132726,
+              132876,
+              133027
+            ]
+          },
+          "allCorrect": true,
+          "restore": [
+            {
+              "turn": 6,
+              "gpuReset": true,
+              "wallSeconds": 5.280352699999639,
+              "allCorrect": true,
+              "completionTokens": 82,
+              "requestWallSeconds": 4.235592603683472,
+              "outputTokensPerRequestWallSecond": 19.359746716123954,
+              "outputTokensPerWallSecond": 15.529265687120787,
+              "sessionSeconds": [
+                4.210202300000219
+              ],
+              "metrics": {
+                "loadedChunks": 65.0,
+                "gpuHitTokens": 131072.0,
+                "gpuQueriedTokens": 264509.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 131072.0,
+                "preemptions": 0.0,
+                "draftTokens": 0,
+                "acceptedDraftTokens": 0,
+                "draftAcceptance": null
+              }
+            }
+          ],
+          "cold": {
+            "turn": 0,
+            "gpuReset": false,
+            "wallSeconds": 51.12594839999974,
+            "allCorrect": true,
+            "completionTokens": 82,
+            "requestWallSeconds": 50.0713837146759,
+            "outputTokensPerRequestWallSecond": 1.6376619521294722,
+            "outputTokensPerWallSecond": 1.6038822274444187,
+            "sessionSeconds": [
+              50.05729500000052
+            ],
+            "metrics": {
+              "loadedChunks": 0.0,
+              "gpuHitTokens": 131072.0,
+              "gpuQueriedTokens": 262745.0,
+              "prefetchFailureChunks": 0,
+              "externalHitTokens": 0.0,
+              "preemptions": 0.0,
+              "draftTokens": 0,
+              "acceptedDraftTokens": 0,
+              "draftAcceptance": null
+            }
+          },
+          "metrics": {
+            "loadedChunks": 65.0,
+            "gpuHitTokens": 2883584.0,
+            "gpuQueriedTokens": 3172360.0,
+            "prefetchFailureChunks": 0,
+            "externalHitTokens": 131072.0,
+            "preemptions": 0.0,
+            "draftTokens": 0,
+            "acceptedDraftTokens": 0,
+            "draftAcceptance": null
+          }
+        },
+        {
+          "concurrency": 2,
+          "cohorts": [
+            {
+              "turns": [
+                1,
+                2,
+                3,
+                4,
+                5
+              ],
+              "correctTurns": 10,
+              "httpWallSeconds": 32.958094120025635,
+              "correctTurnsPerSecond": 0.30341560296485437,
+              "latencyP50Seconds": 6.366078000000016,
+              "latencyP95Seconds": 6.873942500000339,
+              "allCorrect": true,
+              "cachePath": "gpu",
+              "gpuHitTokens": 2621440.0,
+              "externalHitTokens": 0.0,
+              "loadedChunks": 0.0
+            },
+            {
+              "turns": [
+                7,
+                8,
+                9,
+                10,
+                11
+              ],
+              "correctTurns": 10,
+              "httpWallSeconds": 37.52279734611511,
+              "correctTurnsPerSecond": 0.2665046506996457,
+              "latencyP50Seconds": 7.314270299999862,
+              "latencyP95Seconds": 7.6933530999999675,
+              "allCorrect": true,
+              "cachePath": "gpu",
+              "gpuHitTokens": 2621440.0,
+              "externalHitTokens": 0.0,
+              "loadedChunks": 0.0
+            }
+          ],
+          "complete": true,
+          "historyPromptTokens": {
+            "0": [
+              131403,
+              131550,
+              131697,
+              131844,
+              131991,
+              132138,
+              132285,
+              132432,
+              132579,
+              132726,
+              132876,
+              133027
+            ],
+            "1": [
+              131403,
+              131559,
+              131715,
+              131871,
+              132027,
+              132183,
+              132339,
+              132495,
+              132651,
+              132807,
+              132966,
+              133126
+            ]
+          },
+          "allCorrect": true,
+          "restore": [
+            {
+              "turn": 6,
+              "gpuReset": true,
+              "wallSeconds": 8.314821999999822,
+              "allCorrect": true,
+              "completionTokens": 173,
+              "requestWallSeconds": 7.274190664291382,
+              "outputTokensPerRequestWallSecond": 23.78271452922562,
+              "outputTokensPerWallSecond": 20.806218100640482,
+              "sessionSeconds": [
+                6.895005299999866,
+                7.253765999999814
+              ],
+              "metrics": {
+                "loadedChunks": 130.0,
+                "gpuHitTokens": 262144.0,
+                "gpuQueriedTokens": 529126.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 262144.0,
+                "preemptions": 0.0,
+                "draftTokens": 0,
+                "acceptedDraftTokens": 0,
+                "draftAcceptance": null
+              }
+            }
+          ],
+          "cold": {
+            "turn": 0,
+            "gpuReset": false,
+            "wallSeconds": 100.77036240000007,
+            "allCorrect": true,
+            "completionTokens": 173,
+            "requestWallSeconds": 99.71374368667603,
+            "outputTokensPerRequestWallSecond": 1.7349664510000404,
+            "outputTokensPerWallSecond": 1.7167746138819076,
+            "sessionSeconds": [
+              97.83109390000027,
+              99.69979869999997
+            ],
+            "metrics": {
+              "loadedChunks": 0.0,
+              "gpuHitTokens": 262144.0,
+              "gpuQueriedTokens": 525490.0,
+              "prefetchFailureChunks": 0,
+              "externalHitTokens": 0.0,
+              "preemptions": 0.0,
+              "draftTokens": 0,
+              "acceptedDraftTokens": 0,
+              "draftAcceptance": null
+            }
+          },
+          "metrics": {
+            "loadedChunks": 130.0,
+            "gpuHitTokens": 5767168.0,
+            "gpuQueriedTokens": 6345908.0,
+            "prefetchFailureChunks": 0,
+            "externalHitTokens": 262144.0,
+            "preemptions": 0.0,
+            "draftTokens": 0,
+            "acceptedDraftTokens": 0,
+            "draftAcceptance": null
+          }
+        },
+        {
+          "concurrency": 3,
+          "cohorts": [
+            {
+              "turns": [
+                1,
+                2,
+                3,
+                4,
+                5
+              ],
+              "correctTurns": 15,
+              "httpWallSeconds": 41.56852340698242,
+              "correctTurnsPerSecond": 0.36084995979146073,
+              "latencyP50Seconds": 8.015933199999836,
+              "latencyP95Seconds": 8.678043700000217,
+              "allCorrect": true,
+              "cachePath": "gpu",
+              "gpuHitTokens": 3932160.0,
+              "externalHitTokens": 0.0,
+              "loadedChunks": 0.0
+            },
+            {
+              "turns": [
+                7,
+                8,
+                9,
+                10,
+                11
+              ],
+              "correctTurns": 15,
+              "httpWallSeconds": 46.28757882118225,
+              "correctTurnsPerSecond": 0.3240610198677244,
+              "latencyP50Seconds": 9.132538600000316,
+              "latencyP95Seconds": 9.74947629999997,
+              "allCorrect": true,
+              "cachePath": "gpu",
+              "gpuHitTokens": 3932160.0,
+              "externalHitTokens": 0.0,
+              "loadedChunks": 0.0
+            }
+          ],
+          "complete": true,
+          "historyPromptTokens": {
+            "0": [
+              131403,
+              131550,
+              131697,
+              131844,
+              131991,
+              132138,
+              132285,
+              132432,
+              132579,
+              132726,
+              132876,
+              133027
+            ],
+            "1": [
+              131403,
+              131550,
+              131697,
+              131844,
+              131991,
+              132138,
+              132285,
+              132432,
+              132579,
+              132726,
+              132876,
+              133027
+            ],
+            "2": [
+              131403,
+              131550,
+              131697,
+              131844,
+              131991,
+              132138,
+              132285,
+              132432,
+              132579,
+              132726,
+              132876,
+              133027
+            ]
+          },
+          "allCorrect": true,
+          "restore": [
+            {
+              "turn": 6,
+              "gpuReset": true,
+              "wallSeconds": 9.768263599999955,
+              "allCorrect": true,
+              "completionTokens": 246,
+              "requestWallSeconds": 8.729002714157104,
+              "outputTokensPerRequestWallSecond": 28.181913565111593,
+              "outputTokensPerWallSecond": 25.183595577826253,
+              "sessionSeconds": [
+                8.611786100000245,
+                8.529041300000245,
+                8.706175799999983
+              ],
+              "metrics": {
+                "loadedChunks": 195.0,
+                "gpuHitTokens": 393216.0,
+                "gpuQueriedTokens": 793527.0,
+                "prefetchFailureChunks": 0,
+                "externalHitTokens": 393216.0,
+                "preemptions": 0.0,
+                "draftTokens": 0,
+                "acceptedDraftTokens": 0,
+                "draftAcceptance": null
+              }
+            }
+          ],
+          "cold": {
+            "turn": 0,
+            "gpuReset": false,
+            "wallSeconds": 147.77624590000005,
+            "allCorrect": true,
+            "completionTokens": 246,
+            "requestWallSeconds": 146.7199101448059,
+            "outputTokensPerRequestWallSecond": 1.6766640584581134,
+            "outputTokensPerWallSecond": 1.6646789103471191,
+            "sessionSeconds": [
+              146.7023538000003,
+              145.22178859999985,
+              145.5929741999994
+            ],
+            "metrics": {
+              "loadedChunks": 0.0,
+              "gpuHitTokens": 393216.0,
+              "gpuQueriedTokens": 788235.0,
+              "prefetchFailureChunks": 0,
+              "externalHitTokens": 0.0,
+              "preemptions": 0.0,
+              "draftTokens": 0,
+              "acceptedDraftTokens": 0,
+              "draftAcceptance": null
+            }
+          },
+          "metrics": {
+            "loadedChunks": 195.0,
+            "gpuHitTokens": 8650752.0,
+            "gpuQueriedTokens": 9517080.0,
+            "prefetchFailureChunks": 0,
+            "externalHitTokens": 393216.0,
+            "preemptions": 0.0,
+            "draftTokens": 0,
+            "acceptedDraftTokens": 0,
+            "draftAcceptance": null
+          }
+        }
+      ],
+      "parallel": [
+        {
+          "stage": "cold",
+          "allCorrect": true,
+          "requestCount": 2,
+          "promptTokens": [
+            260988,
+            260988
+          ],
+          "allResponsesCorrect": true,
+          "metrics": {
+            "loadedChunks": 0.0,
+            "gpuHitTokens": 0.0,
+            "gpuQueriedTokens": 521976.0,
+            "prefetchFailureChunks": 0,
+            "externalHitTokens": 0.0,
+            "preemptions": 0.0,
+            "draftTokens": 0,
+            "acceptedDraftTokens": 0,
+            "draftAcceptance": null
+          }
+        },
+        {
+          "stage": "gpu-warm",
+          "allCorrect": true,
+          "requestCount": 2,
+          "promptTokens": [
+            260988,
+            260988
+          ],
+          "allResponsesCorrect": true,
+          "metrics": {
+            "loadedChunks": 0.0,
+            "gpuHitTokens": 520192.0,
+            "gpuQueriedTokens": 521976.0,
+            "prefetchFailureChunks": 0,
+            "externalHitTokens": 0.0,
+            "preemptions": 0.0,
+            "draftTokens": 0,
+            "acceptedDraftTokens": 0,
+            "draftAcceptance": null
+          }
+        },
+        {
+          "stage": "gpu-reset",
+          "allCorrect": true,
+          "requestCount": 2,
+          "promptTokens": [
+            260988,
+            260988
+          ],
+          "allResponsesCorrect": true,
+          "metrics": {
+            "loadedChunks": 256.0,
+            "gpuHitTokens": 0.0,
+            "gpuQueriedTokens": 521976.0,
+            "prefetchFailureChunks": 0,
+            "externalHitTokens": 520192.0,
+            "preemptions": 0.0,
+            "draftTokens": 0,
+            "acceptedDraftTokens": 0,
+            "draftAcceptance": null
+          }
+        }
+      ],
+      "featuresPassed": true,
+      "profileName": "batch2048-no-mtp-followup",
+      "qualificationErrors": [],
+      "qualified": true
+    }
+  ]
+}
