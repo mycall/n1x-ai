@@ -1,6 +1,6 @@
 #Requires -Version 5.1
 param(
-    [ValidateSet('all','vllm','aiperf','ruler','scheduler')][string]$Suite='all',
+    [ValidateSet('all','vllm','aiperf','ruler','scheduler','speculation')][string]$Suite='all',
     [string]$Profile='',
     [string]$PowerMode='Not recorded',
     [ValidateRange(1,16)][int]$SchedulerConcurrency=4,

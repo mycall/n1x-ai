@@ -26,7 +26,7 @@ The restore queue can wait briefly for space released by another restore. It doe
 
 ## Cache reuse
 
-Chunk size is 2,048 tokens; partial chunks and changed prefixes affect reuse. See [API guidance](../AGENTS.md) for prompt construction and cache salts, and [benchmark results](Benchmarks.md#feature-and-cache-validation) for verified restores.
+Chunk size is 2,048 tokens for the standard cache profiles and 1,664 for the experimental DFlash2 profile. Partial chunks and changed prefixes affect reuse. See [API guidance](../AGENTS.md) for prompt construction and cache salts, and [benchmark results](Benchmarks.md#feature-and-cache-validation) for verified restores.
 
 ## Ports and privacy
 

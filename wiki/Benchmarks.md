@@ -13,7 +13,7 @@ Reference system: MSI Prestige N16 Flip AI+ with NVIDIA RTX Spark N1X, 128 GiB s
 - An 8 GiB LMCache L1 pool and SSD L2; 512 MiB physical VMM allocation segments.
 - vLLM 0.32.0, LMCache 0.5.6, PyTorch 2.13.0+cu130.
 
-All tables use this configuration. Results are single trials; small differences require repeated measurements.
+The main benchmark tables use this configuration; the DFlash2 comparison specifies its separate profile. Results are single trials; small differences require repeated measurements.
 
 ## Serving throughput
 
@@ -84,6 +84,38 @@ All probes complete with zero observed preemptions. Overlap measures response in
 | 260,877-token retrieval with SSD-backed restore | Pass; 258,048 external-cache hit tokens, one GPU restore, 127 SSD-prefetched chunks, zero native prefix-hit tokens, 12/12 MTP draft tokens accepted |
 
 Vision and maximum context are separate checks. See [service validation](Development.md#service-validation) for commands.
+
+## DFlash2 comparison
+
+The optional `speculation` suite compares identical short prompts at concurrency 1, temperature 0, thinking disabled, and a 512-token output cap. Each task runs twice with a shared per-task cache salt. Values are the mean streamed decode-rate estimate, `(completion_tokens - 1) / (completion time - first content time)`, excluding initial prefill.
+
+| Task | MTP, one draft token (tokens/s) | DFlash2, three draft tokens (tokens/s) |
+| --- | ---: | ---: |
+| JSON | 50.1 | 81.4 |
+| Python code | 46.6 | 78.9 |
+| Explanation | 41.6 | 49.9 |
+
+MTP uses the reference `cache-mtp` profile. DFlash2 uses the [experimental 262K profile](Configuration.md#dflash2), with four sequence slots, an 8 GiB KV pool, 1,664-token blocks/chunks, and the compressed indexer in FP8. This compares complete profiles in separate runs, not the speculative algorithm in isolation. Both JSON answers per profile are exact. Code responses reach the output cap; their rates are not a code-correctness score. Explanation outputs have no automatic quality score. The prompts and timing implementation are in [speculation_probe.py](../benchmarks/speculation_probe.py).
+
+The four-request scheduling probe reaches four running requests and four overlapping reply intervals, with 54.5 aggregate output tokens/s and 5.53 s mean first-token latency. This is not faster than the reference MTP four-request result of 56.0 tokens/s; single-request decode gains do not establish a concurrency-throughput advantage.
+
+The [current DFlash2 layout](Configuration.md#dflash2) passes streaming, JSON, tool, reasoning, shapes, OCR, and a 260,877-token retrieval check. Vision and maximum context are separate checks. The GPU partition stays at 88 GiB and the KV pool at 8 GiB. Its reported capacity is 520,451 tokens at the 262,144 context setting; this estimate includes context-dependent hybrid-cache overhead and does not guarantee simultaneous maximum-length sessions.
+
+| DFlash2 cache qualification | Result |
+| --- | --- |
+| Two independent 130,877-token requests submitted together | Both correct; peak two running requests, zero preemptions |
+| Windows headroom during those concurrent requests | 7.58–7.89 GiB in five-second samples |
+| 260,877-token retrieval after GPU-prefix eviction | Correct, normal completion; 259,584 external-cache hit tokens, one completed GPU restore, 159 SSD-prefetched chunks, zero native prefix-hit tokens |
+
+These retrieval checks do not establish general long-document quality, simultaneous maximum-context vision, or four concurrent maximum-length sessions.
+
+With the desired profile running:
+
+```powershell
+.\benchmark.ps1 -Build -Suite speculation -Profile cache-dflash
+# Run separately, after switching the service back to MTP:
+.\benchmark.ps1 -Suite speculation -Profile cache-mtp
+```
 
 ## Run
 

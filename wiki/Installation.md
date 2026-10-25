@@ -31,3 +31,7 @@ With `-WithLMCache`, setup selects `cache-mtp`. Omit it to build and select `bas
 ## Start and verify
 
 Follow the [README quick start](../README.md#quick-start) to start the service and send a request. Runtime model access is offline after setup. See [Troubleshooting](Troubleshooting.md#api-is-not-ready) for startup delays and [Development](Development.md#service-validation) for feature checks.
+
+## Optional DFlash2 drafter
+
+`prepare-dflash.ps1` downloads [incoai/Qwen3.8-Flash-Next-DFlash2](https://huggingface.co/incoai/Qwen3.8-Flash-Next-DFlash2) revision `a22a1744e85c17364dcc54a6a420af7135d4c7f6` into the configured ModelRoot. The BF16 weights require about 1.2 GB of disk space. This download is separate from standard setup; see the [experimental profile](Configuration.md#dflash2).

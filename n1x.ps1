@@ -115,6 +115,11 @@ switch ($Action) {
         }
         $model = Join-Path $config.ModelRoot 'Qwen3.8-Flash-Next-W4A16-AutoRound-hybrid'
         $table = Join-Path $config.ModelRoot 'ple-table-fp8'
+        if($config.DFlash -and $config.Mtp){throw 'Select either MTP or DFlash, not both'}
+        $drafter = Join-Path $config.ModelRoot 'Qwen3.8-Flash-Next-DFlash2'
+        if($config.DFlash -and -not $PrintOnly -and -not(Test-Path "$drafter/model.safetensors")){
+            throw 'Download the DFlash2 checkpoint with prepare-dflash.ps1 first'
+        }
         if(-not $PrintOnly){
         foreach ($file in @("$model/config.json", "$model/model.safetensors.index.json")) {
             if (-not (Test-Path -LiteralPath $file)) { throw "Missing model file: $file" }
@@ -152,12 +157,20 @@ switch ($Action) {
             '--env','LMCACHE_TRACK_USAGE=false','--env','DO_NOT_TRACK=1','--env','VLLM_NO_USAGE_STATS=1','--env','HF_HUB_DISABLE_TELEMETRY=1',
             '--volume', "${PSScriptRoot}/profiles:/profiles:ro"
         )
+        if($config.DFlash){$run+=@('--volume',"${drafter}:/drafter:ro")}
+        if($config.ContainsKey('IndexerFP8') -and $config.IndexerFP8){$run+=@('--env','VLLM_INDEXER_FP8=1')}
         if($config.UseLMCache){
             $stateDirectory=Join-Path $PSScriptRoot ".state/$name"
             if(-not $PrintOnly){Write-Headroom}
             $namespace=if($config.Mtp){'qwen-8b82-v032-lmc056-fp8-mtp'}else{'qwen-8b82-v032-lmc056-fp8'}
+            if($config.DFlash){$namespace='qwen-8b82-v032-lmc056-fp8-dflash-a22a'}
+            if($config.ContainsKey('IndexerFP8') -and $config.IndexerFP8){$namespace+='-idxfp8'}
+            if($config.CacheBlockTokens -ne 2048 -or $config.LmcacheChunkTokens -ne 2048){
+                $namespace+="-b$($config.CacheBlockTokens)-c$($config.LmcacheChunkTokens)"
+            }
             $run+=@('--volume',"${stateDirectory}:/state:ro",'--volume',"$($config.LmcacheVolume):/lmcache",
                 '--env',"N1X_CACHE_NAMESPACE=$namespace",'--env',"N1X_LMCACHE_L1_GIB=$($config.LmcacheL1GiB)",
+                '--env',"N1X_CACHE_BLOCK_TOKENS=$($config.CacheBlockTokens)",'--env',"N1X_LMCACHE_CHUNK_TOKENS=$($config.LmcacheChunkTokens)",
                 '--env',"N1X_RESTORE_WAIT_MS=$($config.RestoreWaitMs)",'--env',"N1X_WINDOWS_MINIMUM_GIB=$($config.WindowsMinimumGiB)")
         }
         $run+=@($config.Image,
@@ -174,6 +187,7 @@ switch ($Action) {
         if ($config.ContainsKey('CudaGraphMode')) { $run += "-cc.cudagraph_mode=$($config.CudaGraphMode)" }
         else { $run += '--enforce-eager' }
         if ($config.Mtp) { $run += @('--config', '/profiles/mtp.yaml') }
+        if ($config.DFlash) { $run += @('--config', '/profiles/dflash.yaml', '--kv-cache-dtype-skip-layers', 'sliding_window') }
         if ($PrintOnly) { Write-Output ('wslc ' + (($run | ForEach-Object { '"' + $_ + '"' }) -join ' ')); return }
         # WSLC refuses a name collision if another process created it meanwhile.
         Invoke-Wslc $run

@@ -222,7 +222,7 @@ def scheduler(args):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--suite", choices=["all", "vllm", "aiperf", "ruler", "scheduler"], default="all")
+    parser.add_argument("--suite", choices=["all", "vllm", "aiperf", "ruler", "scheduler", "speculation"], default="all")
     parser.add_argument("--url", default="http://127.0.0.1:8000")
     parser.add_argument("--out", type=Path, default=Path("/results"))
     parser.add_argument("--concurrency", type=int, nargs="+", default=[1, 2, 4, 8, 16])
@@ -248,6 +248,9 @@ def main():
             globals()[name](args)
     if args.suite == "scheduler":
         scheduler(args)
+    if args.suite == "speculation":
+        command([sys.executable, "/benchmarks/speculation_probe.py", "--out", args.out / "speculation",
+                 "--url", args.url], args.out, "speculation-probe")
     save(args.out / "complete.json", {"completed": True, "suite": args.suite})
 
 

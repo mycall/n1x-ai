@@ -1,0 +1,5 @@
+speculative-config:
+  method: dflash
+  model: /drafter
+  num_speculative_tokens: 3
+  disable_eagle_block_drop: true

@@ -20,6 +20,9 @@ function Get-N1xConfig {
     if($config.Port -lt 1 -or $config.Port -gt 65535){throw 'Port must be between 1 and 65535'}
     if($config.Container -notmatch '^[a-zA-Z0-9][a-zA-Z0-9_.-]+$'){throw 'Invalid container name'}
     if($config.WindowsMinimumGiB -lt 4){throw 'Keep at least 4 GiB of Windows headroom'}
+    if($config.CacheBlockTokens -le 0 -or $config.LmcacheChunkTokens -le 0 -or $config.LmcacheChunkTokens % $config.CacheBlockTokens){
+        throw 'LMCache chunk tokens must be a positive multiple of cache block tokens'
+    }
     $config['Profile']=$Profile
     return $config
 }

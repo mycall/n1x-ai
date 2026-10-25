@@ -13,8 +13,11 @@
     CacheVolume = 'n1x-qwen38-cache'
     PleVolume = 'n1x-ple-native'
     Mtp = $false
+    DFlash = $false
     UseLMCache = $false
     LmcacheL1GiB = 8
+    CacheBlockTokens = 2048
+    LmcacheChunkTokens = 2048
     LmcacheVolume = 'n1x-qwen38-lmcache'
     RestoreWaitMs = 0
     WindowsMinimumGiB = 4

@@ -20,6 +20,15 @@ try {
     try{Get-N1xConfig -Root $temporary -Profile '../escape';throw 'Traversal accepted'}catch{if($_.Exception.Message -ne 'Invalid profile name'){throw}}
     $preview=& "$root/n1x.ps1" start -Profile cache-mtp -ModelRoot $overrideRoot -PrintOnly
     if($preview -notmatch 'n1x-ai:lmcache' -or $preview -notmatch 'fp8_e4m3' -or $preview -notmatch '/profiles/mtp.yaml'){throw 'Portable launch preview failed'}
+    $draftPreview=& "$root/n1x.ps1" start -Profile cache-dflash -ModelRoot $overrideRoot -PrintOnly
+    foreach($required in @('/drafter:ro','/profiles/dflash.yaml','sliding_window','fp8-dflash-a22a','VLLM_INDEXER_FP8=1','-idxfp8')){
+        if(-not $draftPreview.Contains($required)){throw "DFlash launch missing $required"}
+    }
+    if($draftPreview.Contains('/profiles/mtp.yaml')){throw 'DFlash launch also enables MTP'}
+    [IO.File]::WriteAllText("$temporary/config.local.psd1",'@{CacheBlockTokens=1024;LmcacheChunkTokens=1536}')
+    try{Get-N1xConfig -Root $temporary;throw 'Misaligned cache geometry accepted'}catch{
+        if($_.Exception.Message -ne 'LMCache chunk tokens must be a positive multiple of cache block tokens'){throw}
+    }
     Write-Output 'Configuration and launch checks passed'
 } finally {
     # Only this explicitly created temporary directory may be removed.

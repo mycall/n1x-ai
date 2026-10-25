@@ -48,10 +48,14 @@ def main(arguments):
     try:
         check_headroom()
         namespace=os.environ.get('N1X_CACHE_NAMESPACE','qwen-v032-fp8-mtp')
+        block_tokens=int(os.environ.get('N1X_CACHE_BLOCK_TOKENS','2048'))
+        chunk_tokens=int(os.environ.get('N1X_LMCACHE_CHUNK_TOKENS','2048'))
+        if block_tokens<=0 or chunk_tokens<=0 or chunk_tokens%block_tokens:
+            raise ValueError('LMCache chunk tokens must be a positive multiple of cache block tokens')
         server=subprocess.Popen([sys.executable,'-m','lmcache.v1.multiprocess.http_server',
             '--host','127.0.0.1','--port','5555','--http-host','127.0.0.1','--http-port','8080',
             '--l1-size-gb',os.environ.get('N1X_LMCACHE_L1_GIB','8'),
-            '--eviction-policy','LRU','--chunk-size','2048','--separate-object-groups',
+            '--eviction-policy','LRU','--chunk-size',str(chunk_tokens),'--separate-object-groups',
             '--l2-prefetch-max-in-flight','1','--l2-adapter',json.dumps({
                 'type':'fs','base_path':'/lmcache/'+namespace,'use_odirect':True})],start_new_session=True)
         processes.append(server)
@@ -73,7 +77,7 @@ def main(arguments):
             'kv_connector_module_path':'lmcache.integration.vllm.lmcache_mp_connector',
             'kv_connector_extra_config':{'lmcache.mp.host':'127.0.0.1','lmcache.mp.port':5555,'lmcache.mp.use_vmm_api':True}}
         model=subprocess.Popen([sys.executable,'-m','vllm.entrypoints.openai.api_server',*arguments,
-            '--block-size','2048','--mamba-cache-mode','align','--kv-transfer-config',json.dumps(connector)],start_new_session=True)
+            '--block-size',str(block_tokens),'--mamba-cache-mode','align','--kv-transfer-config',json.dumps(connector)],start_new_session=True)
         processes.append(model)
         while not STOP.wait(2):
             check_headroom()
