@@ -19,13 +19,14 @@ try {
     $changedDefault=& "$temporary/n1x.ps1" start -Profile cache-mtp -ModelRoot $modelRoot -PrintOnly
     $changedFingerprint=[regex]::Match($changedDefault,'n1x-ai.config-sha=([0-9a-f]{64})').Groups[1].Value
     if($changedFingerprint -ne $fingerprint){throw 'Changing only the default selection invalidated an explicit profile'}
-    $recoveryState=[pscustomobject]@{exitCode=1; fingerprint=$fingerprint; calls=[Collections.Generic.List[string]]::new()}
+    $recoveryState=[pscustomobject]@{exitCode=1; fingerprint=$fingerprint; exists=$true; imageExists=$true; calls=[Collections.Generic.List[string]]::new()}
     function wslc {
         param([Parameter(ValueFromRemainingArguments=$true)][string[]]$Arguments)
         $global:LASTEXITCODE=0
         $recoveryState.calls.Add(($Arguments -join ' '))
         switch($Arguments[0]) {
-            'list' {if($Arguments -contains '--all'){'{"Names":"n1x-qwen38-cache-mtp"}'};return}
+            'image' {if(-not $recoveryState.imageExists){$global:LASTEXITCODE=1};return}
+            'list' {if($recoveryState.exists -and $Arguments -contains '--all'){'{"Names":"n1x-qwen38-cache-mtp"}'};return}
             'inspect' {
                 @{Config=@{Labels=@{'n1x-ai.managed'='true';'n1x-ai.config-sha'=$recoveryState.fingerprint}};
                   State=@{Running=$false;ExitCode=$recoveryState.exitCode}}|ConvertTo-Json -Depth 6
@@ -47,6 +48,7 @@ try {
     }
     function Start-Process {
         param($FilePath,$WindowStyle,$ArgumentList,[switch]$PassThru)
+        $recoveryState.calls.Add('monitor-start')
         [pscustomobject]@{Id=987654}
     }
     foreach($action in @('start','restart')){
@@ -54,6 +56,8 @@ try {
         & "$temporary/n1x.ps1" $action -Profile cache-mtp -ModelRoot $modelRoot | Out-Null
         if($recoveryState.calls -notcontains 'rm n1x-qwen38-cache-mtp' -or -not @($recoveryState.calls|Where-Object {$_ -like 'run -d *'}).Count){throw "Failed cache container was not replaced by $action"}
         if($recoveryState.calls -contains 'start n1x-qwen38-cache-mtp'){throw 'Failed cache container was reused'}
+        $launch=@($recoveryState.calls | Where-Object {$_ -like 'run -d *'})[0]
+        if($recoveryState.calls.IndexOf('monitor-start') -gt $recoveryState.calls.IndexOf($launch)){throw 'Monitor started after blocking launch'}
     }
     $recoveryState.exitCode=0
     $recoveryState.calls.Clear()
@@ -73,7 +77,19 @@ try {
         & "$temporary/n1x.ps1" start -Profile cache-mtp -ModelRoot $modelRoot | Out-Null
         throw 'Changed runtime settings accepted'
     } catch {if($_.Exception.Message -notlike 'Container settings differ.*'){throw}}
-    Write-Output 'Failed-start recovery, legacy labels, and runtime-setting checks passed'
+    $recoveryState.exists=$false
+    try {
+        & "$temporary/n1x.ps1" wait -Profile cache-mtp -ModelRoot $modelRoot
+        throw 'Wait accepted a missing container'
+    } catch {if($_.Exception.Message -notlike "Container '*does not exist in this WSLC session.*"){throw}}
+    $recoveryState.imageExists=$false
+    $recoveryState.calls.Clear()
+    try {
+        & "$temporary/n1x.ps1" start -Profile cache-mtp -ModelRoot $modelRoot
+        throw 'Start accepted a missing image'
+    } catch {if($_.Exception.Message -notlike "Local image '*unavailable in this WSLC session.*"){throw}}
+    if(@($recoveryState.calls | Where-Object {$_ -like 'run *'}).Count){throw 'Missing image triggered an implicit pull'}
+    Write-Output 'Failed-start recovery, missing resources, legacy labels, and runtime-setting checks passed'
 } finally {
     $resolved=[IO.Path]::GetFullPath($temporary)
     if(-not $resolved.StartsWith([IO.Path]::GetFullPath([IO.Path]::GetTempPath()),[StringComparison]::OrdinalIgnoreCase)){throw 'Unsafe test cleanup path'}

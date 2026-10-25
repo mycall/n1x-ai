@@ -2,6 +2,7 @@ param([switch]$PrintOnly,[switch]$WithLMCache,[switch]$CacheOnly)
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 $root = $PSScriptRoot
+. "$root/scripts/proxy.ps1"
 if($PrintOnly){
     if(-not $CacheOnly){
         Write-Output "git clone --branch magi-v5-public https://github.com/Saren-Arterius/qwen3.8-Flash-DGX-AutoRound.git $root/upstream"
@@ -12,17 +13,14 @@ if($PrintOnly){
     if($WithLMCache -or $CacheOnly){Write-Output "wslc build -t n1x-ai:lmcache -f $root/Dockerfile.lmcache $root"}
     return
 }
+$resetSession=Sync-N1xWslcProxy
+try {
+$proxyArguments=@(Get-N1xProxyBuildArguments)
 if(-not $CacheOnly){
 $upstream = Join-Path $root 'upstream'
 $revision = '1c66e5b1a69c7bab499ff7649b4143e989bd0ed0'
-if (-not (Test-Path "$upstream/.git")) {
-    & git clone --branch magi-v5-public https://github.com/Saren-Arterius/qwen3.8-Flash-DGX-AutoRound.git $upstream
-    if ($LASTEXITCODE -ne 0) { throw 'Upstream clone failed' }
-    & git -C $upstream checkout --detach $revision
-    if ($LASTEXITCODE -ne 0) { throw 'Upstream checkout failed' }
-}
-$actual = & git -C $upstream rev-parse HEAD
-if ($actual -ne $revision) { throw "Expected upstream $revision, found $actual" }
+. "$root/scripts/upstream.ps1"
+Initialize-N1xUpstream $root 'https://github.com/Saren-Arterius/qwen3.8-Flash-DGX-AutoRound.git' $revision
 $generated = Join-Path $root '.build'
 New-Item -ItemType Directory -Force $generated | Out-Null
 $dockerfile = Get-Content "$upstream/recipe/build/image/Dockerfile.v032" -Raw
@@ -35,17 +33,26 @@ $commands = @(
 foreach ($command in $commands) {
     Write-Host ('wslc ' + ($command -join ' '))
     if (-not $PrintOnly) {
-        & wslc @command
+        $withProxy=@($command[0])+$proxyArguments+@($command[1..($command.Length-1)])
+        & wslc @withProxy
         if ($LASTEXITCODE -ne 0) { throw "Build failed ($LASTEXITCODE)" }
     }
 }
 }
 if($WithLMCache -or $CacheOnly){
-    $arguments=@('build','--progress','plain','-t','n1x-ai:lmcache','-f',"$root/Dockerfile.lmcache")
+    $arguments=@('build')+$proxyArguments+@('--progress','plain','-t','n1x-ai:lmcache','-f',"$root/Dockerfile.lmcache")
     foreach($entry in @(@('https_proxy','HTTPS_PROXY'),@('http_proxy','HTTP_PROXY'))){
         if([Environment]::GetEnvironmentVariable($entry[1])){$arguments+=@('--secret',"id=$($entry[0]),env=$($entry[1])")}
     }
     $arguments+=$root
     if($PrintOnly){Write-Output ('wslc '+($arguments -join ' '))}
     else{& wslc @arguments;if($LASTEXITCODE -ne 0){throw 'LMCache image build failed'}}
+}
+} finally {
+    if($resetSession){
+        # WSLC lifecycle event subscriptions do not survive replacing dockerd.
+        # Builds require an idle session; close it so serving gets fresh state.
+        & wslc system session terminate
+        if($LASTEXITCODE -ne 0){Write-Warning 'Reset the idle WSLC session before serving: wslc system session terminate'}
+    }
 }

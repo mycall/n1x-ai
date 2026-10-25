@@ -1,5 +1,5 @@
 param(
-    [ValidateSet('setup', 'clean', 'start', 'stop', 'restart', 'recreate', 'status', 'wait', 'logs', 'test', 'doctor')]
+    [ValidateSet('setup', 'clean', 'uninstall', 'start', 'stop', 'restart', 'recreate', 'status', 'wait', 'logs', 'test', 'doctor')]
     [string]$Action = 'status',
     [string]$Profile = '',
     [string]$ModelRoot = '',
@@ -12,6 +12,7 @@ param(
     [switch]$SkipDownload,
     [switch]$SkipBuild,
     [switch]$SkipPleCopy,
+    [switch]$Rebuild,
     [string]$VhdPath = ''
 )
 $ErrorActionPreference = 'Stop'
@@ -19,11 +20,15 @@ Set-StrictMode -Version Latest
 . "$PSScriptRoot/scripts/config.ps1"
 if($Action -eq 'setup'){
     if($PrintOnly){Write-Output '.\setup.ps1 -WithLMCache -ModelRoot <configured ModelRoot or ~/Models>'; return}
-    & "$PSScriptRoot/setup.ps1" -WithLMCache -ModelRoot $ModelRoot -SkipDownload:$SkipDownload -SkipBuild:$SkipBuild -SkipPleCopy:$SkipPleCopy
+    & "$PSScriptRoot/setup.ps1" -WithLMCache -ModelRoot $ModelRoot -SkipDownload:$SkipDownload -SkipBuild:$SkipBuild -SkipPleCopy:$SkipPleCopy -Rebuild:$Rebuild
     return
 }
 $config = Get-N1xConfig -Root $PSScriptRoot -Profile $Profile -ModelRoot $ModelRoot -Port $Port
-if($Action -eq 'clean'){
+if($Action -in @('clean','uninstall')){
+    if(-not $VhdPath){
+        . "$PSScriptRoot/scripts/resources.ps1"
+        Invoke-N1xResourceCleanup -Root $PSScriptRoot -Uninstall:($Action -eq 'uninstall') -PrintOnly:$PrintOnly
+    } elseif($Action -eq 'uninstall'){throw 'Use clean -VhdPath for offline compaction after uninstall'}
     & "$PSScriptRoot/scripts/clean.ps1" -Root $PSScriptRoot -ModelRoot $config.ModelRoot -PrintOnly:$PrintOnly -VhdPath $VhdPath
     return
 }
@@ -134,7 +139,7 @@ switch ($Action) {
                     Write-Host "Recreating $name after an unsuccessful exit; named volumes are preserved."
                     Invoke-Wslc @('rm', $name)
                 } else {
-                    if($config.UseLMCache){Write-Headroom}
+                    if($config.UseLMCache){Write-Headroom; Start-MemoryMonitor}
                     if ($existing.State.Running) { Write-Host "$name is already running. Check status for API readiness." }
                     else { Invoke-Wslc @('start', $name); Write-Host "Starting $name with its existing configuration." }
                     if($config.UseLMCache){Start-MemoryMonitor}
@@ -159,6 +164,10 @@ switch ($Action) {
         }
         }
         $tableMount=$table
+        if(-not $PrintOnly){
+            & wslc image inspect $config.Image | Out-Null
+            if($LASTEXITCODE -ne 0){throw "Local image '$($config.Image)' is unavailable in this WSLC session. Run .\n1x.ps1 setup from the same non-elevated PowerShell used for serving. Elevated terminals can use a separate WSLC session."}
+        }
         if ($config.ContainsKey('PleVolume')) {
             $tableMount=$config.PleVolume
             if (-not $PrintOnly) {
@@ -220,6 +229,7 @@ switch ($Action) {
         if ($config.DFlash) { $run += @('--config', '/profiles/dflash.yaml', '--kv-cache-dtype-skip-layers', 'sliding_window') }
         if ($PrintOnly) { Write-Output ('wslc ' + (($run | ForEach-Object { '"' + $_ + '"' }) -join ' ')); return }
         # WSLC refuses a name collision if another process created it meanwhile.
+        if($config.UseLMCache){Start-MemoryMonitor}
         Invoke-Wslc $run
         if($config.UseLMCache){Start-MemoryMonitor}
         Write-Host "Loading model. Check .\n1x.ps1 status -Profile $Profile and .\n1x.ps1 logs -Profile $Profile. API: $endpoint/v1"
@@ -233,13 +243,14 @@ switch ($Action) {
         if($config.UseLMCache -and -not $old.State.Running -and $old.State.ExitCode -ne 0){
             & $PSCommandPath start -Profile $Profile -ModelRoot $config.ModelRoot -Port $config.Port
         } else {
-            if($config.UseLMCache){Write-Headroom}
+            if($config.UseLMCache){Write-Headroom; Start-MemoryMonitor}
             Invoke-Wslc @('restart', $name)
             if($config.UseLMCache){Start-MemoryMonitor}
         }
     }
     'logs' { Invoke-Wslc @('logs', '--tail', '100', $name) }
     'wait' {
+        if(-not(Get-ManagedContainer)){throw "Container '$name' does not exist in this WSLC session. Run .\n1x.ps1 start successfully before wait; use the same non-elevated terminal."}
         $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
         $lastNotice = [datetime]::MinValue
         Write-Host "Waiting up to $TimeoutSeconds seconds for $Profile at $endpoint ..."

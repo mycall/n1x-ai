@@ -3,6 +3,7 @@ Set-StrictMode -Version Latest
 $root=Split-Path $PSScriptRoot -Parent
 . "$root/scripts/models.ps1"
 . "$root/scripts/config.ps1"
+. "$root/scripts/upstream.ps1"
 $temporary=Join-Path ([IO.Path]::GetTempPath()) ('n1x-maintenance-'+[guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $temporary | Out-Null
 try {
@@ -29,6 +30,7 @@ try {
     & "$root/scripts/clean.ps1" -Root $temporary -ModelRoot "$temporary/models"
     if(Test-Path "$temporary/results/disposable.txt"){throw 'Ignored file retained'}
     if(Test-Path "$temporary/nested/source.txt"){throw 'Ignored checkout retained'}
+    if(Test-Path "$temporary/nested/.git"){throw 'Empty Git directories retained'}
     & "$root/scripts/clean.ps1" -Root $temporary -ModelRoot "$temporary/models" -PrintOnly | Out-Null
     foreach($file in @('config.local.psd1','models/weights.bin','.state/host.json','untracked.txt')){
         if(-not(Test-Path "$temporary/$file")){throw "Protected file deleted: $file"}
@@ -49,12 +51,24 @@ try {
     Copy-Item "$root/n1x.ps1" "$temporary/n1x.ps1"
     Copy-Item "$root/scripts/config.ps1" "$temporary/scripts/config.ps1"
     [IO.File]::WriteAllText("$temporary/setup.ps1",@'
-param([string]$ModelRoot,[switch]$WithLMCache,[switch]$SkipDownload,[switch]$SkipBuild,[switch]$SkipPleCopy)
+param([string]$ModelRoot,[switch]$WithLMCache,[switch]$SkipDownload,[switch]$SkipBuild,[switch]$SkipPleCopy,[switch]$Rebuild)
 if(-not $WithLMCache -or -not $SkipBuild -or $ModelRoot -ne '~\Models'){throw 'Setup arguments not forwarded'}
 '@)
     & "$temporary/n1x.ps1" setup -ModelRoot '~\Models' -SkipBuild
     $tildeConfig=Get-N1xConfig -Root $root -ModelRoot '~\Models'
     if($tildeConfig.ModelRoot -ne (Join-Path ([Environment]::GetFolderPath('UserProfile')) 'Models')){throw 'Home expansion failed'}
+    # An empty nested .git must not inherit the parent checkout's HEAD.
+    $origin="$temporary/origin"
+    & git init --quiet $origin
+    [IO.File]::WriteAllText("$origin/source.txt",'upstream fixture')
+    & git -C $origin add source.txt
+    & git -C $origin -c user.name=Test -c user.email=test@example.invalid commit --quiet -m fixture
+    if($LASTEXITCODE -ne 0){throw 'Fixture commit failed'}
+    $revision=& git -C $origin rev-parse HEAD
+    New-Item -ItemType Directory -Force "$temporary/upstream/.git/objects/info" | Out-Null
+    Initialize-N1xUpstream $temporary $origin $revision
+    Initialize-N1xUpstream $temporary $origin $revision
+    if(-not(Test-Path "$temporary/upstream/source.txt")){throw 'Incomplete upstream not repaired'}
     Write-Host 'Maintenance checks passed.'
 } finally {
     $resolved=[IO.Path]::GetFullPath($temporary)

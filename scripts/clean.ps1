@@ -10,6 +10,7 @@ $modelPath=[IO.Path]::GetFullPath($ModelRoot).TrimEnd('\','/')
 $raw=& git -C $rootPath -c core.quotepath=false ls-files --others --ignored --exclude-standard -z
 if($LASTEXITCODE -ne 0){throw 'Cannot enumerate ignored files'}
 $files=[Collections.Generic.List[IO.FileInfo]]::new()
+$directories=[Collections.Generic.List[string]]::new()
 $pending=[Collections.Generic.Stack[string]]::new()
 foreach($relative in (($raw -join "`n").Split([char]0))){if($relative){$pending.Push((Join-Path $rootPath $relative))}}
 $checked=[Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
@@ -26,6 +27,7 @@ while($pending.Count){
     }
     $item=Get-Item -LiteralPath $path -Force
     if($item.PSIsContainer){
+        $directories.Add($path)
         foreach($child in (Get-ChildItem -LiteralPath $path -Force)){$pending.Push($child.FullName)}
     } else {$files.Add($item)}
 }
@@ -44,7 +46,7 @@ foreach($file in $files){$bytes+=$file.Length}
 Write-Host "Ignored files: $($files.Count); bytes: $bytes"
 if($PrintOnly){
     $files | ForEach-Object {Write-Output "Delete: $($_.FullName)"}
-    Write-Output 'Trim: wslc system session run fstrim -av (skipped during offline VHDX compaction)'
+    Write-Output 'Trim: wslc system session run /usr/sbin/fstrim -av (skipped during offline VHDX compaction)'
     if($VhdPath){Write-Output "Compact offline: $VhdPath"}
     return
 }
@@ -54,6 +56,11 @@ if(-not $VhdPath){
     if(@($running | Where-Object {$_.Trim()}).Count){throw 'Stop project containers before cleaning. Use clean -PrintOnly to preview.'}
 }
 foreach($file in $files){Remove-Item -LiteralPath $file.FullName -Force}
+# Include empty Git directories (objects/info, refs/tags, etc.), which have
+# no deleted file whose parent cleanup could discover them.
+foreach($directory in ($directories | Sort-Object Length -Descending)){
+    if((Test-Path -LiteralPath $directory) -and -not @(Get-ChildItem -LiteralPath $directory -Force).Count){Remove-Item -LiteralPath $directory -Force}
+}
 # Remove only empty parents of deleted files; no recursive directory deletion.
 foreach($file in $files){
     $parent=$file.DirectoryName
@@ -82,8 +89,8 @@ if($VhdPath){
     }
     Write-Host "VHDX length: $before -> $((Get-Item -LiteralPath $VhdPath).Length) bytes"
 } else {
-    & wslc system session run fstrim -av
+    & wslc system session run /usr/sbin/fstrim -av
     if($LASTEXITCODE -ne 0){Write-Warning 'Ignored files cleaned, but WSLC trim failed. Retry from an interactive terminal. No physical disk reclamation is claimed.'}
     Write-Host 'TRIM releases unused Linux blocks; physical Windows reclamation may require offline clean -VhdPath <backing.vhdx> in elevated PowerShell.'
 }
-Write-Host 'Preserved models, local configuration, runtime state, images, and named volumes.'
+Write-Host 'Repository cleanup preserved Models, local configuration, and runtime state.'

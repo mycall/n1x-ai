@@ -9,6 +9,16 @@
 
 Use PowerShell from the repository root. If local script execution is blocked, use the execution policy permitted on your machine, for example `powershell -ExecutionPolicy Bypass -File .\n1x.ps1 setup`.
 
+Use a **non-administrator PowerShell** consistently for setup and serving. WSLC can use separate sessions for regular and elevated terminals, with different images, containers, and volumes. An image missing in an elevated terminal does not mean the regular session's installation was deleted. Elevation is only needed for [offline disk compaction](Configuration.md#cleanup-and-disk-reclamation).
+
+### Proxy
+
+Builds honor the current shell's `HTTP_PROXY`, `HTTPS_PROXY`, `NO_PROXY`, and `ALL_PROXY`. If you use `proxy.ps1 on` or `proxy.ps1 off`, call it in the setup terminal or open a new terminal afterward. No proxy address is hard-coded in this repository.
+
+Before building, the script synchronizes WSLC's Docker daemon HTTP/HTTPS proxy settings and forwards proxy variables to all build stages. A daemon proxy change requires all WSLC containers to be stopped; the script refuses to interrupt them. Run setup from an interactive terminal because WSLC session commands require a console. Empty proxy settings clear the daemon proxy and build arguments; if `proxy.ps1 off` restores a previous proxy, that restored setting is used. This routes HTTP/HTTPS requests through the proxy; it does not change the DNS server or proxy arbitrary network traffic.
+
+When proxy synchronization replaces the daemon, the build closes that idle WSLC session afterward, preserving images and named volumes. Serving then opens a fresh session: this avoids lifecycle commands hanging on stale daemon event subscriptions. Proxy synchronization is repeated when needed for the next build; it does not globally configure arbitrary `wslc` commands.
+
 ## Setup
 
 ```powershell
@@ -25,9 +35,11 @@ Setup downloads these pinned revisions:
 
 This calls `setup.ps1 -WithLMCache`, including DFlash2 preparation. The default ModelRoot is `~\Models`; an existing local ModelRoot is retained. Use `-ModelRoot D:\Models` to change it. Setup skips downloads when required files and Hugging Face metadata match the pinned revision and the files have not been modified since download. This is a fast completeness check, not a full checksum audit. Missing files or metadata fall back to `hf download`, which reuses completed files and available partial data.
 
-For existing downloads, add `-SkipDownload`. Advanced reuse options are `-SkipBuild` and `-SkipPleCopy`; use them only when the required images and verified native PLE volume already exist.
+Setup reuses the expected local image tags when they exist. After changing image sources or runtime patches, use `n1x.ps1 setup -Rebuild` (image presence alone does not establish source freshness). Missing images trigger a build. For native PLE, setup checks the pinned revision and required file sizes against its copy manifest; missing/incomplete copies trigger preparation. The fast PLE check is not a new checksum audit; `prepare-native-ple.ps1` performs full source/destination verification.
 
-`n1x.ps1 setup` builds LMCache and selects `cache-dflash`. For the smaller baseline installation, use `setup.ps1` directly without `-WithLMCache`. Settings are saved in ignored `config.local.psd1`. Stop the service before setup prepares the native PLE volume.
+For manually verified downloads, add `-SkipDownload`. Advanced bypasses are `-SkipBuild` and `-SkipPleCopy`; use them only when the required images and verified native PLE volume already exist. Normal setup after `clean` reuses images and native PLE without rebuilding them.
+
+`n1x.ps1 setup` prepares LMCache and selects `cache-dflash`. For the smaller baseline installation, use `setup.ps1` directly without `-WithLMCache`. Settings are saved in ignored `config.local.psd1`. Stop the service before setup needs to build images or prepare a new native PLE copy. Setup does not start the model; run `n1x.ps1 start` afterward.
 
 ## Start and verify
 

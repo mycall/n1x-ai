@@ -88,7 +88,14 @@ Named volumes survive stop and recreate. The [SSD cache budget](LMCache.md#ssd-b
 .\n1x.ps1 clean
 ```
 
-`clean` deletes Git-ignored build sources, environments, logs, benchmark results, and Python caches, including ignored nested checkouts. It preserves tracked and ordinary untracked files, `config.local.psd1`, `.state`, the configured ModelRoot, container images, and named volumes (PLE, compiled kernels, and LMCache). Export any raw benchmark results you want to keep first. Linked paths are refused. Other profiles must also be stopped; cleanup does not stop services automatically.
+| Command | Removes | Preserves |
+| --- | --- | --- |
+| `clean` | Stopped project containers, obsolete project images, kernel/KV/test cache volumes, ignored build sources, environments, logs and raw test results | Models (including `.cache`), settings, current runtime/build/benchmark images, native PLE, tracked and ordinary untracked files |
+| `uninstall` | Project containers (stopping them first), project images and volumes including native PLE, and the same ignored files | Models, settings, repository source, unrelated/shared resources |
+
+`clean` keeps what is needed to start offline; it does not require large downloads afterward. The next start recreates empty caches and recompiles kernels, so it can be slower and previous warm KV entries are lost. Stop all project profiles first. `uninstall` requires setup before serving again and may need large downloads/builds. Preview either command with `-PrintOnly`.
+
+Export raw results you want to keep before cleaning. Resource removal is scoped to project labels, legacy `n1x-*` containers using project images, configured cache volumes, and the `n1x-ai` image repositories. Resources referenced by unrelated containers are preserved. No global image, volume, or build-cache prune is performed. Repository cleanup refuses linked paths and preserves `.state` and local configuration.
 
 The command then runs `fstrim -av` in the default WSLC session to release unused Linux blocks. Run from an interactive terminal if WSLC reports an invalid handle. TRIM does not guarantee that Windows immediately reclaims the backing VHDX's physical space.
 
