@@ -1,3 +1,11 @@
 *
 !Dockerfile.base
 !runtime-packages.txt
+!LICENSE
+!NOTICE.md
+!licenses/
+!licenses/Apache-2.0.txt
+!runtime/
+!runtime/lmcache/
+!runtime/lmcache/*.py
+!runtime/lmcache/constraints.txt

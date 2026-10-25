@@ -14,5 +14,6 @@ RUN uv pip install --python /opt/venv/bin/python -r /opt/runtime-packages.txt
 # The upstream patch scripts expect the official image's Python layout.
 RUN mkdir -p /usr/local/lib/python3.12 \
     && ln -s /opt/venv/lib/python3.12/site-packages /usr/local/lib/python3.12/dist-packages
-ENV HF_HUB_OFFLINE=1 TOKENIZERS_PARALLELISM=false
+ENV HF_HUB_OFFLINE=1 TOKENIZERS_PARALLELISM=false \
+    LMCACHE_TRACK_USAGE=false DO_NOT_TRACK=1 VLLM_NO_USAGE_STATS=1 HF_HUB_DISABLE_TELEMETRY=1
 ENTRYPOINT ["python", "-m", "vllm.entrypoints.openai.api_server"]

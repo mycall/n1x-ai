@@ -3,3 +3,7 @@ upstream/
 logs/
 results/
 __pycache__/
+*.pyc
+.state/
+config.local.psd1
+.venv/

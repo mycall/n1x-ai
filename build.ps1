@@ -1,7 +1,18 @@
-param([switch]$PrintOnly)
+param([switch]$PrintOnly,[switch]$WithLMCache,[switch]$CacheOnly)
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 $root = $PSScriptRoot
+if($PrintOnly){
+    if(-not $CacheOnly){
+        Write-Output "git clone --branch magi-v5-public https://github.com/Saren-Arterius/qwen3.8-Flash-DGX-AutoRound.git $root/upstream"
+        Write-Output "git -C $root/upstream checkout --detach 1c66e5b1a69c7bab499ff7649b4143e989bd0ed0"
+        Write-Output "wslc build -t n1x-ai-base:cuda13.4-ubuntu26.04-vllm0.32.0 -f $root/Dockerfile.base $root"
+        Write-Output "wslc build -t n1x-ai:magi-v5 -f $root/.build/Dockerfile.magi $root/upstream/recipe/build/image"
+    }
+    if($WithLMCache -or $CacheOnly){Write-Output "wslc build -t n1x-ai:lmcache -f $root/Dockerfile.lmcache $root"}
+    return
+}
+if(-not $CacheOnly){
 $upstream = Join-Path $root 'upstream'
 $revision = '1c66e5b1a69c7bab499ff7649b4143e989bd0ed0'
 if (-not (Test-Path "$upstream/.git")) {
@@ -27,4 +38,14 @@ foreach ($command in $commands) {
         & wslc @command
         if ($LASTEXITCODE -ne 0) { throw "Build failed ($LASTEXITCODE)" }
     }
+}
+}
+if($WithLMCache -or $CacheOnly){
+    $arguments=@('build','--progress','plain','-t','n1x-ai:lmcache','-f',"$root/Dockerfile.lmcache")
+    foreach($entry in @(@('https_proxy','HTTPS_PROXY'),@('http_proxy','HTTP_PROXY'))){
+        if([Environment]::GetEnvironmentVariable($entry[1])){$arguments+=@('--secret',"id=$($entry[0]),env=$($entry[1])")}
+    }
+    $arguments+=$root
+    if($PrintOnly){Write-Output ('wslc '+($arguments -join ' '))}
+    else{& wslc @arguments;if($LASTEXITCODE -ne 0){throw 'LMCache image build failed'}}
 }

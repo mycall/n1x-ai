@@ -2,13 +2,15 @@ param(
     [ValidateSet('features', 'context', 'all')][string]$Suite = 'features',
     [int[]]$ContextTokens = @(4096, 16384, 31744),
     [string[]]$Tests = @(),
+    [int]$Port = 0,
     [string]$ResultName = 'qualification'
 )
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
-$config = Import-PowerShellDataFile (Join-Path $PSScriptRoot 'config.psd1')
+. "$PSScriptRoot/scripts/config.ps1"
+$config=Get-N1xConfig -Root $PSScriptRoot -Port $Port
 $base = "http://127.0.0.1:$($config.Port)"
-$resultDir = Join-Path $PSScriptRoot 'results'
+$resultDir = Join-Path $PSScriptRoot '.state/checks'
 New-Item -ItemType Directory -Force $resultDir | Out-Null
 $script:results = [Collections.Generic.List[object]]::new()
 $utf8 = [Text.UTF8Encoding]::new($false)

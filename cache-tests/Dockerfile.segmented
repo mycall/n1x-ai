@@ -1,5 +1,0 @@
-FROM n1x-ai:lmcache-admission-test
-COPY run_suite.py /suite/run_suite.py
-COPY n1x_segmented.py /opt/venv/lib/python3.12/site-packages/n1x_segmented.py
-COPY patch_segmented.py /tmp/patch_segmented.py
-RUN python /tmp/patch_segmented.py

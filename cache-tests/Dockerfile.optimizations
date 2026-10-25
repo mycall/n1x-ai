@@ -1,6 +1,0 @@
-FROM n1x-ai:lmcache-segmented-test
-COPY run_suite.py optimization_workloads.py /suite/
-COPY n1x_cache_admission.py /opt/venv/lib/python3.12/site-packages/n1x_cache_admission.py
-COPY n1x_restore_queue.py /opt/venv/lib/python3.12/site-packages/n1x_restore_queue.py
-COPY patch_restore_queue.py /tmp/patch_restore_queue.py
-RUN python /tmp/patch_restore_queue.py

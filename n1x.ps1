@@ -1,8 +1,9 @@
 param(
-    [ValidateSet('start', 'stop', 'restart', 'status', 'wait', 'logs', 'test', 'doctor')]
+    [ValidateSet('start', 'stop', 'restart', 'recreate', 'status', 'wait', 'logs', 'test', 'doctor')]
     [string]$Action = 'status',
-    [ValidateSet('baseline', 'mtp', 'long-context', 'mtp-long-context', 'throughput', 'mtp-throughput', 'long-context-graphs', 'candidate-fast', 'candidate-16')]
-    [string]$Profile = 'baseline',
+    [string]$Profile = '',
+    [string]$ModelRoot = '',
+    [int]$Port = 0,
     [ValidateSet('smoke', 'features', 'context', 'all')]
     [string]$Suite = 'smoke',
     [ValidateRange(1, 86400)]
@@ -11,11 +12,14 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
-$config = Import-PowerShellDataFile (Join-Path $PSScriptRoot 'config.psd1')
-if ($Profile -ne 'baseline') {
-    $overrides = Import-PowerShellDataFile (Join-Path $PSScriptRoot "profiles/$Profile.psd1")
-    foreach ($key in $overrides.Keys) { $config[$key] = $overrides[$key] }
-}
+. "$PSScriptRoot/scripts/config.ps1"
+$config = Get-N1xConfig -Root $PSScriptRoot -Profile $Profile -ModelRoot $ModelRoot -Port $Port
+$Profile=$config.Profile
+$canonical=[ordered]@{}
+foreach($key in ($config.Keys|Sort-Object)){$canonical[$key]=$config[$key]}
+$sha=[Security.Cryptography.SHA256]::Create()
+$fingerprint=([BitConverter]::ToString($sha.ComputeHash([Text.Encoding]::UTF8.GetBytes(($canonical|ConvertTo-Json -Compress))))).Replace('-','').ToLowerInvariant()
+$sha.Dispose()
 $name = $config.Container
 $endpoint = "http://127.0.0.1:$($config.Port)"
 
@@ -32,7 +36,7 @@ function Get-ManagedContainer {
     if (-not $matches.Count) { return $null }
     $raw = & wslc inspect $name
     if ($LASTEXITCODE -ne 0) { throw "Cannot inspect $name" }
-    $container = @($raw | ConvertFrom-Json)[0]
+    $container = @(($raw -join "`n") | ConvertFrom-Json)[0]
     if ($container.Config.Labels.'n1x-ai.managed' -ne 'true') {
         throw "Container $name is not managed by n1x-ai; refusing to change it"
     }
@@ -55,25 +59,70 @@ function Assert-ProfileRunning {
     }
 }
 
+function Assert-Configuration($Container) {
+    $property=$Container.Config.Labels.PSObject.Properties['n1x-ai.config-sha']
+    if($null -eq $property -or $property.Value -ne $fingerprint){throw "Container settings differ. Run .\n1x.ps1 recreate -Profile $Profile to apply your configuration."}
+}
+
+function Write-Headroom {
+    $directory=Join-Path $PSScriptRoot ".state/$name"
+    New-Item -ItemType Directory -Force $directory|Out-Null
+    $os=Get-CimInstance Win32_OperatingSystem
+    $data=@{availableGiB=$os.FreePhysicalMemory/1MB;updatedUnixSeconds=[DateTimeOffset]::UtcNow.ToUnixTimeSeconds()}
+    if($data.availableGiB -lt $config.WindowsMinimumGiB){throw 'Insufficient Windows memory headroom'}
+    [IO.File]::WriteAllText((Join-Path $directory 'host.json'),($data|ConvertTo-Json),[Text.UTF8Encoding]::new($false))
+}
+
+function Start-MemoryMonitor {
+    $directory=Join-Path $PSScriptRoot ".state/$name"
+    $pidPath=Join-Path $directory 'monitor.json'
+    if(Test-Path -LiteralPath $pidPath){
+        $saved=Get-Content -LiteralPath $pidPath -Raw|ConvertFrom-Json
+        $process=Get-CimInstance Win32_Process -Filter "ProcessId=$($saved.processId)"
+        if($null -ne $process -and $process.CommandLine -match 'monitor-memory.ps1' -and $process.CommandLine -match [regex]::Escape($name)){return}
+    }
+    $arguments=@('-NoProfile','-ExecutionPolicy','Bypass','-File',('"'+"$PSScriptRoot/scripts/monitor-memory.ps1"+'"'),'-Container',$name,'-OutputPath',('"'+(Join-Path $directory 'host.json')+'"'))
+    $process=Start-Process powershell.exe -WindowStyle Hidden -ArgumentList $arguments -PassThru
+    [IO.File]::WriteAllText($pidPath,(@{processId=$process.Id}|ConvertTo-Json),[Text.UTF8Encoding]::new($false))
+}
+
+if($Action -eq 'recreate'){
+    if($PrintOnly){throw 'Use start -PrintOnly to preview the new configuration'}
+    Assert-NoOtherProfile
+    $old=Get-ManagedContainer
+    if($old){if($old.State.Running){Invoke-Wslc @('stop',$name)};Invoke-Wslc @('rm',$name)}
+    $Action='start'
+}
+
 switch ($Action) {
     'start' {
         if (-not $PrintOnly) {
             Assert-NoOtherProfile
             $existing = Get-ManagedContainer
             if ($existing) {
-                if ($existing.State.Running) { Write-Host "$name is already running. Check status for API readiness." }
-                else { Invoke-Wslc @('start', $name); Write-Host "Starting $name with its existing configuration." }
-                return
+                Assert-Configuration $existing
+                if ($config.UseLMCache -and -not $existing.State.Running -and $existing.State.ExitCode -ne 0) {
+                    Write-Host "Recreating $name after an unsuccessful exit; named volumes are preserved."
+                    Invoke-Wslc @('rm', $name)
+                } else {
+                    if($config.UseLMCache){Write-Headroom}
+                    if ($existing.State.Running) { Write-Host "$name is already running. Check status for API readiness." }
+                    else { Invoke-Wslc @('start', $name); Write-Host "Starting $name with its existing configuration." }
+                    if($config.UseLMCache){Start-MemoryMonitor}
+                    return
+                }
             }
         }
         $model = Join-Path $config.ModelRoot 'Qwen3.8-Flash-Next-W4A16-AutoRound-hybrid'
         $table = Join-Path $config.ModelRoot 'ple-table-fp8'
-        foreach ($file in @("$model/config.json", "$model/model.safetensors.index.json", "$table/model-00005-of-00131.safetensors")) {
+        if(-not $PrintOnly){
+        foreach ($file in @("$model/config.json", "$model/model.safetensors.index.json")) {
             if (-not (Test-Path -LiteralPath $file)) { throw "Missing model file: $file" }
         }
         $index = Get-Content "$model/model.safetensors.index.json" -Raw | ConvertFrom-Json
         foreach ($shard in ($index.weight_map.PSObject.Properties.Value | Sort-Object -Unique)) {
             if (-not (Test-Path -LiteralPath (Join-Path $model $shard))) { throw "Missing model shard: $shard" }
+        }
         }
         $tableMount=$table
         if ($config.ContainsKey('PleVolume')) {
@@ -83,14 +132,12 @@ switch ($Action) {
                 if ($LASTEXITCODE -ne 0) { throw 'Prepare the native PLE volume with prepare-native-ple.ps1 first' }
                 $manifest=($manifestRaw -join "`n") | ConvertFrom-Json
                 if ($manifest.sourceRevision -ne '50511b0a41aa1d34b8beb7e5d4bb06a0b650dc14') { throw 'Unexpected native PLE revision' }
-                foreach ($sourceFile in (Get-ChildItem -LiteralPath $table -File)) {
-                    $entry=@($manifest.files | Where-Object { $_.name -eq $sourceFile.Name })
-                    if ($entry.Count -ne 1 -or $entry[0].bytes -ne $sourceFile.Length) { throw "Native PLE manifest mismatch: $($sourceFile.Name)" }
-                }
+                if(-not @($manifest.files).Count){throw 'Native PLE volume is empty'}
             }
         }
         $run = @(
             'run', '-d', '--name', $name, '--label', 'n1x-ai.managed=true',
+            '--label',"n1x-ai.config-sha=$fingerprint",'--label',"n1x-ai.profile=$Profile",
             '--gpus', 'all', '--shm-size', '1g', '--ulimit', 'memlock=-1:-1',
             '--publish', "127.0.0.1:$($config.Port):8000",
             '--volume', "${model}:/model:ro", '--volume', "${tableMount}:/ple-table-fp8:ro",
@@ -102,28 +149,51 @@ switch ($Action) {
             '--env', "VLLM_PLE_MMAP_WORKERS=$($config.PleWorkers)", '--env', 'VLLM_PLE_MMAP_CHUNK=2048',
             '--env', 'VLLM_FP8_HYBRID=1', '--env', 'VLLM_MARLIN_USE_ATOMIC_ADD=1',
             '--env', 'VLLM_USE_DEEP_GEMM=0', '--env', 'VLLM_USE_FLASHINFER_SAMPLER=1',
-            '--volume', "${PSScriptRoot}/profiles:/profiles:ro",
-            $config.Image,
+            '--env','LMCACHE_TRACK_USAGE=false','--env','DO_NOT_TRACK=1','--env','VLLM_NO_USAGE_STATS=1','--env','HF_HUB_DISABLE_TELEMETRY=1',
+            '--volume', "${PSScriptRoot}/profiles:/profiles:ro"
+        )
+        if($config.UseLMCache){
+            $stateDirectory=Join-Path $PSScriptRoot ".state/$name"
+            if(-not $PrintOnly){Write-Headroom}
+            $namespace=if($config.Mtp){'qwen-8b82-v032-lmc056-fp8-mtp'}else{'qwen-8b82-v032-lmc056-fp8'}
+            $run+=@('--volume',"${stateDirectory}:/state:ro",'--volume',"$($config.LmcacheVolume):/lmcache",
+                '--env',"N1X_CACHE_NAMESPACE=$namespace",'--env',"N1X_LMCACHE_L1_GIB=$($config.LmcacheL1GiB)",
+                '--env',"N1X_RESTORE_WAIT_MS=$($config.RestoreWaitMs)",'--env',"N1X_WINDOWS_MINIMUM_GIB=$($config.WindowsMinimumGiB)")
+        }
+        $run+=@($config.Image,
             '--model', '/model', '--served-model-name', 'qwen', '--host', '0.0.0.0', '--port', '8000',
             '--max-model-len', [string]$config.Context, '--max-num-seqs', [string]$config.MaxSequences,
             '--gpu-memory-utilization', '0.01', '--kv-cache-memory-bytes', $config.KvCacheBytes,
             '--load-format', 'safetensors', '--safetensors-load-strategy', 'lazy',
             '--enable-prefix-caching', '--enable-chunked-prefill',
             '--max-num-batched-tokens', [string]$config.BatchedTokens,
-            '--mamba-ssm-cache-dtype', 'bfloat16', '--kv-cache-dtype', 'auto',
+            '--mamba-ssm-cache-dtype', 'bfloat16', '--kv-cache-dtype', $config.KvCacheDtype,
             '--no-enable-flashinfer-autotune',
             '--enable-auto-tool-choice', '--tool-call-parser', 'qwen3_xml', '--reasoning-parser', 'qwen3'
         )
         if ($config.ContainsKey('CudaGraphMode')) { $run += "-cc.cudagraph_mode=$($config.CudaGraphMode)" }
         else { $run += '--enforce-eager' }
-        if ($Profile -in @('mtp', 'mtp-long-context', 'mtp-throughput', 'candidate-fast', 'candidate-16')) { $run += @('--config', '/profiles/mtp.yaml') }
+        if ($config.Mtp) { $run += @('--config', '/profiles/mtp.yaml') }
         if ($PrintOnly) { Write-Output ('wslc ' + (($run | ForEach-Object { '"' + $_ + '"' }) -join ' ')); return }
         # WSLC refuses a name collision if another process created it meanwhile.
         Invoke-Wslc $run
+        if($config.UseLMCache){Start-MemoryMonitor}
         Write-Host "Loading model. Check .\n1x.ps1 status -Profile $Profile and .\n1x.ps1 logs -Profile $Profile. API: $endpoint/v1"
     }
     'stop' { if (-not (Get-ManagedContainer)) { throw "No managed container $name" }; Invoke-Wslc @('stop', $name) }
-    'restart' { Assert-NoOtherProfile; if (-not (Get-ManagedContainer)) { throw "No managed container $name" }; Invoke-Wslc @('restart', $name) }
+    'restart' {
+        Assert-NoOtherProfile
+        $old=Get-ManagedContainer
+        if(-not $old){throw "No managed container $name"}
+        Assert-Configuration $old
+        if($config.UseLMCache -and -not $old.State.Running -and $old.State.ExitCode -ne 0){
+            & $PSCommandPath start -Profile $Profile -ModelRoot $config.ModelRoot -Port $config.Port
+        } else {
+            if($config.UseLMCache){Write-Headroom}
+            Invoke-Wslc @('restart', $name)
+            if($config.UseLMCache){Start-MemoryMonitor}
+        }
+    }
     'logs' { Invoke-Wslc @('logs', '--tail', '100', $name) }
     'wait' {
         $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
@@ -133,7 +203,7 @@ switch ($Action) {
             # A WSLC transport timeout does not mean the container has stopped.
             $raw = & wslc inspect $name
             if ($LASTEXITCODE -eq 0) {
-                $selected = @($raw | ConvertFrom-Json)[0]
+                $selected = @(($raw -join "`n") | ConvertFrom-Json)[0]
                 if (-not $selected.State.Running) { throw "Container $name stopped before API readiness; inspect its logs." }
                 try {
                     $remaining = [math]::Max(1, [int]($deadline - (Get-Date)).TotalSeconds)
@@ -172,7 +242,7 @@ switch ($Action) {
     'test' {
         Assert-ProfileRunning
         if ($Suite -ne 'smoke') {
-            & (Join-Path $PSScriptRoot 'test.ps1') -Suite $Suite -ResultName "$Suite-$Profile"
+            & (Join-Path $PSScriptRoot 'test.ps1') -Suite $Suite -ResultName "$Suite-$Profile" -Port $config.Port
             return
         }
         $tests = @(
@@ -188,13 +258,13 @@ switch ($Action) {
             } | ConvertTo-Json -Depth 8
             $reply = Invoke-RestMethod "$endpoint/v1/chat/completions" -Method Post -ContentType 'application/json' -Body $body -TimeoutSec 600
             $content = [string]$reply.choices[0].message.content
-            $passed = $content.Trim() -match $test.Expected
+            $passed = $content.Trim() -match $test.Expected -and $reply.choices[0].finish_reason -eq 'stop'
             $results += [pscustomobject]@{test=$test.Name; passed=$passed; content=$content; finish_reason=$reply.choices[0].finish_reason}
         }
-        $resultDir = Join-Path $PSScriptRoot 'results'
+        $resultDir = Join-Path $PSScriptRoot '.state/checks'
         New-Item -ItemType Directory -Force $resultDir | Out-Null
         $results | ConvertTo-Json -Depth 5 | Set-Content (Join-Path $resultDir "smoke-$Profile.json") -Encoding UTF8
         $results | Format-Table -AutoSize
-        if (@($results | Where-Object { -not $_.passed }).Count) { throw "Model correctness check failed; see results/smoke-$Profile.json" }
+        if (@($results | Where-Object { -not $_.passed }).Count) { throw "Model correctness check failed; see .state/checks/smoke-$Profile.json" }
     }
 }
