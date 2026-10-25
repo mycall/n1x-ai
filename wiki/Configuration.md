@@ -27,7 +27,7 @@ MTP changes acceptance and throughput with workload. Choose the profile using re
 
 `BatchedTokens` is the scheduler's per-step token budget, not the number of sessions. The `cache-mtp` profile uses 4,096 so running decodes can share a step with a 2,048-token prefill block. A budget of one block can serialize admission. The non-MTP `cache` profile uses 2,048.
 
-Set `BatchedTokens` in `config.local.psd1` and recreate the service to apply an override. Larger budgets require memory validation. `CacheBlockTokens` and `LmcacheChunkTokens` must be compatible: the chunk size must be a positive multiple of the block size, and the runtime validates each attention group's layout. Keep the supplied per-profile values unless testing a new layout. See [overlapping-request measurements](Benchmarks.md#overlapping-requests) for the `cache-mtp` profile.
+Set `BatchedTokens` in `config.local.psd1` and recreate the service to apply an override. Larger budgets require memory validation. `CacheBlockTokens` and `LmcacheChunkTokens` must be compatible: the chunk size must be a positive multiple of the block size, and the runtime validates each attention group's layout. Keep the supplied per-profile values unless testing a new layout. See [agent concurrency measurements](Benchmarks.md#agent-and-restore-qualification) for the benchmark reference profile.
 
 ## Lifecycle
 
@@ -55,6 +55,8 @@ The experimental `cache-dflash` profile uses the optional DFlash2 drafter with t
 
 At this context limit, vLLM reports approximately 520K tokens of capacity (1.99 maximum-length requests). This is a scheduler estimate, not a guarantee of two simultaneous 262K sessions. Capacity depends on context length because sliding-attention and recurrent-state overhead are included. Four sequence slots do not imply four maximum-length contexts fit together.
 
+Both DFlash2 and MTP pass the synthetic multi-turn agent check with thinking enabled and fail it with thinking disabled; see [agent qualification](Benchmarks.md#agent-and-restore-qualification). DFlash2 at concurrency 4 has the highest measured correct-work throughput in that check. Keep it experimental until your application's tasks pass; this narrow qualification does not establish general agent reliability.
+
 ```powershell
 .\prepare-dflash.ps1
 .\n1x.ps1 stop -Profile cache-mtp
@@ -73,4 +75,4 @@ The first start compiles additional FlashInfer kernels. Use `-Profile cache-dfla
 - LMCache volume: local SSD cache, separated by runtime/model and speculative method.
 - `.state/`: ignored current host-memory snapshot, monitor identity, and local test output.
 
-Named volumes survive stop and recreate. SSD cache files can grow; monitor available disk space. Cache reuse across engine restarts is not guaranteed by this project.
+Named volumes survive stop and recreate. The [SSD cache budget](LMCache.md#ssd-budget) bounds stored KV files; model weights, images, and compilation caches are separate. Cache reuse across engine restarts is not guaranteed by this project.

@@ -27,12 +27,14 @@ The API is OpenAI compatible: **`http://127.0.0.1:8000/v1`**, model **`qwen`**.
 $body = @{
     model = 'qwen'
     messages = @(@{ role = 'user'; content = 'Reply with a greeting.' })
-    max_tokens = 128
-    chat_template_kwargs = @{ enable_thinking = $false }
+    max_tokens = 1024
+    chat_template_kwargs = @{ enable_thinking = $true }
 } | ConvertTo-Json -Depth 8
 Invoke-RestMethod http://127.0.0.1:8000/v1/chat/completions `
     -Method Post -ContentType application/json -Body $body
 ```
+
+Thinking is enabled by default by the model's chat template. The example makes that choice explicit; its output budget includes reasoning. See [API guidance](AGENTS.md) for tool workflows.
 
 ## Daily use
 

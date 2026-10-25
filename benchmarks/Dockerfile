@@ -19,5 +19,5 @@ RUN --mount=type=secret,id=https_proxy --mount=type=secret,id=http_proxy \
 COPY patch_aiperf.py /benchmarks/patch_aiperf.py
 RUN /opt/aiperf/bin/python /benchmarks/patch_aiperf.py && \
     /opt/aiperf/bin/python -c "from aiperf.common.tokenizer import Tokenizer; assert Tokenizer._resolve_local_snapshot('/tmp', 'main') == '/tmp'"
-COPY run.py scheduler_probe.py speculation_probe.py /benchmarks/
+COPY run.py scheduler_probe.py speculation_probe.py agent_cache_probe.py /benchmarks/
 ENTRYPOINT ["/opt/venv/bin/python", "/benchmarks/run.py"]

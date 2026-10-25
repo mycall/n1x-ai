@@ -1,6 +1,6 @@
 # LMCache
 
-The cache profiles run vLLM and LMCache together in one container. LMCache uses an 8 GiB host L1 pool with LRU eviction and a native SSD L2 cache. vLLM also retains its GPU prefix cache. The native PLE table serves model embeddings and is independent of KV caching.
+The cache profiles run vLLM and LMCache together in one container. LMCache uses an 8 GiB host L1 pool with LRU eviction and a bounded SSD L2 cache. vLLM also retains its GPU prefix cache. The native PLE table serves model embeddings and is independent of KV caching.
 
 ## Compatibility
 
@@ -25,6 +25,18 @@ For less host-cache pressure, edit `config.local.psd1`:
 The restore queue can wait briefly for space released by another restore. It does not increase capacity. The default wait is zero; cold recomputation remains possible on a cache miss or admission failure. Apply changes with `n1x.ps1 recreate`.
 
 ## Cache reuse
+
+### SSD budget
+
+`LmcacheL2GiB` defaults to 16 GiB across this project's namespaces in the configured cache volume, rather than 16 GiB per profile. A local filesystem-adapter patch serializes store reservations and evicts the oldest-accessed files before writes. It also leaves 20 GiB available on the Linux filesystem; this floor does not reserve Windows disk space. Run only one project serving profile at a time.
+
+Set `LmcacheL2GiB = 8` for a smaller cache, or `0` to disable new SSD caching while retaining RAM caching. Disabling SSD caching does not remove existing files. Rebuild the cache image after patch changes, and recreate the service after configuration changes.
+
+The budget is a working-set choice, not a fixed context-length guarantee. DFlash2 and MTP produce different entry sizes; see [measured sizing](Benchmarks.md#ssd-budget-validation) and [restore qualification](Benchmarks.md#feature-and-cache-validation). Additional entries compete for space, and eviction can reduce prefix hits or require recomputation. The budget excludes model weights, native PLE data, runtime compilation caches, and container images.
+
+Deleting cache files frees Linux filesystem space. WSLC's backing VHDX may still require offline compaction to return physical space to Windows.
+
+### Prompt reuse
 
 Chunk size is 2,048 tokens for the standard cache profiles and 1,664 for the experimental DFlash2 profile. Partial chunks and changed prefixes affect reuse. See [API guidance](../AGENTS.md) for prompt construction and cache salts, and [benchmark results](Benchmarks.md#feature-and-cache-validation) for verified restores.
 

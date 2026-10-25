@@ -1,15 +1,20 @@
 #Requires -Version 5.1
 param(
-    [ValidateSet('all','vllm','aiperf','ruler','scheduler','speculation')][string]$Suite='all',
+    [ValidateSet('all','vllm','aiperf','ruler','scheduler','speculation','agents','restores','soak')][string]$Suite='all',
     [string]$Profile='',
     [string]$PowerMode='Not recorded',
     [ValidateRange(1,16)][int]$SchedulerConcurrency=4,
     [ValidateRange(1,4096)][int]$SchedulerOutputTokens=256,
     [switch]$Build,
-    [switch]$Smoke
+    [switch]$Smoke,
+    [switch]$AgentThinking
 )
 $ErrorActionPreference='Stop'
 Set-StrictMode -Version Latest
+if($AgentThinking -and $Suite -ne 'agents'){throw '-AgentThinking applies only to -Suite agents.'}
+if($Smoke -and $Suite -in @('agents','restores','soak')){
+    throw 'The agents, restores, and soak suites have fixed qualification workloads; omit -Smoke.'
+}
 . "$PSScriptRoot/scripts/config.ps1"
 $config=Get-N1xConfig -Root $PSScriptRoot -Profile $Profile
 if(-not $Smoke -and $Suite -in @('all','ruler') -and $config.Context -lt 262144){
@@ -49,6 +54,7 @@ $runArgs=@('run','--rm','--name','n1x-benchmark-client','--network',"container:$
     '-v',"${model}:/model:ro",'-v',"${destination}:/results",'n1x-ai:benchmarks','--suite',$Suite)
 if($Suite -eq 'scheduler'){$runArgs+=@('--scheduler-concurrency',[string]$SchedulerConcurrency,
     '--scheduler-output-tokens',[string]$SchedulerOutputTokens)}
+if($AgentThinking){$runArgs+='--agent-thinking'}
 if($Smoke){$runArgs+=@('--concurrency','1','--input-lengths','512','--requests','2','--output-tokens','16',
     '--agent-concurrency','1','--conversations','1','--context-lengths','4096','--samples','1')}
 Write-Host "Results: $destination"

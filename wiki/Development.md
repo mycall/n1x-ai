@@ -23,6 +23,15 @@ With Python on PATH:
 
 This parses PowerShell, checks configuration/launch behavior, and runs CPU unit tests. GitHub Actions runs these checks on Windows. They require neither model weights nor a GPU.
 
+After building the cache image, test its real filesystem adapter without a GPU or persistent cache volume:
+
+```powershell
+wslc run --rm --volume "${PWD}/tests:/tests:ro" `
+    --entrypoint python n1x-ai:lmcache /tests/disk_adapter_integration.py
+```
+
+This checks concurrent stores, bounded eviction, loaded bytes, and restart accounting in a disposable container.
+
 ## GPU integration
 
 Stop model services first; these tests allocate GPU memory. Build the cache image, then run:

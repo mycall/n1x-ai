@@ -16,6 +16,7 @@
     DFlash = $false
     UseLMCache = $false
     LmcacheL1GiB = 8
+    LmcacheL2GiB = 16
     CacheBlockTokens = 2048
     LmcacheChunkTokens = 2048
     LmcacheVolume = 'n1x-qwen38-lmcache'

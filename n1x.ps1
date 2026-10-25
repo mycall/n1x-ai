@@ -170,6 +170,7 @@ switch ($Action) {
             }
             $run+=@('--volume',"${stateDirectory}:/state:ro",'--volume',"$($config.LmcacheVolume):/lmcache",
                 '--env',"N1X_CACHE_NAMESPACE=$namespace",'--env',"N1X_LMCACHE_L1_GIB=$($config.LmcacheL1GiB)",
+                '--env',"N1X_LMCACHE_L2_GIB=$($config.LmcacheL2GiB)",
                 '--env',"N1X_CACHE_BLOCK_TOKENS=$($config.CacheBlockTokens)",'--env',"N1X_LMCACHE_CHUNK_TOKENS=$($config.LmcacheChunkTokens)",
                 '--env',"N1X_RESTORE_WAIT_MS=$($config.RestoreWaitMs)",'--env',"N1X_WINDOWS_MINIMUM_GIB=$($config.WindowsMinimumGiB)")
         }

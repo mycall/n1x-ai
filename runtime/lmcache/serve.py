@@ -52,12 +52,15 @@ def main(arguments):
         chunk_tokens=int(os.environ.get('N1X_LMCACHE_CHUNK_TOKENS','2048'))
         if block_tokens<=0 or chunk_tokens<=0 or chunk_tokens%block_tokens:
             raise ValueError('LMCache chunk tokens must be a positive multiple of cache block tokens')
-        server=subprocess.Popen([sys.executable,'-m','lmcache.v1.multiprocess.http_server',
+        cache_args=[sys.executable,'-m','lmcache.v1.multiprocess.http_server',
             '--host','127.0.0.1','--port','5555','--http-host','127.0.0.1','--http-port','8080',
             '--l1-size-gb',os.environ.get('N1X_LMCACHE_L1_GIB','8'),
             '--eviction-policy','LRU','--chunk-size',str(chunk_tokens),'--separate-object-groups',
-            '--l2-prefetch-max-in-flight','1','--l2-adapter',json.dumps({
-                'type':'fs','base_path':'/lmcache/'+namespace,'use_odirect':True})],start_new_session=True)
+            '--l2-prefetch-max-in-flight','1']
+        if float(os.environ.get('N1X_LMCACHE_L2_GIB','16')) > 0:
+            cache_args+=['--l2-adapter',json.dumps({
+                'type':'fs','base_path':'/lmcache/'+namespace,'use_odirect':True})]
+        server=subprocess.Popen(cache_args,start_new_session=True)
         processes.append(server)
         deadline=time.monotonic()+180
         while not STOP.is_set():

@@ -222,7 +222,7 @@ def scheduler(args):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--suite", choices=["all", "vllm", "aiperf", "ruler", "scheduler", "speculation"], default="all")
+    parser.add_argument("--suite", choices=["all", "vllm", "aiperf", "ruler", "scheduler", "speculation", "agents", "restores", "soak"], default="all")
     parser.add_argument("--url", default="http://127.0.0.1:8000")
     parser.add_argument("--out", type=Path, default=Path("/results"))
     parser.add_argument("--concurrency", type=int, nargs="+", default=[1, 2, 4, 8, 16])
@@ -236,6 +236,7 @@ def main():
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--scheduler-concurrency", type=int, default=4)
     parser.add_argument("--scheduler-output-tokens", type=int, default=256)
+    parser.add_argument("--agent-thinking", action="store_true")
     args = parser.parse_args()
     args.run_id = uuid.uuid4().hex
     args.out.mkdir(parents=True, exist_ok=True)
@@ -251,6 +252,10 @@ def main():
     if args.suite == "speculation":
         command([sys.executable, "/benchmarks/speculation_probe.py", "--out", args.out / "speculation",
                  "--url", args.url], args.out, "speculation-probe")
+    if args.suite in ("agents", "restores", "soak"):
+        command([sys.executable, "/benchmarks/agent_cache_probe.py", "--phase", args.suite,
+                 "--out", args.out / args.suite, "--url", args.url] +
+                (["--agent-thinking"] if args.agent_thinking else []), args.out, args.suite + "-probe")
     save(args.out / "complete.json", {"completed": True, "suite": args.suite})
 
 
