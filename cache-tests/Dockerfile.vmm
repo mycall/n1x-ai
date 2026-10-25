@@ -1,0 +1,9 @@
+FROM n1x-ai:lmcache-test
+ENV LMCACHE_TRACK_USAGE=false DO_NOT_TRACK=1 VLLM_NO_USAGE_STATS=1 HF_HUB_DISABLE_TELEMETRY=1
+ENV N1X_LMCACHE_STAGED_TRANSFER=1
+COPY run_suite.py /suite/run_suite.py
+COPY n1x_vmm.py /opt/venv/lib/python3.12/site-packages/n1x_vmm.py
+COPY n1x_vmm_ipc.py /opt/venv/lib/python3.12/site-packages/n1x_vmm_ipc.py
+COPY patch_vmm.py /tmp/patch_vmm.py
+COPY test_vmm_wrapper.py /suite/test_vmm_wrapper.py
+RUN python /tmp/patch_vmm.py

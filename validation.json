@@ -1,0 +1,59 @@
+{
+  "validatedDate": "2026-10-22",
+  "timezone": "America/Los_Angeles",
+  "image": "sha256:7f3716944e9c5a4fafcb1322fed252e05102fe6391e8a212d820b989d55199a5",
+  "upstreamCommit": "1c66e5b1a69c7bab499ff7649b4143e989bd0ed0",
+  "powerMode": "Lowest power (user reported; unchanged)",
+  "healthStatus": 200,
+  "activeProfile": "mtp-long-context",
+  "finalHealthEvidence": "results/mtp-long-runtime.json",
+  "activeSmokeEvidence": "results/smoke-mtp-long-context.json",
+  "baselineSmokeEvidence": "results/smoke-baseline.json",
+  "model": "qwen",
+  "contextLimit": 262144,
+  "smokeTests": [
+    {
+      "test": "instruction",
+      "passed": true,
+      "content": "OK",
+      "finish_reason": "stop"
+    },
+    {
+      "test": "arithmetic",
+      "passed": true,
+      "content": "42",
+      "finish_reason": "stop"
+    },
+    {
+      "test": "context",
+      "passed": true,
+      "content": "RIVER-729",
+      "finish_reason": "stop"
+    }
+  ],
+  "performanceMeasured": false,
+  "visionQualified": true,
+  "visionScope": "One synthetic image: shape/color recognition and OCR; no video or multi-image qualification",
+  "baselineFeaturesPassed": ["streaming", "json_output", "tool_round_trip", "reasoning", "vision_shapes", "vision_ocr"],
+  "baselineContextInputTokensPassed": [3977, 16252, 31627],
+  "featureEvidence": ["results/features-baseline.json", "results/streaming-baseline.json", "results/context-baseline.json"],
+  "harnessCorrection": "Initial streaming check failed on an empty SSE delta under PowerShell strict mode; fixed property lookup and streaming rerun passed.",
+  "mtpQualified": true,
+  "mtpScope": "One speculative token, Triton draft experts, 32768 configured context; text, streaming, JSON, tool round trip, reasoning, synthetic vision/OCR, retrieval at 3977 and 31627 input tokens passed.",
+  "mtpDraftTokens": 108,
+  "mtpAcceptedTokens": 100,
+  "mtpEvidence": ["results/smoke-mtp.json", "results/mtp-triton.json", "results/mtp-triton-counters.txt"],
+  "mtpLimitations": "Drafter uses text-only inputs; no external multimodal embeddings. FlashInfer draft-expert startup failed with host OOM, recorded in results/mtp-first-start-error.json.",
+  "maximumContextQualified": true,
+  "maximumContextScope": "Native configured limit 262144; three-code retrieval passed through 261002 input tokens with short replies, MTP disabled. Not an exhaustive long-context quality evaluation or a test beyond the native limit.",
+  "longContextInputTokensPassed": [64402, 129927, 261002],
+  "longContextKvCacheBytes": 10000000000,
+  "longContextEvidence": ["results/context-long.json", "results/long-context-runtime.json"],
+  "combinedMtpContextQualified": true,
+  "combinedMtpContextScope": "Triton MTP with one speculative token, native 262144-token limit, 10 GB KV cache, one sequence. All feature checks and retrieval at 64402, 129927, and 261002 input tokens passed. Short replies; not an exhaustive long-context quality evaluation.",
+  "combinedMtpContextEvidence": ["results/mtp-long-initial.json", "results/mtp-long-limit.json", "results/mtp-long-limit-counters.json", "results/mtp-long-runtime.json"],
+  "combinedMtpLongestRequestDraftTokens": 12,
+  "combinedMtpLongestRequestAcceptedTokens": 12,
+  "combinedMtpMemorySample": "results/mtp-long-memory-sample.json",
+  "remainingQualification": ["Broader long-context tasks and longer replies", "Video and multiple images", "DFlash drafter", "Sustained mixed workloads", "Performance in a documented power mode"]
+}

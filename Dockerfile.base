@@ -1,0 +1,18 @@
+FROM nvidia/cuda:13.4.3-devel-ubuntu26.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates curl git build-essential pkg-config libnuma1 \
+    libibverbs-dev librdmacm1 libgl1 libglib2.0-0 libgomp1 ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
+RUN curl -LsSf https://astral.sh/uv/0.13.5/install.sh | env UV_INSTALL_DIR=/usr/local/bin sh
+ENV UV_PYTHON_INSTALL_DIR=/opt/python UV_LINK_MODE=copy
+RUN uv python install 3.12.15 && uv venv --python 3.12.15 /opt/venv
+ENV PATH=/opt/venv/bin:$PATH
+COPY runtime-packages.txt /opt/runtime-packages.txt
+RUN uv pip install --python /opt/venv/bin/python -r /opt/runtime-packages.txt
+# The upstream patch scripts expect the official image's Python layout.
+RUN mkdir -p /usr/local/lib/python3.12 \
+    && ln -s /opt/venv/lib/python3.12/site-packages /usr/local/lib/python3.12/dist-packages
+ENV HF_HUB_OFFLINE=1 TOKENIZERS_PARALLELISM=false
+ENTRYPOINT ["python", "-m", "vllm.entrypoints.openai.api_server"]

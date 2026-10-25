@@ -1,0 +1,4 @@
+speculative-config:
+  method: mtp
+  num_speculative_tokens: 1
+  moe_backend: triton

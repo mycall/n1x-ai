@@ -1,0 +1,5 @@
+FROM n1x-ai:lmcache-vmm-test
+COPY run_suite.py /suite/run_suite.py
+COPY n1x_cache_admission.py /opt/venv/lib/python3.12/site-packages/n1x_cache_admission.py
+COPY patch_admission.py /tmp/patch_admission.py
+RUN python /tmp/patch_admission.py

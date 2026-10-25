@@ -1,0 +1,36 @@
+﻿{
+    "status":  "blocked",
+    "date":  "2026-10-23",
+    "feature":  "LMCache multiprocess qualification",
+    "lmcache":  "0.5.6",
+    "vllm":  "0.32.0",
+    "torch":  "2.13.0+cu130",
+    "finalRun":  "results/cache-suite-fp8-4000m-block2048-usbc-20261023",
+    "rootError":  "CUDA error: invalid resource handle on torch.UntypedStorage._new_shared_cuda in receiving process",
+    "reproduction":  "results/lmcache-ipc-roundtrip-probe.txt",
+    "reproducedSizesMiB":  [
+                               1,
+                               64
+                           ],
+    "externalPower":  "Online throughout final attempt; user reports 100 W USB-C",
+    "windowsMinimumAvailableGiB":  7.429443359375,
+    "completedModelRequests":  0,
+    "unvalidated":  [
+                        "LMCache prefix restore",
+                        "LMCache MTP and vision",
+                        "FP8 quality",
+                        "long-context comparison",
+                        "LongBench-v2 canary",
+                        "concurrency 1/2 with LMCache"
+                    ],
+    "testImage":  "n1x-ai:lmcache-test",
+    "testImageId":  "sha256:2f0e3e4ec9cdd015d1b9e09d8295262dfb0ff1b3c5121e6a427279d05b4bfd3b",
+    "preservedServingProfile":  "candidate-16",
+    "interpretation":  "Observed failure in this runtime, not proof all WSL CUDA IPC is unsupported. Export probes alone passed but import failed.",
+    "restoredService":  {
+                            "evidence":  "results/lmcache-fallback-restore-check.json",
+                            "health":  200,
+                            "container":  "n1x-qwen38-candidate-16",
+                            "response":  "READY"
+                        }
+}
