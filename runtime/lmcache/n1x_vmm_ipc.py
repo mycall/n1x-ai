@@ -1,8 +1,10 @@
 """Same-container VMM FD broker. No network listener or serialized code."""
 import array
+import errno
 import os
 from pathlib import Path
 import socket
+import stat
 import struct
 import threading
 
@@ -13,6 +15,27 @@ _directory = Path('/tmp/n1x-vmm-fds')
 
 def _path(pid):
     return str(_directory / f'{pid}.sock')
+
+def _bind_server(server, path):
+    """Recover a dead broker's pathname after a container restart reuses its PID."""
+    try:
+        server.bind(path)
+        return
+    except OSError as error:
+        if error.errno != errno.EADDRINUSE:
+            raise
+    info = os.lstat(path)
+    if not stat.S_ISSOCK(info.st_mode) or info.st_uid != os.getuid():
+        raise RuntimeError('Unsafe existing VMM FD socket')
+    with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as probe:
+        probe.settimeout(1)
+        try:
+            probe.connect(path)
+        except ConnectionRefusedError:
+            os.unlink(path)
+        else:
+            raise RuntimeError('VMM FD socket already has a live broker')
+    server.bind(path)
 
 def _serve():
     while True:
@@ -42,9 +65,14 @@ def publish(key, fd):
             info = _directory.stat()
             if info.st_uid != os.getuid() or info.st_mode & 0o077:
                 raise RuntimeError('Unsafe VMM FD directory ownership or permissions')
-            _server = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-            _server.bind(_path(os.getpid()))
-            _server.listen(128)
+            server = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+            try:
+                _bind_server(server, _path(os.getpid()))
+                server.listen(128)
+            except Exception:
+                server.close()
+                raise
+            _server = server
             threading.Thread(target=_serve, daemon=True, name='n1x-vmm-fd').start()
         _fds.setdefault(key, set()).add(fd)
 

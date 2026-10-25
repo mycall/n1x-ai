@@ -8,6 +8,7 @@ from pathlib import Path
 parser = argparse.ArgumentParser(description='Short single-request speculation comparison; run each serving profile separately.')
 parser.add_argument('--out', type=Path, required=True)
 parser.add_argument('--url', default='http://127.0.0.1:8000')
+parser.add_argument('--thinking', action=argparse.BooleanOptionalAction, default=True)
 args = parser.parse_args()
 arm = uuid.uuid4().hex
 out = args.out
@@ -26,7 +27,7 @@ metrics('before')
 rows = []
 for task, prompt in tasks.items():
     for repeat in range(2):
-        body = dict(model='qwen', messages=[dict(role='user', content=prompt)], temperature=0, max_tokens=512, stream=True, stream_options={'include_usage': True}, chat_template_kwargs={'enable_thinking': False}, cache_salt=f'compare-{arm}-{task}')
+        body = dict(model='qwen', messages=[dict(role='user', content=prompt)], temperature=0, max_tokens=2048 if args.thinking else 512, stream=True, stream_options={'include_usage': True}, chat_template_kwargs={'enable_thinking': args.thinking}, cache_salt=f'compare-{arm}-{task}')
         req = urllib.request.Request(args.url + '/v1/chat/completions', data=json.dumps(body).encode(), headers={'Content-Type': 'application/json'})
         start = time.perf_counter()
         first = None
@@ -44,13 +45,14 @@ for task, prompt in tasks.items():
                     usage = chunk['usage']
                 for choice in chunk.get('choices', []):
                     piece = choice.get('delta', {}).get('content') or ''
-                    if piece and first is None:
+                    delta = choice.get('delta', {})
+                    if (piece or delta.get('reasoning') or delta.get('reasoning_content')) and first is None:
                         first = time.perf_counter()
                     text += piece
                     if choice.get('finish_reason'):
                         finish = choice['finish_reason']
         end = time.perf_counter()
-        row = dict(task=task, repeat=repeat, ttft=first - start, elapsed=end - start, decode_tps=(usage['completion_tokens'] - 1) / (end - first), usage=usage, finish=finish, text=text)
+        row = dict(task=task, repeat=repeat, thinking=args.thinking, ttft=first - start, elapsed=end - start, decode_tps=(usage['completion_tokens'] - 1) / (end - first), usage=usage, finish=finish, text=text)
         if task == 'json':
             row['correct'] = json.loads(text) == [dict(n=n, square=n * n, cube=n ** 3) for n in range(1, 21)]
         rows.append(row)

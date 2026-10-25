@@ -15,11 +15,18 @@ Set-StrictMode -Version Latest
 . "$PSScriptRoot/scripts/config.ps1"
 $config = Get-N1xConfig -Root $PSScriptRoot -Profile $Profile -ModelRoot $ModelRoot -Port $Port
 $Profile=$config.Profile
-$canonical=[ordered]@{}
-foreach($key in ($config.Keys|Sort-Object)){$canonical[$key]=$config[$key]}
-$sha=[Security.Cryptography.SHA256]::Create()
-$fingerprint=([BitConverter]::ToString($sha.ComputeHash([Text.Encoding]::UTF8.GetBytes(($canonical|ConvertTo-Json -Compress))))).Replace('-','').ToLowerInvariant()
-$sha.Dispose()
+function Get-ConfigFingerprint([string]$LegacyDefault='') {
+    $canonical=[ordered]@{}
+    foreach($key in ($config.Keys|Sort-Object)){
+        if($key -eq 'DefaultProfile'){
+            if($LegacyDefault){$canonical[$key]=$LegacyDefault}
+        } else {$canonical[$key]=$config[$key]}
+    }
+    $sha=[Security.Cryptography.SHA256]::Create()
+    try {return ([BitConverter]::ToString($sha.ComputeHash([Text.Encoding]::UTF8.GetBytes(($canonical|ConvertTo-Json -Compress))))).Replace('-','').ToLowerInvariant()}
+    finally {$sha.Dispose()}
+}
+$fingerprint=Get-ConfigFingerprint
 $name = $config.Container
 $endpoint = "http://127.0.0.1:$($config.Port)"
 
@@ -61,7 +68,16 @@ function Assert-ProfileRunning {
 
 function Assert-Configuration($Container) {
     $property=$Container.Config.Labels.PSObject.Properties['n1x-ai.config-sha']
-    if($null -eq $property -or $property.Value -ne $fingerprint){throw "Container settings differ. Run .\n1x.ps1 recreate -Profile $Profile to apply your configuration."}
+    if($null -ne $property){
+        if($property.Value -eq $fingerprint){return}
+        # Older labels included the default selection, which does not affect an
+        # already selected profile. All actual settings must still match.
+        $legacyDefaults=@('baseline',$config.DefaultProfile)+@(Get-ChildItem "$PSScriptRoot/profiles" -Filter '*.psd1' -File | ForEach-Object BaseName)
+        foreach($legacyDefault in ($legacyDefaults|Select-Object -Unique)){
+            if($property.Value -eq (Get-ConfigFingerprint -LegacyDefault $legacyDefault)){return}
+        }
+    }
+    throw "Container settings differ. Run .\n1x.ps1 recreate -Profile $Profile to apply your configuration."
 }
 
 function Write-Headroom {

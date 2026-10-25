@@ -1,5 +1,5 @@
 @{
-    DefaultProfile = 'baseline'
+    DefaultProfile = 'cache-dflash'
     Image = 'n1x-ai:magi-v5'
     Container = 'n1x-qwen38'
     ModelRoot = ''

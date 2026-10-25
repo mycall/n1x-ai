@@ -15,7 +15,11 @@ try {
     $preview=& "$temporary/n1x.ps1" start -Profile cache-mtp -ModelRoot $modelRoot -PrintOnly
     $fingerprint=[regex]::Match($preview,'n1x-ai.config-sha=([0-9a-f]{64})').Groups[1].Value
     if(-not $fingerprint){throw 'Missing launch fingerprint'}
-    $recoveryState=[pscustomobject]@{exitCode=1; calls=[Collections.Generic.List[string]]::new()}
+    Set-Content "$temporary/config.local.psd1" "@{DefaultProfile='baseline'}"
+    $changedDefault=& "$temporary/n1x.ps1" start -Profile cache-mtp -ModelRoot $modelRoot -PrintOnly
+    $changedFingerprint=[regex]::Match($changedDefault,'n1x-ai.config-sha=([0-9a-f]{64})').Groups[1].Value
+    if($changedFingerprint -ne $fingerprint){throw 'Changing only the default selection invalidated an explicit profile'}
+    $recoveryState=[pscustomobject]@{exitCode=1; fingerprint=$fingerprint; calls=[Collections.Generic.List[string]]::new()}
     function wslc {
         param([Parameter(ValueFromRemainingArguments=$true)][string[]]$Arguments)
         $global:LASTEXITCODE=0
@@ -23,7 +27,7 @@ try {
         switch($Arguments[0]) {
             'list' {if($Arguments -contains '--all'){'{"Names":"n1x-qwen38-cache-mtp"}'};return}
             'inspect' {
-                @{Config=@{Labels=@{'n1x-ai.managed'='true';'n1x-ai.config-sha'=$fingerprint}};
+                @{Config=@{Labels=@{'n1x-ai.managed'='true';'n1x-ai.config-sha'=$recoveryState.fingerprint}};
                   State=@{Running=$false;ExitCode=$recoveryState.exitCode}}|ConvertTo-Json -Depth 6
                 return
             }
@@ -55,7 +59,21 @@ try {
     $recoveryState.calls.Clear()
     & "$temporary/n1x.ps1" start -Profile cache-mtp -ModelRoot $modelRoot | Out-Null
     if($recoveryState.calls -notcontains 'start n1x-qwen38-cache-mtp' -or @($recoveryState.calls|Where-Object {$_ -like 'rm *'}).Count){throw 'Cleanly stopped container should be reused'}
-    Write-Output 'Failed-start recovery and clean restart checks passed'
+    . "$root/scripts/config.ps1"
+    $legacyConfig=Get-N1xConfig -Root $temporary -Profile cache-mtp -ModelRoot $modelRoot
+    $legacyCanonical=[ordered]@{}
+    foreach($key in ($legacyConfig.Keys|Sort-Object)){$legacyCanonical[$key]=$legacyConfig[$key]}
+    $sha=[Security.Cryptography.SHA256]::Create()
+    try {$fingerprint=([BitConverter]::ToString($sha.ComputeHash([Text.Encoding]::UTF8.GetBytes(($legacyCanonical|ConvertTo-Json -Compress))))).Replace('-','').ToLowerInvariant()}
+    finally {$sha.Dispose()}
+    $recoveryState.fingerprint=$fingerprint
+    & "$temporary/n1x.ps1" start -Profile cache-mtp -ModelRoot $modelRoot | Out-Null
+    Set-Content "$temporary/config.local.psd1" "@{DefaultProfile='baseline';Port=8005}"
+    try {
+        & "$temporary/n1x.ps1" start -Profile cache-mtp -ModelRoot $modelRoot | Out-Null
+        throw 'Changed runtime settings accepted'
+    } catch {if($_.Exception.Message -notlike 'Container settings differ.*'){throw}}
+    Write-Output 'Failed-start recovery, legacy labels, and runtime-setting checks passed'
 } finally {
     $resolved=[IO.Path]::GetFullPath($temporary)
     if(-not $resolved.StartsWith([IO.Path]::GetFullPath([IO.Path]::GetTempPath()),[StringComparison]::OrdinalIgnoreCase)){throw 'Unsafe test cleanup path'}

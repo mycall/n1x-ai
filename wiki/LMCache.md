@@ -6,6 +6,8 @@ The cache profiles run vLLM and LMCache together in one container. LMCache uses 
 
 Local patches provide exportable CUDA VMM allocations, physical segments capped at 512 MiB, alias-safe sharing, staged transfers, bounded admission, and an optional restore queue for WSLC. Smaller physical segments preserve the full KV pool while reducing individual driver allocation sizes. These are experimental platform adaptations, not an upstream support guarantee. See [Development](Development.md#builds) for pinned builds and patch validation.
 
+The local descriptor broker recovers abandoned socket paths when container restarts reuse process IDs. It preserves live listeners and refuses to replace ordinary files or sockets owned by another user.
+
 ## Memory budget
 
 Use the [recommended hardware partition](Installation.md#requirements) with the supplied cache settings. Leave at least 4 GiB Windows memory available; aim for 6 GiB for browsing and a harness.
@@ -16,7 +18,7 @@ For less host-cache pressure, edit `config.local.psd1`:
 
 ```powershell
 @{
-    DefaultProfile = 'cache-mtp'
+    DefaultProfile = 'cache-dflash'
     LmcacheL1GiB = 4
     RestoreWaitMs = 2000
 }
@@ -38,7 +40,7 @@ Deleting cache files frees Linux filesystem space. WSLC's backing VHDX may still
 
 ### Prompt reuse
 
-Chunk size is 2,048 tokens for the standard cache profiles and 1,664 for the experimental DFlash2 profile. Partial chunks and changed prefixes affect reuse. See [API guidance](../AGENTS.md) for prompt construction and cache salts, and [benchmark results](Benchmarks.md#feature-and-cache-validation) for verified restores.
+Chunk size is 1,664 tokens for the default DFlash2 profile and 2,048 for the other cache profiles. Partial chunks and changed prefixes affect reuse. See [API guidance](../AGENTS.md) for prompt construction and cache salts, and [benchmark results](Benchmarks.md#feature-and-cache-validation) for verified restores.
 
 ## Ports and privacy
 

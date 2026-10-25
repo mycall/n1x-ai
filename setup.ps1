@@ -9,6 +9,9 @@ $models=@(
     @('Saren/Qwen3.8-Flash-Next-W4A16-AutoRound-hybrid','8b82f0b7abe3d1150a7827d298c75e86267636ae','Qwen3.8-Flash-Next-W4A16-AutoRound-hybrid'),
     @('Saren/Qwen3.8-Flash-Next-ple-table-fp8','50511b0a41aa1d34b8beb7e5d4bb06a0b650dc14','ple-table-fp8')
 )
+if($WithLMCache){
+    $models+=,@('incoai/Qwen3.8-Flash-Next-DFlash2','a22a1744e85c17364dcc54a6a420af7135d4c7f6','Qwen3.8-Flash-Next-DFlash2')
+}
 if(-not $SkipDownload){
     New-Item -ItemType Directory -Force $config.ModelRoot|Out-Null
     foreach($model in $models){
@@ -21,7 +24,7 @@ if(-not $SkipPleCopy){& "$PSScriptRoot/prepare-native-ple.ps1" -ModelRoot $confi
 $localPath=Join-Path $PSScriptRoot 'config.local.psd1'
 $settings=if(Test-Path -LiteralPath $localPath){Import-PowerShellDataFile $localPath}else{@{}}
 $settings['ModelRoot']=$config.ModelRoot
-$settings['DefaultProfile']=if($WithLMCache){'cache-mtp'}else{'baseline'}
+$settings['DefaultProfile']=if($WithLMCache){'cache-dflash'}else{'baseline'}
 $lines=@('@{')
 foreach($key in ($settings.Keys|Sort-Object)){
     $value=$settings[$key]

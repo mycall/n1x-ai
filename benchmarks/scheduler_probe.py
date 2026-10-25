@@ -16,6 +16,7 @@ async def main():
     parser.add_argument("--concurrency", type=int, default=4)
     parser.add_argument("--output-tokens", type=int, default=256)
     parser.add_argument("--url", default="http://127.0.0.1:8000")
+    parser.add_argument("--thinking", action=argparse.BooleanOptionalAction, default=True)
     args = parser.parse_args()
     out = args.out
     out.mkdir(exist_ok=True, parents=True)
@@ -61,7 +62,7 @@ async def main():
                 "stream": True,
                 "stream_options": {"include_usage": True},
                 "cache_salt": salt,
-                "chat_template_kwargs": {"enable_thinking": False},
+                "chat_template_kwargs": {"enable_thinking": args.thinking},
             }
             start = time.monotonic()
             first = None
@@ -81,7 +82,8 @@ async def main():
                     usage = event.get("usage") or usage
                     for choice in event.get("choices", []):
                         text = choice.get("delta", {}).get("content") or ""
-                        if text and first is None:
+                        delta = choice.get("delta", {})
+                        if (text or delta.get("reasoning") or delta.get("reasoning_content")) and first is None:
                             first = time.monotonic()
                         content += text
             rows.append(
@@ -113,6 +115,7 @@ async def main():
     duration = max(r["end"] for r in rows) - min(r["start"] for r in rows)
     result = {
         "concurrency": args.concurrency,
+        "thinking": args.thinking,
         "output_tokens": args.output_tokens,
         "duration_s": duration,
         "output_tokens_s": sum(r["usage"]["completion_tokens"] for r in rows)

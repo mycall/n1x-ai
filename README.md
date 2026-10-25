@@ -15,7 +15,7 @@ Install Git, WSLC with GPU support, and the [Hugging Face CLI](https://huggingfa
 .\n1x.ps1 test
 ```
 
-Setup downloads pinned model revisions into `$HOME\models`, builds the images, copies the PLE table into a native volume, and selects the `cache-mtp` profile. Allow substantial disk space and time for downloads and the initial build. To reuse downloaded models:
+Setup downloads pinned model revisions into `$HOME\models`, builds the images, copies the PLE table into a native volume, and selects the `cache-dflash` profile. Allow substantial disk space and time for downloads and the initial build. To reuse downloaded models:
 
 ```powershell
 .\setup.ps1 -WithLMCache -ModelRoot D:\Models -SkipDownload

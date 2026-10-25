@@ -1,19 +1,22 @@
 #Requires -Version 5.1
 param(
-    [ValidateSet('all','vllm','aiperf','ruler','scheduler','speculation','agents','restores','soak')][string]$Suite='all',
+    [ValidateSet('all','vllm','aiperf','ruler','scheduler','speculation','agents','restores','soak','recovery','mixed')][string]$Suite='all',
     [string]$Profile='',
     [string]$PowerMode='Not recorded',
     [ValidateRange(1,16)][int]$SchedulerConcurrency=4,
     [ValidateRange(1,4096)][int]$SchedulerOutputTokens=256,
     [switch]$Build,
     [switch]$Smoke,
-    [switch]$AgentThinking
+    [switch]$AgentThinking,
+    [switch]$NoThinking
 )
 $ErrorActionPreference='Stop'
 Set-StrictMode -Version Latest
+if($AgentThinking -and $NoThinking){throw 'Choose thinking or -NoThinking, not both.'}
+if($NoThinking -and $Suite -in @('recovery','mixed')){throw 'Recovery and mixed qualification always enable thinking.'}
 if($AgentThinking -and $Suite -ne 'agents'){throw '-AgentThinking applies only to -Suite agents.'}
-if($Smoke -and $Suite -in @('agents','restores','soak')){
-    throw 'The agents, restores, and soak suites have fixed qualification workloads; omit -Smoke.'
+if($Smoke -and $Suite -in @('agents','restores','soak','recovery','mixed')){
+    throw 'The agents, restores, soak, recovery, and mixed suites have fixed qualification workloads; omit -Smoke.'
 }
 . "$PSScriptRoot/scripts/config.ps1"
 $config=Get-N1xConfig -Root $PSScriptRoot -Profile $Profile
@@ -55,6 +58,7 @@ $runArgs=@('run','--rm','--name','n1x-benchmark-client','--network',"container:$
 if($Suite -eq 'scheduler'){$runArgs+=@('--scheduler-concurrency',[string]$SchedulerConcurrency,
     '--scheduler-output-tokens',[string]$SchedulerOutputTokens)}
 if($AgentThinking){$runArgs+='--agent-thinking'}
+if($NoThinking){$runArgs+='--no-thinking'}
 if($Smoke){$runArgs+=@('--concurrency','1','--input-lengths','512','--requests','2','--output-tokens','16',
     '--agent-concurrency','1','--conversations','1','--context-lengths','4096','--samples','1')}
 Write-Host "Results: $destination"

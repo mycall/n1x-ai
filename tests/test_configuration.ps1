@@ -7,7 +7,9 @@ New-Item -ItemType Directory -Force "$temporary/profiles"|Out-Null
 try {
     Copy-Item "$root/config.psd1" "$temporary/config.psd1"
     Copy-Item "$root/profiles/cache-mtp.psd1" "$temporary/profiles/cache-mtp.psd1"
+    Copy-Item "$root/profiles/cache-dflash.psd1" "$temporary/profiles/cache-dflash.psd1"
     $config=Get-N1xConfig -Root $temporary
+    if(-not $config.DFlash -or -not $config.UseLMCache -or $config.Mtp){throw 'Default profile must use DFlash2 and LMCache'}
     $expectedRoot=Join-Path ([Environment]::GetFolderPath('UserProfile')) 'models'
     if($config.ModelRoot -ne $expectedRoot){throw 'Default model path is not portable'}
     $overrideRoot=Join-Path $temporary 'model files'

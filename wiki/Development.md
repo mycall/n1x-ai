@@ -32,6 +32,15 @@ wslc run --rm --volume "${PWD}/tests:/tests:ro" `
 
 This checks concurrent stores, bounded eviction, loaded bytes, and restart accounting in a disposable container.
 
+Check Linux broker restart handling without a GPU:
+
+```powershell
+wslc run --rm --volume "${PWD}:/project:ro" `
+    --entrypoint python n1x-ai:lmcache /project/tests/test_vmm_socket.py
+```
+
+These tests cover stale socket recovery and preservation of live sockets and ordinary files. Windows local checks skip these Linux-specific cases.
+
 ## GPU integration
 
 Stop model services first; these tests allocate GPU memory. Build the cache image, then run:

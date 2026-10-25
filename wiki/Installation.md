@@ -21,17 +21,18 @@ Setup downloads these pinned revisions:
 | --- | --- | --- |
 | [Main model](https://huggingface.co/Saren/Qwen3.8-Flash-Next-W4A16-AutoRound-hybrid) | `8b82f0b7abe3d1150a7827d298c75e86267636ae` | `Qwen3.8-Flash-Next-W4A16-AutoRound-hybrid` |
 | [PLE table](https://huggingface.co/Saren/Qwen3.8-Flash-Next-ple-table-fp8) | `50511b0a41aa1d34b8beb7e5d4bb06a0b650dc14` | `ple-table-fp8` |
+| [DFlash2 drafter](https://huggingface.co/incoai/Qwen3.8-Flash-Next-DFlash2), with LMCache setup | `a22a1744e85c17364dcc54a6a420af7135d4c7f6` | `Qwen3.8-Flash-Next-DFlash2` |
 
 The default ModelRoot is the current user's `models` directory. Use `-ModelRoot D:\Models` to change it. Rerun setup after interrupted downloads; `hf` reuses completed files and available partial data.
 
 For existing downloads, add `-SkipDownload`. Advanced reuse options are `-SkipBuild` and `-SkipPleCopy`; use them only when the required images and verified native PLE volume already exist.
 
-With `-WithLMCache`, setup selects `cache-mtp`. Omit it to build and select `baseline`. Settings are saved in ignored `config.local.psd1`.
+With `-WithLMCache`, setup selects `cache-dflash`. Omit it to build and select `baseline`. Settings are saved in ignored `config.local.psd1`.
 
 ## Start and verify
 
 Follow the [README quick start](../README.md#quick-start) to start the service and send a request. Runtime model access is offline after setup. See [Troubleshooting](Troubleshooting.md#api-is-not-ready) for startup delays and [Development](Development.md#service-validation) for feature checks.
 
-## Optional DFlash2 drafter
+## DFlash2 drafter
 
-`prepare-dflash.ps1` downloads [incoai/Qwen3.8-Flash-Next-DFlash2](https://huggingface.co/incoai/Qwen3.8-Flash-Next-DFlash2) revision `a22a1744e85c17364dcc54a6a420af7135d4c7f6` into the configured ModelRoot. The BF16 weights require about 1.2 GB of disk space. This download is separate from standard setup; see the [experimental profile](Configuration.md#dflash2).
+LMCache setup includes the DFlash2 drafter. For an existing installation, `prepare-dflash.ps1` downloads the same pinned revision separately into the configured ModelRoot. The BF16 weights require about 1.2 GB of disk space. See the [profile configuration](Configuration.md#dflash2).

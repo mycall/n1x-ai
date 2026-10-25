@@ -56,7 +56,7 @@ def vllm(args):
             directory = args.out / f"vllm-{length}-c{concurrency}"
             directory.mkdir(parents=True)
             snapshot(args, directory, "before")
-            extra = {"chat_template_kwargs": {"enable_thinking": False},
+            extra = {"chat_template_kwargs": {"enable_thinking": args.thinking},
                      "cache_salt": f"{args.run_id}-vllm-{length}-{concurrency}"}
             command(["vllm", "bench", "serve", "--base-url", args.url,
                      "--backend", "openai-chat", "--endpoint", "/v1/chat/completions",
@@ -94,7 +94,7 @@ def aiperf(args):
                 text = (f"Session {session}. Memorize these lookup keys.\n{context}\n{filler}\n"
                         if turn == 0 else "")
                 text += f"Return only the exact value for Key {turn + 1} from this session."
-                turns.append({"text": text, "output_length": 32})
+                turns.append({"text": text, "output_length": 1024 if args.thinking else 32})
             dataset.append({"session_id": f"session-{session}", "turns": turns})
             expected[f"session-{session}"] = codes
         path = directory / "conversations.jsonl"
@@ -107,7 +107,7 @@ def aiperf(args):
                  "--input-file", path, "--custom-dataset-type", "multi_turn",
                  "--conversation-num", args.conversations, "--concurrency", concurrency,
                  "--random-seed", args.seed, "--extra-inputs", json.dumps({
-                     "temperature": 0, "chat_template_kwargs": {"enable_thinking": False},
+                     "temperature": 0, "chat_template_kwargs": {"enable_thinking": args.thinking},
                      "cache_salt": f"{args.run_id}-aiperf-{concurrency}"}),
                  "--artifact-dir", directory / "artifacts", "--export-level", "raw",
                  "--ui", "simple", "--no-server-metrics", "--workers-max", "1"], directory, "aiperf")
@@ -166,7 +166,7 @@ def ruler(args):
     summaries = []
     for length in args.context_lengths:
         for task in ("niah_single_1", "vt"):
-            output_limit = 512 if task == "vt" else 128
+            output_limit = (2048 if task == "vt" else 1024) if args.thinking else (512 if task == "vt" else 128)
             directory = args.out / f"ruler-{length}-{task}"
             directory.mkdir(parents=True)
             command([sys.executable, "/opt/RULER/scripts/data/prepare.py",
@@ -182,7 +182,7 @@ def ruler(args):
             results = []
             for row in rows:
                 body = {"model": "qwen", "messages": [{"role": "user", "content": row["input"]}],
-                        "temperature": 0, "max_tokens": output_limit, "chat_template_kwargs": {"enable_thinking": False},
+                        "temperature": 0, "max_tokens": output_limit, "chat_template_kwargs": {"enable_thinking": args.thinking},
                         "cache_salt": f"{args.run_id}-{task}-{length}-{row['index']}"}
                 count = json.loads(request(args.url + "/tokenize", {k: v for k, v in body.items()
                                    if k in ("model", "messages", "chat_template_kwargs")}))["count"]
@@ -214,7 +214,7 @@ def ruler(args):
 def scheduler(args):
     command([sys.executable, "/benchmarks/scheduler_probe.py", "--out", args.out / "scheduler",
              "--concurrency", args.scheduler_concurrency, "--output-tokens", args.scheduler_output_tokens,
-             "--url", args.url],
+             "--url", args.url] + ([] if args.thinking else ["--no-thinking"]),
             args.out, "scheduler-probe")
     result = json.loads((args.out / "scheduler" / "probe.json").read_text())
     print(json.dumps({key: value for key, value in result.items() if key not in ("rows", "samples")}), flush=True)
@@ -222,14 +222,14 @@ def scheduler(args):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--suite", choices=["all", "vllm", "aiperf", "ruler", "scheduler", "speculation", "agents", "restores", "soak"], default="all")
+    parser.add_argument("--suite", choices=["all", "vllm", "aiperf", "ruler", "scheduler", "speculation", "agents", "restores", "soak", "recovery", "mixed"], default="all")
     parser.add_argument("--url", default="http://127.0.0.1:8000")
     parser.add_argument("--out", type=Path, default=Path("/results"))
-    parser.add_argument("--concurrency", type=int, nargs="+", default=[1, 2, 4, 8, 16])
+    parser.add_argument("--concurrency", type=int, nargs="+", default=[1, 2, 4])
     parser.add_argument("--input-lengths", type=int, nargs="+", default=[4096, 16384])
     parser.add_argument("--requests", type=int, default=16)
     parser.add_argument("--output-tokens", type=int, default=128)
-    parser.add_argument("--agent-concurrency", type=int, nargs="+", default=[1, 2, 4, 8, 16])
+    parser.add_argument("--agent-concurrency", type=int, nargs="+", default=[1, 2, 4])
     parser.add_argument("--conversations", type=int, default=16)
     parser.add_argument("--context-lengths", type=int, nargs="+", default=[16384, 65536, 131072, 262144])
     parser.add_argument("--samples", type=int, default=2)
@@ -237,6 +237,7 @@ def main():
     parser.add_argument("--scheduler-concurrency", type=int, default=4)
     parser.add_argument("--scheduler-output-tokens", type=int, default=256)
     parser.add_argument("--agent-thinking", action="store_true")
+    parser.add_argument("--thinking", action=argparse.BooleanOptionalAction, default=True)
     args = parser.parse_args()
     args.run_id = uuid.uuid4().hex
     args.out.mkdir(parents=True, exist_ok=True)
@@ -251,11 +252,17 @@ def main():
         scheduler(args)
     if args.suite == "speculation":
         command([sys.executable, "/benchmarks/speculation_probe.py", "--out", args.out / "speculation",
-                 "--url", args.url], args.out, "speculation-probe")
+                 "--url", args.url] + ([] if args.thinking else ["--no-thinking"]), args.out, "speculation-probe")
     if args.suite in ("agents", "restores", "soak"):
         command([sys.executable, "/benchmarks/agent_cache_probe.py", "--phase", args.suite,
                  "--out", args.out / args.suite, "--url", args.url] +
-                (["--agent-thinking"] if args.agent_thinking else []), args.out, args.suite + "-probe")
+                (["--agent-thinking"] if args.thinking or args.agent_thinking else []), args.out, args.suite + "-probe")
+    if args.suite == "recovery":
+        command([sys.executable, "/benchmarks/tool_recovery_probe.py", "--out", args.out / "recovery",
+                 "--url", args.url], args.out, "recovery-probe")
+    if args.suite == "mixed":
+        command([sys.executable, "/benchmarks/mixed_probe.py", "--out", args.out / "mixed",
+                 "--url", args.url], args.out, "mixed-probe")
     save(args.out / "complete.json", {"completed": True, "suite": args.suite})
 
 
