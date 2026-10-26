@@ -34,7 +34,10 @@ def poll(function, predicate, seconds=30):
 
 
 if __name__ == '__main__':
-    disk = tempfile.TemporaryDirectory(prefix='n1x-queue-mp-')
+    # The bounded FS adapter requires a direct /lmcache/qwen-* namespace.
+    # Run in a disposable container without a persistent cache volume.
+    Path('/lmcache').mkdir(exist_ok=True)
+    disk = tempfile.TemporaryDirectory(prefix='qwen-queue-mp-', dir='/lmcache')
     log_path = Path(disk.name)/'server.log'
     log = log_path.open('w')
     server = subprocess.Popen([sys.executable,'-m','lmcache.v1.multiprocess.http_server',
@@ -42,7 +45,7 @@ if __name__ == '__main__':
         '--l1-size-gb','0.0625','--eviction-policy','LRU','--chunk-size','2048',
         '--separate-object-groups','--l2-prefetch-max-in-flight','1',
         '--eviction-trigger-watermark','0.99','--l2-adapter',
-        json.dumps({'type':'fs','base_path':str(Path(disk.name)/'ssd'),'use_odirect':True})],
+        json.dumps({'type':'fs','base_path':disk.name,'use_odirect':True})],
         stdout=log,stderr=subprocess.STDOUT)
     http = urllib.request.build_opener(urllib.request.ProxyHandler({}))
     client, wrappers, events = None, [], []
