@@ -1,5 +1,5 @@
 param(
-    [ValidateSet('setup', 'clean', 'uninstall', 'start', 'stop', 'restart', 'recreate', 'status', 'wait', 'logs', 'test', 'doctor')]
+    [ValidateSet('help', 'setup', 'clean', 'uninstall', 'start', 'stop', 'restart', 'recreate', 'status', 'wait', 'logs', 'test', 'doctor')]
     [string]$Action = 'status',
     [string]$Profile = '',
     [string]$ModelRoot = '',
@@ -30,6 +30,40 @@ function Update-ClientRegistrations([switch]$Remove) {
         . "$PSScriptRoot/scripts/clients.ps1"
         Sync-N1xClients -Root $PSScriptRoot -Port $config.Port -Context $config.Context -Remove:$Remove
     } catch {Write-Warning "Client registration failed: $($_.Exception.Message)"}
+}
+if($Action -eq 'help'){
+    @"
+n1x.ps1 - manage the n1x-ai local model server
+
+Actions:
+  help        Show this help
+  setup       Install prerequisites, download models, build image (with LMCache)
+  start       Create and start the container for the selected profile
+  stop        Stop the container and remove client/firewall registrations
+  restart     Restart the running container with its existing configuration
+  recreate    Remove and re-create the container to apply configuration changes
+  status      Show container state and API readiness
+  wait        Block until the API reports ready (default timeout 3600s)
+  logs        Show the last 100 lines of container logs
+  test        Run smoke checks, or -Suite features|context|all for full suites
+  doctor      Show WSLC info, images, GPU state, and model root
+  clean       Delete caches and volumes (optionally compact a VHD: -VhdPath)
+  uninstall   Clean up everything this project created
+
+Common options:
+  -Profile <name>      Profile from profiles/*.psd1 (default: configured DefaultProfile)
+  -Port <n>            Override the configured API port
+  -ModelRoot <path>    Override the configured model root
+  -PrintOnly           Preview what would run without changing anything
+  -TimeoutSeconds <n>  For wait
+
+Examples:
+  .\n1x.ps1 start
+  .\n1x.ps1 status -Profile mtp
+  .\n1x.ps1 wait -TimeoutSeconds 600
+  .\n1x.ps1 start -PrintOnly
+"@
+    return
 }
 if($Action -eq 'setup'){
     if($PrintOnly){Write-Output '.\setup.ps1 -WithLMCache -ModelRoot <configured ModelRoot or ~/Models>'; return}
