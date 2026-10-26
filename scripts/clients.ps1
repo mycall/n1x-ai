@@ -101,9 +101,17 @@ stream_idle_timeout_ms = 3600000
         if(-not(Test-Path -LiteralPath $client.directory -PathType Container)){continue}
         try {
             if($client.name -eq 'OpenCode' -and (Test-Path (Join-Path $client.directory 'opencode.jsonc'))){
-                throw 'opencode.jsonc exists; automatic JSON merging is disabled to preserve its settings'
+                . "$PSScriptRoot/jsonc.ps1"
+                Update-N1xJsoncEntry -Path (Join-Path $client.directory 'opencode.jsonc') -Owner ([IO.Path]::GetFullPath($Root)) -Value $client.value -Remove:$Remove
+                # Retire our older JSON entry if the user has switched to JSONC.
+                $jsonPath=Join-Path $client.directory 'opencode.json'
+                if(Test-Path -LiteralPath ($jsonPath+'.n1x-managed.json')){
+                    try {Update-N1xClientEntry -Path $jsonPath -Owner ([IO.Path]::GetFullPath($Root)) -Remove}
+                    catch {Write-Warning "JSONC updated, but the older JSON registration was preserved: $($_.Exception.Message)"}
+                }
+            } else {
+                Update-N1xClientEntry -Path (Join-Path $client.directory $client.file) -Owner ([IO.Path]::GetFullPath($Root)) -Value $client.value -WholeFile:$client.whole -Remove:$Remove
             }
-            Update-N1xClientEntry -Path (Join-Path $client.directory $client.file) -Owner ([IO.Path]::GetFullPath($Root)) -Value $client.value -WholeFile:$client.whole -Remove:$Remove
             $verb=if($Remove){'Removed'}else{'Registered'}
             Write-Host "$verb N1X configuration for $($client.name). Reload the client to refresh its model list."
         } catch {Write-Warning "$($client.name) configuration unchanged: $($_.Exception.Message)"}

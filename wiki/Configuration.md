@@ -70,13 +70,13 @@ Successful `start` and `restart` register the local model for clients whose user
 
 | Client | User configuration | Select the local model |
 | --- | --- | --- |
-| OpenCode 2 | `~/.config/opencode/opencode.json`, provider `n1x` | Reload/reopen OpenCode, then select `n1x/qwen` in `/models` |
+| OpenCode 2 | `~/.config/opencode/opencode.jsonc` when present, otherwise `opencode.json`; provider `n1x` | Reload/reopen OpenCode, then select `n1x/qwen` in `/models` |
 | Codex 0.134+ | `~/.codex/n1x.config.toml` | `codex --profile n1x` |
 | Pi | `~/.pi/agent/models.json`, provider `n1x` | Open `/model`, or `pi --provider n1x --model qwen` |
 
 The entries follow the active port and context limit. OpenCode and Pi advertise image input and reasoning, with thinking enabled and an 8,192-token output cap (less for small contexts). Codex uses the Responses API and a compaction threshold at 85% of context. Configuration registration does not establish end-to-end client/tool compatibility; Codex specifically requires the server's `/v1/responses` support.
 
-`XDG_CONFIG_HOME`, `CODEX_HOME`, and `PI_CODING_AGENT_DIR` override the corresponding user locations. Set `$env:N1X_CLIENT_CONFIG='off'` to disable automatic changes. JSONC OpenCode configurations are preserved with a warning instead of rewritten. Invalid configuration, name collisions, or manually edited N1X entries are also preserved with a warning. Ownership sidecars stay alongside the client configs so repository cleanup cannot lose them. Existing sessions may need a client reload after start/stop; the service must be ready before sending requests.
+`XDG_CONFIG_HOME`, `CODEX_HOME`, and `PI_CODING_AGENT_DIR` override the corresponding user locations. Set `$env:N1X_CLIENT_CONFIG='off'` to disable automatic changes. OpenCode JSONC is patched with a managed provider block: comments, formatting, trailing commas, and unrelated settings are preserved. Stop removes that block. Invalid configuration, name collisions, or manually edited N1X entries are preserved with a warning. Ownership sidecars stay alongside the client configs so repository cleanup cannot lose them. Existing sessions may need a client reload after start/stop; the service must be ready before sending requests. Select `n1x/qwen` for the explicit reasoning and vision metadata; OpenCode's auto-discovered `vLLM/qwen` entry is separate.
 
 Install and launch a client once to create its user configuration directory, then run `n1x.ps1 start` again to register it; an already-running matching container is reused. These are configuration entries, not executable patches or client installations. Configuration is updated only on this Windows user account; configure clients on other computers with the LAN endpoint separately.
 

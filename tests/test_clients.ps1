@@ -33,9 +33,14 @@ try {
     Sync-N1xClients @args -Remove -WarningVariable warnings
     if([IO.File]::ReadAllText($path) -cne $before -or -not $warnings){throw 'User edit not protected'}
     Set-Content "$temporary/opencode/opencode.jsonc" '{/* user configuration */}'
+    $jsoncBefore=[IO.File]::ReadAllText("$temporary/opencode/opencode.jsonc")
     Sync-N1xClients @args -WarningVariable warnings
-    if([IO.File]::ReadAllText($path) -cne $before -or -not $warnings){throw 'JSONC guard failed'}
+    if([IO.File]::ReadAllText($path) -cne $before){throw 'JSONC migration overwrote user-edited JSON'}
+    . "$PSScriptRoot/../scripts/jsonc.ps1"
+    $jsonc=Read-N1xJsonc ([IO.File]::ReadAllText("$temporary/opencode/opencode.jsonc"))
+    if(-not $jsonc.Document.providers.n1x.models.qwen.capabilities.reasoning.supported){throw 'JSONC integration missing reasoning'}
     Sync-N1xClients @args -Remove
+    if([IO.File]::ReadAllText("$temporary/opencode/opencode.jsonc") -cne $jsoncBefore){throw 'JSONC integration did not unpatch'}
     Set-Content "$temporary/pi/models.json" '{invalid json'
     Sync-N1xClients @args -WarningVariable warnings
     if((Get-Content "$temporary/pi/models.json" -Raw).Trim() -ne '{invalid json' -or -not $warnings){throw 'Invalid config overwritten'}
