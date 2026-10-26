@@ -68,8 +68,11 @@ function Sync-N1xClients {
             capabilities=@{tools=$true;input=@('text','image');output=@('text');reasoning=@{supported=$true}}
             limit=@{context=$Context;output=$output}
             compatibility=@{reasoningField='reasoning'}
-            variants=@(@{id='thinking';body=@{chat_template_kwargs=@{enable_thinking=$true}}})
-            body=@{chat_template_kwargs=@{enable_thinking=$true}}}}
+            variants=@(
+                @{id='medium';body=@{chat_template_kwargs=@{enable_thinking=$true;reasoning_effort='medium'}}},
+                @{id='thinking';body=@{chat_template_kwargs=@{enable_thinking=$true;reasoning_effort='medium'}}}
+            )
+            body=@{chat_template_kwargs=@{enable_thinking=$true;reasoning_effort='medium'}}}}
     }
     $pi=[ordered]@{baseUrl=$url;api='openai-completions';apiKey='n1x-local'
         models=@(@{id='qwen';name='Qwen3.8 Flash Next (N1X)';reasoning=$true;input=@('text','image')

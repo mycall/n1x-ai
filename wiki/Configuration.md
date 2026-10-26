@@ -66,6 +66,26 @@ Find the serving computer's LAN address with `Get-NetIPConfiguration` and use th
 
 ## Agent clients
 
+### REST reasoning control
+
+For `POST /v1/chat/completions`, choose reasoning effort per request:
+
+```json
+{
+  "model": "qwen",
+  "messages": [{"role": "user", "content": "Explain this code."}],
+  "max_tokens": 8192,
+  "chat_template_kwargs": {
+    "enable_thinking": true,
+    "reasoning_effort": "medium"
+  }
+}
+```
+
+The pinned template supports `low`, `medium`, and `xhigh`; omitting effort uses its `xhigh` default. Set `enable_thinking` to `false` to disable thinking. The output budget includes reasoning and the final answer. OpenCode's medium default is a client setting, not a server-wide override. The same request works through the LAN API URL.
+
+### Client registration
+
 Successful `start` and `restart` register the local model for clients whose user configuration directories exist. `stop`, online `clean`, and `uninstall` remove only the registrations owned by this checkout. Existing defaults and unrelated providers remain unchanged; `-PrintOnly` does not modify client files.
 
 | Client | User configuration | Select the local model |
@@ -80,7 +100,7 @@ The entries follow the active port and context limit. OpenCode and Pi advertise 
 
 Install and launch a client once to create its user configuration directory, then run `n1x.ps1 start` again to register it; an already-running matching container is reused. These are configuration entries, not executable patches or client installations. Configuration is updated only on this Windows user account; configure clients on other computers with the LAN endpoint separately.
 
-OpenCode exposes an explicit `thinking` variant for `n1x/qwen`, with thinking also enabled in the base request. Desktop may still display "No reasoning" because of its [v2 model tooltip bug](https://github.com/anomalyco/opencode/issues/50257). The label does not establish whether the model is reasoning; check the response's reasoning field. This limitation affects the desktop display even when the CLI and service load the correct request settings.
+OpenCode defaults to medium reasoning for `n1x/qwen`. Its `medium` variant and the backward-compatible `thinking` variant both send `chat_template_kwargs = {enable_thinking: true, reasoning_effort: "medium"}`. Desktop may still display "No reasoning" because of its [v2 model tooltip bug](https://github.com/anomalyco/opencode/issues/50257). The label does not establish whether the model is reasoning; check the response's reasoning field. This limitation affects the desktop display even when the CLI and service load the correct request settings.
 
 The opt-out affects both registration and removal. To remove existing managed entries before opting out, run `n1x.ps1 stop` first. To re-enable automatic updates in the current terminal, run `Remove-Item Env:N1X_CLIENT_CONFIG`. Keep each `*.n1x-managed.json` sidecar so stop can identify its own entries safely.
 
