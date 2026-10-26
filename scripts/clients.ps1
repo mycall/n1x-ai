@@ -68,6 +68,7 @@ function Sync-N1xClients {
             capabilities=@{tools=$true;input=@('text','image');output=@('text');reasoning=@{supported=$true}}
             limit=@{context=$Context;output=$output}
             compatibility=@{reasoningField='reasoning'}
+            variants=@(@{id='thinking';body=@{chat_template_kwargs=@{enable_thinking=$true}}})
             body=@{chat_template_kwargs=@{enable_thinking=$true}}}}
     }
     $pi=[ordered]@{baseUrl=$url;api='openai-completions';apiKey='n1x-local'

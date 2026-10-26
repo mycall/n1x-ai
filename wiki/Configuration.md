@@ -80,6 +80,8 @@ The entries follow the active port and context limit. OpenCode and Pi advertise 
 
 Install and launch a client once to create its user configuration directory, then run `n1x.ps1 start` again to register it; an already-running matching container is reused. These are configuration entries, not executable patches or client installations. Configuration is updated only on this Windows user account; configure clients on other computers with the LAN endpoint separately.
 
+OpenCode exposes an explicit `thinking` variant for `n1x/qwen`, with thinking also enabled in the base request. Desktop may still display "No reasoning" because of its [v2 model tooltip bug](https://github.com/anomalyco/opencode/issues/50257). The label does not establish whether the model is reasoning; check the response's reasoning field. This limitation affects the desktop display even when the CLI and service load the correct request settings.
+
 The opt-out affects both registration and removal. To remove existing managed entries before opting out, run `n1x.ps1 stop` first. To re-enable automatic updates in the current terminal, run `Remove-Item Env:N1X_CLIENT_CONFIG`. Keep each `*.n1x-managed.json` sidecar so stop can identify its own entries safely.
 
 ## DFlash2

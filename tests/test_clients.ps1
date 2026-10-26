@@ -15,6 +15,7 @@ try {
     $doc=Get-Content $path -Raw|ConvertFrom-Json
     if($doc.model -ne 'other/model' -or $doc.providers.other.name -ne 'keep'){throw 'Existing config changed'}
     if($doc.providers.n1x.settings.baseURL -ne 'http://127.0.0.1:8123/v1' -or $doc.providers.n1x.models.qwen.limit.context -ne 32768){throw 'Active settings missing'}
+    if($doc.providers.n1x.models.qwen.variants[0].id -ne 'thinking' -or -not $doc.providers.n1x.models.qwen.variants[0].body.chat_template_kwargs.enable_thinking){throw 'OpenCode thinking variant missing'}
     Sync-N1xClients @args -Port 8124
     $doc=Get-Content $path -Raw|ConvertFrom-Json
     if($doc.providers.n1x.settings.baseURL -notmatch ':8124/v1$'){throw 'Idempotent update failed'}
