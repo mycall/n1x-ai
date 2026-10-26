@@ -3,8 +3,27 @@ Set-StrictMode -Version Latest
 . "$(Split-Path $PSScriptRoot -Parent)/scripts/proxy.ps1"
 $names=@('HTTP_PROXY','HTTPS_PROXY','NO_PROXY','ALL_PROXY')
 $saved=@{}
+$savedSource=$env:N1X_PROXY_SOURCE
 foreach($name in $names){$saved[$name]=[Environment]::GetEnvironmentVariable($name)}
 try {
+    $env:N1X_PROXY_SOURCE='auto'
+    $persistent=@{HTTP_PROXY='http://updated.invalid:8080';HTTPS_PROXY='http://updated.invalid:8080';NO_PROXY='localhost';ALL_PROXY=$null}
+    function Get-N1xPersistentProxyEnvironment {return $persistent}
+    $env:HTTPS_PROXY='http://stale.invalid:8080'
+    Update-N1xProxyEnvironment
+    if($env:HTTPS_PROXY -ne $persistent.HTTPS_PROXY){throw 'Persistent proxy change not detected'}
+    $env:N1X_PROXY_SOURCE='process'
+    $env:HTTPS_PROXY='http://terminal.invalid:8080'
+    Update-N1xProxyEnvironment
+    if($env:HTTPS_PROXY -ne 'http://terminal.invalid:8080'){throw 'Process override discarded'}
+    $env:N1X_PROXY_SOURCE=$null
+    foreach($name in $names){$persistent[$name]=$null}
+    Update-N1xProxyEnvironment
+    if($env:HTTPS_PROXY -or $env:HTTP_PROXY){throw 'Stale proxy not cleared after persistent proxy-off'}
+    $env:N1X_PROXY_SOURCE='typo'
+    try {Update-N1xProxyEnvironment;throw 'Invalid proxy source accepted'}
+    catch {if($_.Exception.Message -notlike 'N1X_PROXY_SOURCE must be*'){throw}}
+    $env:N1X_PROXY_SOURCE=$null
     $env:HTTP_PROXY='http://example.invalid:8080'
     $env:HTTPS_PROXY=$env:HTTP_PROXY
     $env:NO_PROXY='localhost,127.0.0.1'
@@ -36,5 +55,6 @@ try {
     if(@(Get-N1xProxyBuildArguments) -notcontains 'HTTPS_PROXY='){throw 'Proxy-off build argument missing'}
     Write-Host 'Proxy on/off, active-container guard, and build forwarding checks passed.'
 } finally {
+    [Environment]::SetEnvironmentVariable('N1X_PROXY_SOURCE',$savedSource,'Process')
     foreach($name in $names){[Environment]::SetEnvironmentVariable($name,$saved[$name],'Process')}
 }

@@ -23,6 +23,10 @@ Setup downloads pinned model revisions into `$HOME\models`, builds the images, c
 
 The API is OpenAI compatible: **`http://127.0.0.1:8000/v1`**, model **`qwen`**.
 
+Start/stop manage a Windows Firewall exception for local-subnet access on the API port. Approve the firewall UAC prompt; other LAN computers use this computer's LAN IP. See [LAN access](wiki/Configuration.md#lan-access) for scope and local-only configuration.
+
+Start/stop also manage local-model entries for installed OpenCode, Codex, and Pi configurations. See [agent client setup](wiki/Configuration.md#agent-clients) for model selection and compatibility limits.
+
 To reclaim disposable project data while keeping offline startup available, stop the service and run `n1x.ps1 clean`. Use `n1x.ps1 uninstall` to remove the project runtime as well. Both preserve Models; see [cleanup and disk reclamation](wiki/Configuration.md#cleanup-and-disk-reclamation).
 
 ```powershell

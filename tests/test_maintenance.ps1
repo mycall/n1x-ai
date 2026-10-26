@@ -61,6 +61,8 @@ try {
     New-Item -ItemType Directory "$temporary/scripts" | Out-Null
     Copy-Item "$root/n1x.ps1" "$temporary/n1x.ps1"
     Copy-Item "$root/scripts/config.ps1" "$temporary/scripts/config.ps1"
+    Set-Content "$temporary/scripts/firewall.ps1" 'function Set-N1xFirewall { param($Root,$Port,[switch]$Remove) }'
+    Set-Content "$temporary/scripts/clients.ps1" 'function Sync-N1xClients { param($Root,$Port,$Context,[switch]$Remove) }'
     [IO.File]::WriteAllText("$temporary/setup.ps1",@'
 param([string]$ModelRoot,[switch]$WithLMCache,[switch]$SkipDownload,[switch]$SkipBuild,[switch]$SkipPleCopy,[switch]$Rebuild)
 if(-not $WithLMCache -or -not $SkipBuild -or $ModelRoot -ne '~\Models'){throw 'Setup arguments not forwarded'}

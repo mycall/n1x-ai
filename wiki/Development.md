@@ -23,6 +23,8 @@ With Python on PATH:
 
 This parses PowerShell, checks configuration/launch behavior, and runs CPU unit tests. GitHub Actions runs these checks on Windows. They require neither model weights nor a GPU.
 
+Client tests use temporary configurations to check registration, removal, and preservation of user edits. Firewall tests mock elevation and inspect the generated rule scope; they do not change Windows Firewall. Live client conversations and access from a second LAN computer require separate integration checks described in [Configuration](Configuration.md#lan-access).
+
 After building the cache image, test its real filesystem adapter without a GPU or persistent cache volume:
 
 ```powershell

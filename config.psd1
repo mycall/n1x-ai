@@ -4,6 +4,7 @@
     Container = 'n1x-qwen38'
     ModelRoot = ''
     Port = 8000
+    LanAccess = $true
     Context = 32768
     MaxSequences = 1
     KvCacheBytes = '4g'

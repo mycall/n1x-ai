@@ -26,13 +26,23 @@ if(-not $Smoke -and $Suite -in @('all','ruler') -and $config.Context -lt 262144)
 $model=Join-Path $config.ModelRoot 'Qwen3.8-Flash-Next-W4A16-AutoRound-hybrid'
 if(-not(Test-Path -LiteralPath "$model/tokenizer_config.json")){throw "Tokenizer not found at $model"}
 if($Build){
-    $buildArgs=@('build','--progress','plain','-t','n1x-ai:benchmarks')
+    . "$PSScriptRoot/scripts/proxy.ps1"
+    Update-N1xProxyEnvironment
+    $resetSession=Sync-N1xWslcProxy
+    try {
+    $buildArgs=@('build')+@(Get-N1xProxyBuildArguments)+@('--progress','plain','-t','n1x-ai:benchmarks')
     foreach($entry in @(@('https_proxy','HTTPS_PROXY'),@('http_proxy','HTTP_PROXY'))){
         if([Environment]::GetEnvironmentVariable($entry[1])){$buildArgs+=@('--secret',"id=$($entry[0]),env=$($entry[1])")}
     }
     $buildArgs+="$PSScriptRoot/benchmarks"
     & wslc @buildArgs
     if($LASTEXITCODE -ne 0){throw 'Benchmark image build failed'}
+    } finally {
+        if($resetSession){
+            & wslc system session terminate
+            if($LASTEXITCODE -ne 0){Write-Warning 'Reset the idle WSLC session before serving: wslc system session terminate'}
+        }
+    }
 }
 $health=Invoke-WebRequest "http://127.0.0.1:$($config.Port)/health" -UseBasicParsing -TimeoutSec 15
 if($health.StatusCode -ne 200){throw 'Start the model service before benchmarking'}

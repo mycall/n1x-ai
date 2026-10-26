@@ -14,6 +14,10 @@ If settings differ from the existing container, run `recreate`, then `wait`. Che
 
 After a cache container exits unsuccessfully, `start` and `restart` replace it while preserving the model and named volumes. Use `recreate` explicitly if a startup allocation failure persists.
 
+## LAN or agent client connection fails
+
+First confirm `n1x.ps1 wait` succeeds locally. Then follow [LAN access](Configuration.md#lan-access) for the remote health check, firewall UAC handling, and container binding, or [agent clients](Configuration.md#agent-clients) for model selection, reload behavior, and configuration conflict warnings. A registered model is not proof of a working API or tool-call workflow.
+
 ## Missing models or PLE table
 
 Verify ModelRoot and directory names in [Installation](Installation.md). Rerun setup to download missing files. To rebuild only the native PLE copy:

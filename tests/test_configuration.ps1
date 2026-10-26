@@ -27,6 +27,10 @@ try {
         if(-not $draftPreview.Contains($required)){throw "DFlash launch missing $required"}
     }
     if($draftPreview.Contains('/profiles/mtp.yaml')){throw 'DFlash launch also enables MTP'}
+    if($draftPreview -notmatch '0\.0\.0\.0:\d+:8000'){throw 'LAN publication missing'}
+    [IO.File]::WriteAllText("$temporary/config.local.psd1",'@{LanAccess=$false}')
+    $localConfig=Get-N1xConfig -Root $temporary
+    if($localConfig.LanAccess){throw 'LAN opt-out ignored'}
     [IO.File]::WriteAllText("$temporary/config.local.psd1",'@{CacheBlockTokens=1024;LmcacheChunkTokens=1536}')
     try{Get-N1xConfig -Root $temporary;throw 'Misaligned cache geometry accepted'}catch{
         if($_.Exception.Message -ne 'LMCache chunk tokens must be a positive multiple of cache block tokens'){throw}

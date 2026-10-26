@@ -13,6 +13,7 @@ if($PrintOnly){
     if($WithLMCache -or $CacheOnly){Write-Output "wslc build -t n1x-ai:lmcache -f $root/Dockerfile.lmcache $root"}
     return
 }
+Update-N1xProxyEnvironment
 $resetSession=Sync-N1xWslcProxy
 try {
 $proxyArguments=@(Get-N1xProxyBuildArguments)

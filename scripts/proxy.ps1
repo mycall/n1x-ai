@@ -1,4 +1,29 @@
-# Consume the environment set by proxy.ps1; never select a proxy address here.
+# Read the persistent environment updated by proxy.ps1 before internet work.
+function Get-N1xPersistentProxyEnvironment {
+    $values=@{}
+    foreach($name in @('HTTP_PROXY','HTTPS_PROXY','NO_PROXY','ALL_PROXY')){
+        $value=[Environment]::GetEnvironmentVariable($name,'User')
+        if($null -eq $value){$value=[Environment]::GetEnvironmentVariable($name,'Machine')}
+        $values[$name]=$value
+    }
+    return $values
+}
+
+function Update-N1xProxyEnvironment {
+    if($env:N1X_PROXY_SOURCE -and $env:N1X_PROXY_SOURCE -notin @('auto','process')){
+        throw 'N1X_PROXY_SOURCE must be auto, process, or unset.'
+    }
+    # Explicit opt-out for intentional per-terminal overrides.
+    if($env:N1X_PROXY_SOURCE -eq 'process'){return}
+    $values=Get-N1xPersistentProxyEnvironment
+    $changed=$false
+    foreach($name in $values.Keys){
+        if([string][Environment]::GetEnvironmentVariable($name) -cne [string]$values[$name]){$changed=$true}
+        [Environment]::SetEnvironmentVariable($name,$values[$name],'Process')
+    }
+    if($changed){Write-Host 'Refreshed proxy settings from the Windows user/machine environment.'}
+}
+
 function Get-N1xProxyBuildArguments {
     foreach($name in @('HTTP_PROXY','HTTPS_PROXY','NO_PROXY','ALL_PROXY')){
         foreach($variant in @($name,$name.ToLowerInvariant())){

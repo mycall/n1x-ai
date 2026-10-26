@@ -28,6 +28,8 @@ function Test-N1xModelDownload([string]$Directory, [string]$Revision, [string]$K
 function Get-N1xModelDownload([string]$Repository,[string]$Revision,[string]$Directory,[string]$Kind){
     if(Test-N1xModelDownload $Directory $Revision $Kind){Write-Host "Reusing pinned $Kind files: $Directory"; return}
     if(-not(Get-Command hf -ErrorAction SilentlyContinue)){throw 'Install Hugging Face CLI (hf) to fetch or verify missing model files; see wiki/Installation.md'}
+    . "$PSScriptRoot/proxy.ps1"
+    Update-N1xProxyEnvironment
     & hf download $Repository --revision $Revision --local-dir $Directory
     if($LASTEXITCODE -ne 0){throw 'Model download failed; rerun setup to resume'}
 }

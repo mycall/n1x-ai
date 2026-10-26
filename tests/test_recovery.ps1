@@ -6,6 +6,8 @@ New-Item -ItemType Directory -Force "$temporary/scripts","$temporary/profiles","
 try {
     Copy-Item "$root/n1x.ps1","$root/config.psd1" $temporary
     Copy-Item "$root/scripts/config.ps1" "$temporary/scripts/config.ps1"
+    Set-Content "$temporary/scripts/firewall.ps1" 'function Set-N1xFirewall { param($Root,$Port,[switch]$Remove); Set-Content (Join-Path $Root "firewall-mode.txt") ([string][bool]$Remove) }'
+    Set-Content "$temporary/scripts/clients.ps1" 'function Sync-N1xClients { param($Root,$Port,$Context,[switch]$Remove) }'
     Copy-Item "$root/profiles/cache-mtp.psd1" "$temporary/profiles/cache-mtp.psd1"
     $modelRoot=Join-Path $temporary 'models'
     $model=Join-Path $modelRoot 'Qwen3.8-Flash-Next-W4A16-AutoRound-hybrid'
@@ -60,8 +62,16 @@ try {
         if($recoveryState.calls.IndexOf('monitor-start') -gt $recoveryState.calls.IndexOf($launch)){throw 'Monitor started after blocking launch'}
     }
     $recoveryState.exitCode=0
+    foreach($action in @('start','restart')){
+        # restart with an unsuccessful exit delegates to start.
+        $recoveryState.exitCode=1
+        & "$temporary/n1x.ps1" $action -Profile cache-mtp -ModelRoot $modelRoot -DenyFirewall | Out-Null
+        if((Get-Content "$temporary/firewall-mode.txt") -ne 'True'){throw "$action lost DenyFirewall"}
+    }
+    $recoveryState.exitCode=0
     $recoveryState.calls.Clear()
     & "$temporary/n1x.ps1" start -Profile cache-mtp -ModelRoot $modelRoot | Out-Null
+    if((Get-Content "$temporary/firewall-mode.txt") -ne 'False'){throw 'Plain start should enable the firewall allowance'}
     if($recoveryState.calls -notcontains 'start n1x-qwen38-cache-mtp' -or @($recoveryState.calls|Where-Object {$_ -like 'rm *'}).Count){throw 'Cleanly stopped container should be reused'}
     . "$root/scripts/config.ps1"
     $legacyConfig=Get-N1xConfig -Root $temporary -Profile cache-mtp -ModelRoot $modelRoot

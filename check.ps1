@@ -15,4 +15,6 @@ if($LASTEXITCODE -ne 0){throw 'Python tests failed'}
 & "$root/tests/test_proxy.ps1"
 & "$root/tests/test_resources.ps1"
 & "$root/tests/test_monitor.ps1"
+& "$root/tests/test_clients.ps1"
+& "$root/tests/test_firewall.ps1"
 Write-Host 'All local checks passed. GPU integration tests are separate; see wiki/Development.md.'

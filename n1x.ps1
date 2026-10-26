@@ -9,6 +9,7 @@ param(
     [ValidateRange(1, 86400)]
     [int]$TimeoutSeconds = 3600,
     [switch]$PrintOnly,
+    [switch]$DenyFirewall,
     [switch]$SkipDownload,
     [switch]$SkipBuild,
     [switch]$SkipPleCopy,
@@ -18,6 +19,18 @@ param(
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 . "$PSScriptRoot/scripts/config.ps1"
+function Update-LanAccess([switch]$Remove) {
+    if($PrintOnly){return}
+    . "$PSScriptRoot/scripts/firewall.ps1"
+    Set-N1xFirewall -Root $PSScriptRoot -Port $config.Port -Remove:($Remove -or $DenyFirewall -or -not $config.LanAccess)
+}
+function Update-ClientRegistrations([switch]$Remove) {
+    if($PrintOnly -or $env:N1X_CLIENT_CONFIG -eq 'off'){return}
+    try {
+        . "$PSScriptRoot/scripts/clients.ps1"
+        Sync-N1xClients -Root $PSScriptRoot -Port $config.Port -Context $config.Context -Remove:$Remove
+    } catch {Write-Warning "Client registration failed: $($_.Exception.Message)"}
+}
 if($Action -eq 'setup'){
     if($PrintOnly){Write-Output '.\setup.ps1 -WithLMCache -ModelRoot <configured ModelRoot or ~/Models>'; return}
     & "$PSScriptRoot/setup.ps1" -WithLMCache -ModelRoot $ModelRoot -SkipDownload:$SkipDownload -SkipBuild:$SkipBuild -SkipPleCopy:$SkipPleCopy -Rebuild:$Rebuild
@@ -28,6 +41,8 @@ if($Action -in @('clean','uninstall')){
     if(-not $VhdPath){
         . "$PSScriptRoot/scripts/resources.ps1"
         Invoke-N1xResourceCleanup -Root $PSScriptRoot -Uninstall:($Action -eq 'uninstall') -PrintOnly:$PrintOnly
+        Update-ClientRegistrations -Remove
+        Update-LanAccess -Remove
     } elseif($Action -eq 'uninstall'){throw 'Use clean -VhdPath for offline compaction after uninstall'}
     & "$PSScriptRoot/scripts/clean.ps1" -Root $PSScriptRoot -ModelRoot $config.ModelRoot -PrintOnly:$PrintOnly -VhdPath $VhdPath
     return
@@ -143,6 +158,8 @@ switch ($Action) {
                     if ($existing.State.Running) { Write-Host "$name is already running. Check status for API readiness." }
                     else { Invoke-Wslc @('start', $name); Write-Host "Starting $name with its existing configuration." }
                     if($config.UseLMCache){Start-MemoryMonitor}
+                    Update-ClientRegistrations
+                    Update-LanAccess
                     return
                 }
             }
@@ -182,7 +199,7 @@ switch ($Action) {
             'run', '-d', '--name', $name, '--label', 'n1x-ai.managed=true',
             '--label',"n1x-ai.config-sha=$fingerprint",'--label',"n1x-ai.profile=$Profile",
             '--gpus', 'all', '--shm-size', '1g', '--ulimit', 'memlock=-1:-1',
-            '--publish', "127.0.0.1:$($config.Port):8000",
+            '--publish', "$(if($config.LanAccess){'0.0.0.0'}else{'127.0.0.1'}):$($config.Port):8000",
             '--volume', "${model}:/model:ro", '--volume', "${tableMount}:/ple-table-fp8:ro",
             '--volume', "$($config.CacheVolume):/root/.cache",
             '--env', 'HF_HUB_OFFLINE=1', '--env', 'TOKENIZERS_PARALLELISM=false',
@@ -232,20 +249,27 @@ switch ($Action) {
         if($config.UseLMCache){Start-MemoryMonitor}
         Invoke-Wslc $run
         if($config.UseLMCache){Start-MemoryMonitor}
+        Update-ClientRegistrations
+        Update-LanAccess
         Write-Host "Loading model. Check .\n1x.ps1 status -Profile $Profile and .\n1x.ps1 logs -Profile $Profile. API: $endpoint/v1"
     }
-    'stop' { if (-not (Get-ManagedContainer)) { throw "No managed container $name" }; Invoke-Wslc @('stop', $name) }
+    'stop' {
+        try { if (Get-ManagedContainer) { Invoke-Wslc @('stop', $name) }; Update-ClientRegistrations -Remove }
+        finally { Update-LanAccess -Remove }
+    }
     'restart' {
         Assert-NoOtherProfile
         $old=Get-ManagedContainer
         if(-not $old){throw "No managed container $name"}
         Assert-Configuration $old
         if($config.UseLMCache -and -not $old.State.Running -and $old.State.ExitCode -ne 0){
-            & $PSCommandPath start -Profile $Profile -ModelRoot $config.ModelRoot -Port $config.Port
+            & $PSCommandPath start -Profile $Profile -ModelRoot $config.ModelRoot -Port $config.Port -DenyFirewall:$DenyFirewall
         } else {
             if($config.UseLMCache){Write-Headroom; Start-MemoryMonitor}
             Invoke-Wslc @('restart', $name)
             if($config.UseLMCache){Start-MemoryMonitor}
+            Update-ClientRegistrations
+            Update-LanAccess
         }
     }
     'logs' { Invoke-Wslc @('logs', '--tail', '100', $name) }

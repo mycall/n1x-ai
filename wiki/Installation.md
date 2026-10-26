@@ -13,7 +13,24 @@ Use a **non-administrator PowerShell** consistently for setup and serving. WSLC 
 
 ### Proxy
 
-Builds honor the current shell's `HTTP_PROXY`, `HTTPS_PROXY`, `NO_PROXY`, and `ALL_PROXY`. If you use `proxy.ps1 on` or `proxy.ps1 off`, call it in the setup terminal or open a new terminal afterward. No proxy address is hard-coded in this repository.
+Before model downloads, upstream HTTPS clones, and runtime or benchmark image builds, the scripts refresh `HTTP_PROXY`, `HTTPS_PROXY`, `NO_PROXY`, and `ALL_PROXY` from the Windows user environment, falling back to machine settings. This detects changes made by `proxy.ps1 on/off` even in an already-open terminal. It also clears stale process values when the persistent proxy is removed. No proxy address is hard-coded.
+
+`N1X_PROXY_SOURCE` controls this check:
+
+| Value | Behavior |
+| --- | --- |
+| Unset or `auto` | Refresh from Windows user/machine environment before internet work |
+| `process` | Use the current terminal's proxy variables without refreshing them |
+
+For an intentional per-terminal override:
+
+```powershell
+$env:N1X_PROXY_SOURCE = 'process'
+# Return to automatic detection:
+Remove-Item Env:N1X_PROXY_SOURCE -ErrorAction SilentlyContinue
+```
+
+Offline model reuse, local API tests, serving, and cleanup do not trigger this check. These settings are environment variables, not Windows PAC/WinINet discovery, and changes are checked before operations rather than monitored continuously.
 
 Before building, the script synchronizes WSLC's Docker daemon HTTP/HTTPS proxy settings and forwards proxy variables to all build stages. A daemon proxy change requires all WSLC containers to be stopped; the script refuses to interrupt them. Run setup from an interactive terminal because WSLC session commands require a console. Empty proxy settings clear the daemon proxy and build arguments; if `proxy.ps1 off` restores a previous proxy, that restored setting is used. This routes HTTP/HTTPS requests through the proxy; it does not change the DNS server or proxy arbitrary network traffic.
 

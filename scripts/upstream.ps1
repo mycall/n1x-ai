@@ -19,6 +19,10 @@ function Initialize-N1xUpstream([string]$Root,[string]$Repository,[string]$Revis
             Move-Item -LiteralPath $upstream -Destination $backup -Force -ErrorAction Stop
             Write-Host "Preserved incomplete upstream checkout: $backup"
         }
+        if($Repository -match '^https?://'){
+            . "$PSScriptRoot/proxy.ps1"
+            Update-N1xProxyEnvironment
+        }
         & git clone --no-checkout $Repository $upstream
         if($LASTEXITCODE -ne 0){throw 'Upstream clone failed; rerun setup to retry'}
         & git --git-dir="$upstream/.git" --work-tree="$upstream" checkout --detach $Revision

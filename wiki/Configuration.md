@@ -52,6 +52,36 @@ Existing containers retain their creation settings. After configuration changes:
 
 This replaces the selected container and preserves named volumes. Also recreate after rebuilding an image to use the new image. `start -PrintOnly` previews the launch without requiring downloaded models or WSLC access. `restart` reuses a matching configuration.
 
+## LAN access
+
+Use `n1x.ps1 start -DenyFirewall` to start without adding a firewall allowance and remove any existing N1X allowance for this checkout. The switch also works with `restart` and `recreate`. Removing an existing rule requires UAC; when no rule exists, no firewall elevation is needed. This is a per-command choice: a subsequent plain `start` enables the allowance again. It does not change the container's listening address or override other firewall rules; use `LanAccess = $false` and recreate for localhost-only serving.
+
+`start` and `restart` publish the API on all IPv4 interfaces and add a Windows Firewall rule for the configured TCP port (8000 by default), restricted to `LocalSubnet`. The rule applies to all Windows network profiles, including Public Wi-Fi. Other computers on that subnet can use `http://<Windows-LAN-IP>:8000/v1`, model `qwen`, after the API is ready. The API has no authentication; computers on the allowed subnet can submit requests.
+
+`stop`, online `clean`, and `uninstall` remove this checkout's rule. Firewall changes request Windows UAC elevation separately; keep running the main commands from your normal terminal so WSLC uses the same session. A failed or cancelled firewall update is reported as an error, even if the container started successfully. Other applications' firewall rules are not changed. This does not configure router forwarding or guarantee access through organizational firewall policy or Wi-Fi client isolation.
+
+Existing localhost-only containers need `n1x.ps1 recreate` once to apply the new binding. Set `LanAccess = $false` in `config.local.psd1` and recreate to keep serving only on localhost. Client registrations continue to use localhost on this computer. From another LAN computer, verify with `Invoke-RestMethod http://<Windows-LAN-IP>:8000/health`; after stop the connection should fail.
+
+Find the serving computer's LAN address with `Get-NetIPConfiguration` and use the IPv4 address on its connected Ethernet or Wi-Fi adapter. Substitute your configured port if it differs from 8000. Only the model API is exposed; these commands do not publish LMCache's internal ports. Closing N1X's rule does not remove allowances created by other software.
+
+## Agent clients
+
+Successful `start` and `restart` register the local model for clients whose user configuration directories exist. `stop`, online `clean`, and `uninstall` remove only the registrations owned by this checkout. Existing defaults and unrelated providers remain unchanged; `-PrintOnly` does not modify client files.
+
+| Client | User configuration | Select the local model |
+| --- | --- | --- |
+| OpenCode 2 | `~/.config/opencode/opencode.json`, provider `n1x` | Reload/reopen OpenCode, then select `n1x/qwen` in `/models` |
+| Codex 0.134+ | `~/.codex/n1x.config.toml` | `codex --profile n1x` |
+| Pi | `~/.pi/agent/models.json`, provider `n1x` | Open `/model`, or `pi --provider n1x --model qwen` |
+
+The entries follow the active port and context limit. OpenCode and Pi advertise image input and reasoning, with thinking enabled and an 8,192-token output cap (less for small contexts). Codex uses the Responses API and a compaction threshold at 85% of context. Configuration registration does not establish end-to-end client/tool compatibility; Codex specifically requires the server's `/v1/responses` support.
+
+`XDG_CONFIG_HOME`, `CODEX_HOME`, and `PI_CODING_AGENT_DIR` override the corresponding user locations. Set `$env:N1X_CLIENT_CONFIG='off'` to disable automatic changes. JSONC OpenCode configurations are preserved with a warning instead of rewritten. Invalid configuration, name collisions, or manually edited N1X entries are also preserved with a warning. Ownership sidecars stay alongside the client configs so repository cleanup cannot lose them. Existing sessions may need a client reload after start/stop; the service must be ready before sending requests.
+
+Install and launch a client once to create its user configuration directory, then run `n1x.ps1 start` again to register it; an already-running matching container is reused. These are configuration entries, not executable patches or client installations. Configuration is updated only on this Windows user account; configure clients on other computers with the LAN endpoint separately.
+
+The opt-out affects both registration and removal. To remove existing managed entries before opting out, run `n1x.ps1 stop` first. To re-enable automatic updates in the current terminal, run `Remove-Item Env:N1X_CLIENT_CONFIG`. Keep each `*.n1x-managed.json` sidecar so stop can identify its own entries safely.
+
 ## DFlash2
 
 The default `cache-dflash` profile uses the DFlash2 drafter with three draft tokens, 262,144-token context, four sequence slots, and an 8 GiB FP8 KV pool. Sliding-attention KV stays BF16; the compressed indexer uses FP8. Matching 1,664-token cache blocks and LMCache chunks reduce Mamba page padding to 0.48%. Its LMCache namespace includes the speculative method, indexer precision, and cache geometry to separate incompatible entries. `cache-mtp` remains available as an alternative; see [qualification results](Benchmarks.md#dflash2-comparison).
