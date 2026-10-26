@@ -13,6 +13,10 @@ The main recipe comes from the upstream `magi-v5-public` revision pinned in `bui
 
 Keep dependencies and model revisions pinned. Upgrades require checking patch source guards, cross-process cache transfers, model correctness, and memory behavior together. Do not treat successful patch application alone as runtime validation.
 
+The patch scripts share `runtime/lmcache/n1x_patch.py`: every replacement requires one match, section boundaries must be unique and ordered, and edited files must compile before being written. Missing or ambiguous targets fail with the patch name and file path, including when Python optimization is enabled. Apply VMM before segmented; both scripts check this ordering because VMM's validation rewrite would otherwise erase the segmented initialization hook.
+
+The cache image build runs `verify_patches.py` after all patches. It compiles the touched files and local helpers, checks the final hooks, and imports the IPC definitions and local compatibility modules without constructing GPU allocations. These checks catch source and import failures; the GPU integration tests below still validate transfers, aliases, and restored bytes.
+
 ## Local checks
 
 With Python on PATH:

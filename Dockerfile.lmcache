@@ -9,11 +9,14 @@ RUN --mount=type=secret,id=https_proxy --mount=type=secret,id=http_proxy \
       lmcache==0.5.6 'torch==2.13.0' 'vllm==0.32.0' 'flashinfer-python==0.7.0.post1'
 COPY runtime/lmcache/n1x_*.py /opt/venv/lib/python3.12/site-packages/
 COPY runtime/lmcache/patch_*.py /tmp/n1x-patches/
+# VMM must precede segmented: its validation rewrite would erase that hook.
 RUN python /tmp/n1x-patches/patch_vmm.py && \
     python /tmp/n1x-patches/patch_admission.py && \
     python /tmp/n1x-patches/patch_segmented.py && \
     python /tmp/n1x-patches/patch_restore_queue_v2.py && \
     python /tmp/n1x-patches/patch_disk_cache.py
+COPY runtime/lmcache/verify_patches.py /tmp/n1x-patches/
+RUN python /tmp/n1x-patches/verify_patches.py
 COPY runtime/lmcache/serve.py /opt/n1x/serve.py
 COPY LICENSE NOTICE.md licenses/Apache-2.0.txt /opt/n1x/licenses/
 ENTRYPOINT ["python", "-u", "/opt/n1x/serve.py"]
