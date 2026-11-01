@@ -237,8 +237,17 @@ def main():
     parser.add_argument("--scheduler-concurrency", type=int, default=4)
     parser.add_argument("--scheduler-output-tokens", type=int, default=256)
     parser.add_argument("--agent-thinking", action="store_true")
+    parser.add_argument("--agent-output-tokens", type=int)
+    parser.add_argument("--agent-sessions", type=int, choices=range(1,17), default=4)
+    parser.add_argument("--agent-turns", type=int, choices=range(1,101), default=3)
     parser.add_argument("--thinking", action=argparse.BooleanOptionalAction, default=True)
     args = parser.parse_args()
+    if args.agent_output_tokens is not None and args.agent_output_tokens < 1:
+        parser.error('--agent-output-tokens must be positive')
+    if args.suite != 'agents' and (args.agent_output_tokens is not None or args.agent_sessions != 4 or args.agent_turns != 3):
+        parser.error('Agent output/session/turn controls require --suite agents')
+    if args.suite == 'agents' and any(point < 1 or point > 16 for point in args.agent_concurrency):
+        parser.error('Agent concurrency must be between 1 and 16')
     args.run_id = uuid.uuid4().hex
     args.out.mkdir(parents=True, exist_ok=True)
     save(args.out / "settings.json", {k: str(v) if isinstance(v, Path) else v for k, v in vars(args).items()})
@@ -254,9 +263,15 @@ def main():
         command([sys.executable, "/benchmarks/speculation_probe.py", "--out", args.out / "speculation",
                  "--url", args.url] + ([] if args.thinking else ["--no-thinking"]), args.out, "speculation-probe")
     if args.suite in ("agents", "restores", "soak"):
+        agent_options = []
+        if args.suite == 'agents':
+            agent_options = ['--agent-concurrency', *map(str, args.agent_concurrency),
+                             '--agent-sessions', str(args.agent_sessions), '--agent-turns', str(args.agent_turns)]
+            if args.agent_output_tokens is not None:
+                agent_options += ['--agent-output-tokens', str(args.agent_output_tokens)]
         command([sys.executable, "/benchmarks/agent_cache_probe.py", "--phase", args.suite,
                  "--out", args.out / args.suite, "--url", args.url] +
-                (["--agent-thinking"] if args.thinking or args.agent_thinking else []), args.out, args.suite + "-probe")
+                (["--agent-thinking"] if args.thinking or args.agent_thinking else []) + agent_options, args.out, args.suite + "-probe")
     if args.suite == "recovery":
         command([sys.executable, "/benchmarks/tool_recovery_probe.py", "--out", args.out / "recovery",
                  "--url", args.url], args.out, "recovery-probe")

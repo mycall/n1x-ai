@@ -8,7 +8,11 @@ param(
     [switch]$Build,
     [switch]$Smoke,
     [switch]$AgentThinking,
-    [switch]$NoThinking
+    [switch]$NoThinking,
+    [ValidateRange(1,16)][int[]]$AgentConcurrency=@(),
+    [ValidateRange(0,65536)][int]$AgentOutputTokens=0,
+    [ValidateRange(1,16)][int]$AgentSessions=4,
+    [ValidateRange(1,100)][int]$AgentTurns=3
 )
 $ErrorActionPreference='Stop'
 Set-StrictMode -Version Latest
@@ -20,6 +24,8 @@ if($Smoke -and $Suite -in @('agents','restores','soak','recovery','mixed')){
 }
 . "$PSScriptRoot/scripts/config.ps1"
 $config=Get-N1xConfig -Root $PSScriptRoot -Profile $Profile
+if(($AgentConcurrency.Count -or $AgentOutputTokens -or $AgentSessions -ne 4 -or $AgentTurns -ne 3) -and $Suite -ne 'agents'){throw 'Agent workload controls require -Suite agents'}
+if($AgentOutputTokens -ge $config.Context){throw 'Agent output allowance must leave room for input within the configured context'}
 if(-not $Smoke -and $Suite -in @('all','ruler') -and $config.Context -lt 262144){
     throw 'The full RULER sweep needs a 262144-token profile. Use -Profile cache-mtp, or -Smoke for a small check.'
 }
@@ -68,6 +74,10 @@ $runArgs=@('run','--rm','--name','n1x-benchmark-client','--network',"container:$
 if($Suite -eq 'scheduler'){$runArgs+=@('--scheduler-concurrency',[string]$SchedulerConcurrency,
     '--scheduler-output-tokens',[string]$SchedulerOutputTokens)}
 if($AgentThinking){$runArgs+='--agent-thinking'}
+if($AgentConcurrency.Count){$runArgs+=@('--agent-concurrency')+@($AgentConcurrency | ForEach-Object {[string]$_})}
+if($AgentOutputTokens){$runArgs+=@('--agent-output-tokens',[string]$AgentOutputTokens)}
+if($AgentSessions -ne 4){$runArgs+=@('--agent-sessions',[string]$AgentSessions)}
+if($AgentTurns -ne 3){$runArgs+=@('--agent-turns',[string]$AgentTurns)}
 if($NoThinking){$runArgs+='--no-thinking'}
 if($Smoke){$runArgs+=@('--concurrency','1','--input-lengths','512','--requests','2','--output-tokens','16',
     '--agent-concurrency','1','--conversations','1','--context-lengths','4096','--samples','1')}

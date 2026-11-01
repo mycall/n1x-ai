@@ -7,6 +7,7 @@ from pathlib import Path
 import re
 import threading
 import time
+import urllib.error
 import urllib.request
 import uuid
 
@@ -36,10 +37,24 @@ class Probe:
                     cache_salt=salt, chat_template_kwargs={'enable_thinking': False})
         body.update(extra)
         start = time.monotonic()
-        response = json.loads(request(self.args.url + '/v1/chat/completions', body))
+        started_unix_s = time.time()
+        try:
+            response = json.loads(request(self.args.url + '/v1/chat/completions', body))
+        except Exception as error:
+            failure = dict(salt=salt, started_unix_s=started_unix_s, elapsed_s=time.monotonic()-start,
+                           request=body, error=str(error))
+            if isinstance(error, urllib.error.HTTPError):
+                try:
+                    failure.update(status=error.code, response_body=error.read().decode(errors='replace'))
+                finally:
+                    error.close()
+            with self.lock:
+                with (self.out / 'errors.jsonl').open('a') as file:
+                    file.write(json.dumps(failure)+'\n')
+            raise
         with self.lock:
             with (self.out / 'responses.jsonl').open('a') as file:
-                file.write(json.dumps(dict(salt=salt, elapsed_s=time.monotonic()-start, response=response))+'\n')
+                file.write(json.dumps(dict(salt=salt, started_unix_s=started_unix_s, elapsed_s=time.monotonic()-start, request=body, response=response))+'\n')
         return response['choices'][0]
 
     def snapshot(self, name):
@@ -77,14 +92,18 @@ class Probe:
 
     def agents(self):
         thinking = getattr(self.args, 'agent_thinking', False)
+        output_tokens = getattr(self.args, 'agent_output_tokens', None) or (1024 if thinking else 128)
+        session_count = getattr(self.args, 'agent_sessions', 4)
+        turns = getattr(self.args, 'agent_turns', 3)
         def chat(messages, salt, **extra):
-            return self.chat(messages, salt, max_tokens=1024 if thinking else 128,
+            return self.chat(messages, salt, max_tokens=output_tokens,
                              chat_template_kwargs={'enable_thinking': thinking}, **extra)
         tools = [dict(type='function', function=dict(name='lookup_inventory', description='Look up stock by SKU.', parameters=dict(type='object', properties=dict(sku=dict(type='string')), required=['sku'], additionalProperties=False)))]
-        for repeat, order in enumerate(([1,2,4], [4,2,1])):
+        concurrency_points = getattr(self.args, 'agent_concurrency', None) or [1,2,4]
+        for repeat, order in enumerate((concurrency_points, list(reversed(concurrency_points)))):
             for concurrency in order:
                 sessions = []
-                for number in range(4):
+                for number in range(session_count):
                     filler = '\n'.join(f'Archive item {i:06d}: reference batch {(i*7919)%999983:06d}; status archived.' for i in range(450))
                     messages = [dict(role='system',content='Use lookup_inventory whenever asked for inventory. Preserve the exact requested SKU. After its result, return only the requested CODE:COUNT format.'), dict(role='user',content=f'{filler}\nSession code is AGENT-{number:04d}. Remember it. Reply only READY.')]
                     salt=f'{self.salt}-agent-{repeat}-{concurrency}-{number}'
@@ -95,8 +114,9 @@ class Probe:
                     sessions.append((number,messages,salt))
                 def session(item):
                     number,messages,salt=item
+                    session_start=time.monotonic()
                     correct=0
-                    for turn in range(3):
+                    for turn in range(turns):
                         sku=f'AX-{number}-{turn}'
                         messages.append(dict(role='user',content=f'Look up inventory for SKU {sku}. Then return the session code and inventory count separated by a colon, with no other text.'))
                         choice=chat(messages,salt,tools=tools,tool_choice='auto')
@@ -105,8 +125,9 @@ class Probe:
                             messages.append(dict(role='assistant',content=choice['message'].get('content') or ''))
                             continue
                         assistant=dict(role='assistant',content=choice['message'].get('content'),tool_calls=calls)
-                        if choice['message'].get('reasoning'):
-                            assistant['reasoning']=choice['message']['reasoning']
+                        for field in ('reasoning', 'reasoning_content'):
+                            if choice['message'].get(field):
+                                assistant[field]=choice['message'][field]
                         messages.append(assistant)
                         count=23+number*7+turn
                         messages.append(dict(role='tool',tool_call_id=calls[0]['id'],content=json.dumps(dict(sku=sku,count=count))))
@@ -114,15 +135,18 @@ class Probe:
                         answer=(choice['message'].get('content') or '').strip()
                         messages.append(dict(role='assistant',content=answer))
                         correct+=int(choice['finish_reason']=='stop' and answer==f'AGENT-{number:04d}:{count}')
-                    return correct
+                    return dict(session=number,correct_tasks=correct,planned_tasks=turns,elapsed_s=time.monotonic()-session_start)
                 before=self.snapshot(f'agent-{repeat}-c{concurrency}-before')
                 start=time.monotonic()
                 with ThreadPoolExecutor(max_workers=concurrency) as pool:
-                    correct=sum(pool.map(session,sessions))
+                    session_results=list(pool.map(session,sessions))
+                correct=sum(result['correct_tasks'] for result in session_results)
                 elapsed=time.monotonic()-start
                 after=self.snapshot(f'agent-{repeat}-c{concurrency}-after')
-                row=dict(repeat=repeat,concurrency=concurrency,planned_tasks=12,correct_tasks=correct,elapsed_s=elapsed,correct_tasks_s=correct/elapsed,preemptions=after.get('vllm:num_preemptions_total',0)-before.get('vllm:num_preemptions_total',0))
-                row.update(thinking=thinking, max_output_tokens=1024 if thinking else 128)
+                preemptions = after.get('vllm:num_preemptions_total',0)-before.get('vllm:num_preemptions_total',0)
+                row=dict(repeat=repeat,concurrency=concurrency,sessions=session_count,turns=turns,planned_tasks=session_count*turns,correct_tasks=correct,elapsed_s=elapsed,correct_tasks_s=correct/elapsed,preemptions=preemptions)
+                row.update(thinking=thinking, max_output_tokens=output_tokens)
+                row['session_results']=session_results
                 self.rows.append(row)
                 save(self.out/'summary.json',self.rows)
                 print(json.dumps(row),flush=True)
@@ -188,7 +212,13 @@ def main():
     parser.add_argument('--url',default='http://127.0.0.1:8000')
     parser.add_argument('--out',type=Path,required=True)
     parser.add_argument('--agent-thinking',action='store_true')
+    parser.add_argument('--agent-concurrency', type=int, nargs='+', choices=range(1,17))
+    parser.add_argument('--agent-output-tokens', type=int)
+    parser.add_argument('--agent-sessions', type=int, choices=range(1,17), default=4)
+    parser.add_argument('--agent-turns', type=int, choices=range(1,101), default=3)
     args=parser.parse_args()
+    if args.agent_output_tokens is not None and args.agent_output_tokens < 1:
+        parser.error('--agent-output-tokens must be positive')
     probe=Probe(args)
     getattr(probe,args.phase)()
 

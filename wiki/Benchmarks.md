@@ -171,7 +171,30 @@ Start the reference profile, then run its thinking-enabled agent benchmark:
 .\test-restores.ps1 -Profile cache-dflash
 ```
 
-Supply `-PowerMode` with the actual MSI setting to record it; the option does not change system settings. Avoid other model requests during measurements. The fixed agent workload does not accept `-Smoke`.
+Supply `-PowerMode` with the actual MSI setting to record it; the option does not change system settings. Avoid other model requests during measurements. The agent suite does not accept `-Smoke`; use its explicit workload controls instead.
+
+### Agent workload controls
+
+`-Suite agents` retains the original default workload: four conversations, three inventory tasks per conversation, concurrency points 1/2/4 followed by 4/2/1, and a 1,024-token output allowance with thinking enabled. That is 72 scored tasks across both sweeps. `-NoThinking` retains the 128-token default allowance. Each point warms the conversations before timing their tool tasks.
+
+| Option | Default | Purpose |
+| --- | --- | --- |
+| `-AgentConcurrency` | `1,2,4` | Client concurrency points, each from 1 to 16; the second sweep reverses their order |
+| `-AgentOutputTokens` | Automatic | Total generated tokens per request, including reasoning; zero uses the thinking/non-thinking default |
+| `-AgentSessions` | `4` | Independent conversations per point, from 1 to 16 |
+| `-AgentTurns` | `3` | Inventory tasks per conversation, from 1 to 100 |
+
+```powershell
+# Rebuild the benchmark client once to pick up the new options.
+.\benchmark.ps1 -Build -Suite agents -Profile cache-dflash -AgentConcurrency 1,2,4 -AgentOutputTokens 8192
+
+# One continuous conversation, twelve tasks, repeated in two sweeps.
+.\benchmark.ps1 -Suite agents -Profile cache-dflash -AgentConcurrency 1 -AgentSessions 1 -AgentTurns 12 -AgentOutputTokens 8192
+```
+
+These controls change the client workload, not the serving profile's scheduling or context limits. Client concurrency cannot exceed the number of conversations actually submitted. Keep settings identical when comparing profiles; changed output allowances or conversation lengths are separate measurements from the historical results above. The configured context must hold both the rendered prompt and output allowance.
+
+The agent probe records each request and response with a start timestamp and elapsed time. Failed requests retain their request, error and available HTTP response body in `errors.jsonl`. Each completed point includes per-conversation scores and durations in `session_results`; those durations begin when a worker starts the conversation and exclude time waiting for a client worker. Aggregate point timing includes that queueing. Both `reasoning` and `reasoning_content` are preserved on assistant tool calls for continuation.
 
 Raw responses, commands, configuration, package versions, scores, and cache counters remain in ignored `results/benchmarks/`. Failed runs retain their artifacts. The benchmark client is removed automatically; the model service remains running.
 
