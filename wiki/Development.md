@@ -1,5 +1,7 @@
 # Development
 
+Feature checks accept an explicit serving profile, for example `test.ps1 -Profile cache-dflash -Suite features`. Each result records `elapsedSeconds` for the check and its follow-up health request, including failed checks. Vision/OCR checks require normal completion (`finish_reason=stop`) as well as the expected answer; truncated responses do not pass. Local `check.ps1` also parses PowerShell scripts below `scripts/` recursively and those in `benchmarks/`.
+
 ## Builds
 
 ```powershell

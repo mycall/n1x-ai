@@ -2,6 +2,7 @@ param(
     [ValidateSet('features', 'context', 'all')][string]$Suite = 'features',
     [int[]]$ContextTokens = @(4096, 16384, 31744),
     [string[]]$Tests = @(),
+    [string]$Profile = '',
     [int]$Port = 0,
     [string]$ResultName = 'qualification',
     [string]$CacheSalt = ''
@@ -9,8 +10,8 @@ param(
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 . "$PSScriptRoot/scripts/config.ps1"
-$config=Get-N1xConfig -Root $PSScriptRoot -Port $Port
-$base = "http://127.0.0.1:$($config.Port)"
+$config=Get-N1xConfig -Root $PSScriptRoot -Profile $Profile -Port $Port
+$base="http://127.0.0.1:$($config.Port)"
 $resultDir = Join-Path $PSScriptRoot '.state/checks'
 New-Item -ItemType Directory -Force $resultDir | Out-Null
 $script:results = [Collections.Generic.List[object]]::new()
@@ -35,14 +36,15 @@ function Assert-True([bool]$Condition, [string]$Message) {
 function Run-Check([string]$Name, [scriptblock]$Check) {
     if ($Tests.Count -and $Name -notin $Tests) { return }
     Write-Host "Checking $Name ..."
+    $timer=[Diagnostics.Stopwatch]::StartNew()
     try {
         $evidence = & $Check
         $health = Invoke-WebRequest "$base/health" -UseBasicParsing -TimeoutSec 15
         Assert-True ($health.StatusCode -eq 200) 'API unhealthy after request'
-        $script:results.Add([pscustomobject]@{test=$Name; passed=$true; evidence=$evidence})
+        $script:results.Add([pscustomobject]@{test=$Name; passed=$true; elapsedSeconds=$timer.Elapsed.TotalSeconds; evidence=$evidence})
         Write-Host "PASS $Name"
     } catch {
-        $script:results.Add([pscustomobject]@{test=$Name; passed=$false; error=$_.Exception.Message})
+        $script:results.Add([pscustomobject]@{test=$Name; passed=$false; elapsedSeconds=$timer.Elapsed.TotalSeconds; error=$_.Exception.Message})
         Write-Host "FAIL ${Name}: $($_.Exception.Message)"
     }
     Write-JsonFile ($script:results.ToArray()) "$ResultName.json"
@@ -121,6 +123,7 @@ if ($Suite -in @('features','all')) {
         $content = @(@{type='text'; text='Describe the shape and color on the left, then the shape and color on the right. Be brief.'}, @{type='image_url'; image_url=@{url=$dataUri}})
         $reply = Chat @(@{role='user'; content=$content})
         Write-JsonFile $reply "$ResultName-vision-shapes.json"
+        Assert-True ($reply.choices[0].finish_reason -eq 'stop') 'Image answer did not finish normally'
         $answer = $reply.choices[0].message.content
         Assert-True ($answer -match '(?is)red.*circle|circle.*red') 'Red circle not identified'
         Assert-True ($answer -match '(?is)blue.*square|square.*blue') 'Blue square not identified'
@@ -130,6 +133,7 @@ if ($Suite -in @('features','all')) {
         $content = @(@{type='text'; text='Read the printed code at the bottom of this image. Reply with only that code.'}, @{type='image_url'; image_url=@{url=$dataUri}})
         $reply = Chat @(@{role='user'; content=$content})
         Write-JsonFile $reply "$ResultName-vision-ocr.json"
+        Assert-True ($reply.choices[0].finish_reason -eq 'stop') 'OCR answer did not finish normally'
         $answer = $reply.choices[0].message.content
         Assert-True ($answer.Trim() -match '^N1X-742[.!]?$') 'Incorrect image text'
         @{content=$answer; fixture='vision-fixture.png'}

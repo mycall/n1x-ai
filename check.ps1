@@ -1,7 +1,10 @@
 $ErrorActionPreference='Stop'
 Set-StrictMode -Version Latest
 $root=$PSScriptRoot
-$files=@(Get-ChildItem -LiteralPath $root -File -Filter '*.ps1')+@(Get-ChildItem "$root/scripts" -File -Filter '*.ps1')+@(Get-ChildItem "$root/tests" -File -Filter '*.ps1')
+$files=@(Get-ChildItem -LiteralPath $root -File -Filter '*.ps1')+
+    @(Get-ChildItem "$root/scripts" -Recurse -File -Filter '*.ps1')+
+    @(Get-ChildItem "$root/tests" -File -Filter '*.ps1')+
+    @(Get-ChildItem "$root/benchmarks" -File -Filter '*.ps1')
 foreach($file in $files){
     $errors=$null
     [void][Management.Automation.Language.Parser]::ParseFile($file.FullName,[ref]$null,[ref]$errors)
