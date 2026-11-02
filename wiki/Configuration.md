@@ -5,28 +5,47 @@ Settings merge in this order: `config.psd1`, the selected profile in `profiles/`
 ```powershell
 @{
     ModelRoot = 'D:\Models'
-    DefaultProfile = 'cache-dflash'
+    DefaultProfile = 'qwen38fn-cache-dflash'
     Port = 8000
 }
 ```
 
 ## Profiles
 
+Selectable profile names include the model family prefix `qwen38fn-`; old profile names are not accepted. Update any local default and use `recreate -Profile <new-name>` for containers created before the rename. Existing container names, model data and cache volumes are preserved.
+
 | Profile | Context | Speculation | LMCache | KV allocation |
 | --- | --- | --- | --- | --- |
-| baseline | 32,768 | Off | Off | 4 GiB |
-| mtp | 32,768 | One draft token, Triton | Off | 4 GiB |
-| cache | 262,144 | Off | On | 8 GiB FP8 |
-| cache-mtp | 262,144 | One draft token, Triton | On | 8 GiB FP8 |
-| cache-dflash (default) | 262,144 | Three DFlash2 draft tokens | On | 8 GiB FP8 |
+| qwen38fn-baseline | 32,768 | Off | Off | 4 GiB |
+| qwen38fn-mtp | 32,768 | One draft token, Triton | Off | 4 GiB |
+| qwen38fn-cache | 262,144 | Off | On | 8 GiB FP8 |
+| qwen38fn-cache-mtp | 262,144 | One draft token, Triton | On | 8 GiB FP8 |
+| qwen38fn-cache-dflash (default) | 262,144 | Three DFlash2 draft tokens | On | 8 GiB FP8 |
+| qwen38fn-myllmbox (native Windows, test) | 409,600 | Dynamic MTP depth 3–7, HEAD2 | Off | 12 GB FP8, BF16 draft KV |
+
+The [native Windows profile](Native-vLLM.md) uses a separately installed RTX Spark wheel and FP4 model. It defaults to localhost and supports the normal lifecycle commands plus a Windows agent-benchmark client. The WSLC setup and cleanup instructions below apply to the container profiles.
 
 Context includes input and output. DFlash2 allows four scheduled sequences; the other cache profiles allow up to 16, but concurrent requests share the KV pool. Output length, simultaneous prefill, vision, and host applications affect capacity. See [LMCache](LMCache.md#memory-budget) for memory controls and [Benchmarks](Benchmarks.md) for measured workloads.
 
 MTP changes acceptance and throughput with workload. Choose the profile using representative application requests rather than assuming more draft tokens are faster.
 
+## Output allowance
+
+`MaxOutputTokens = 8192` is the shared default output allowance and server cap for every profile. It counts reasoning and final-answer tokens together. Override it in `config.local.psd1` when needed:
+
+```powershell
+MaxOutputTokens = 8192
+```
+
+Both native and WSLC launches pass this through vLLM's `--override-generation-config` as `max_new_tokens`, preserving the model's other generation settings. Requests that omit an output limit receive up to this allowance, subject to remaining context. An explicit smaller request limit still wins; a larger one is capped. Raise `MaxOutputTokens` and recreate the service to allow more than 8,192. This server-wide cap behavior is documented in the [vLLM generation configuration](https://docs.vllm.ai/en/latest/cli/serve/#--generation-config).
+
+The setting must be a positive integer smaller than `Context`. Reserve room for output when constructing prompts; it does not increase the context window or force the model to generate 8,192 tokens. OpenCode/Pi registrations use the configured allowance on the next normal start, subject to the existing client-registration opt-out. Clients that explicitly send 1,024 still use 1,024. Fixed benchmark budgets are unchanged.
+
+The new setting takes effect on the next launch of a stopped native server, or after `recreate` for an existing container. Changing this setting updates the configuration fingerprint. The [budget comparison](Native-vLLM.md#code-and-explanation-budget-comparison-november-1-2026) motivated the 8K choice; it does not establish universal answer correctness.
+
 ## Scheduling
 
-`BatchedTokens` is the scheduler's per-step token budget, not the number of sessions. DFlash2 and MTP use 4,096; their cache blocks are 1,664 and 2,048 tokens respectively. A budget of one block can serialize admission. The target-only `cache` profile uses 2,048.
+`BatchedTokens` is the scheduler's per-step token budget, not the number of sessions. DFlash2 and MTP use 4,096; their cache blocks are 1,664 and 2,048 tokens respectively. A budget of one block can serialize admission. The target-only `qwen38fn-cache` profile uses 2,048.
 
 Set `BatchedTokens` in `config.local.psd1` and recreate the service to apply an override. Larger budgets require memory validation. `CacheBlockTokens` and `LmcacheChunkTokens` must be compatible: the chunk size must be a positive multiple of the block size, and the runtime validates each attention group's layout. Keep the supplied per-profile values unless testing a new layout. See [agent concurrency measurements](Benchmarks.md#agent-and-restore-qualification) for the benchmark reference profile.
 
@@ -106,7 +125,7 @@ The opt-out affects both registration and removal. To remove existing managed en
 
 ## DFlash2
 
-The default `cache-dflash` profile uses the DFlash2 drafter with three draft tokens, 262,144-token context, four sequence slots, and an 8 GiB FP8 KV pool. Sliding-attention KV stays BF16; the compressed indexer uses FP8. Matching 1,664-token cache blocks and LMCache chunks reduce Mamba page padding to 0.48%. Its LMCache namespace includes the speculative method, indexer precision, and cache geometry to separate incompatible entries. `cache-mtp` remains available as an alternative; see [qualification results](Benchmarks.md#dflash2-comparison).
+The default `qwen38fn-cache-dflash` profile uses the DFlash2 drafter with three draft tokens, 262,144-token context, four sequence slots, and an 8 GiB FP8 KV pool. Sliding-attention KV stays BF16; the compressed indexer uses FP8. Matching 1,664-token cache blocks and LMCache chunks reduce Mamba page padding to 0.48%. Its LMCache namespace includes the speculative method, indexer precision, and cache geometry to separate incompatible entries. `qwen38fn-cache-mtp` remains available as an alternative; see [qualification results](Benchmarks.md#dflash2-comparison).
 
 At this context limit, vLLM reports approximately 520K tokens of capacity (1.99 maximum-length requests). This is a scheduler estimate, not a guarantee of two simultaneous 262K sessions. Capacity depends on context length because sliding-attention and recurrent-state overhead are included. Four sequence slots do not imply four maximum-length contexts fit together.
 
@@ -114,13 +133,13 @@ Both DFlash2 and MTP pass the synthetic multi-turn agent check with thinking ena
 
 ```powershell
 # Setup already prepares DFlash2. To switch an existing MTP service:
-.\n1x.ps1 stop -Profile cache-mtp
-.\n1x.ps1 start -Profile cache-dflash
-.\n1x.ps1 wait -Profile cache-dflash -TimeoutSeconds 1800
-.\n1x.ps1 test -Profile cache-dflash
+.\n1x.ps1 stop -Profile qwen38fn-cache-mtp
+.\n1x.ps1 start -Profile qwen38fn-cache-dflash
+.\n1x.ps1 wait -Profile qwen38fn-cache-dflash -TimeoutSeconds 1800
+.\n1x.ps1 test -Profile qwen38fn-cache-dflash
 ```
 
-The first start compiles additional FlashInfer kernels. Use `-Profile cache-dflash` for lifecycle commands when selecting it explicitly. Stop it before returning to `cache-mtp`.
+The first start compiles additional FlashInfer kernels. Use `-Profile qwen38fn-cache-dflash` for lifecycle commands when selecting it explicitly. Stop it before returning to `qwen38fn-cache-mtp`.
 
 ## Storage
 

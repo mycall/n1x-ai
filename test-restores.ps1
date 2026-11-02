@@ -1,5 +1,5 @@
 #Requires -Version 5.1
-param([string]$Profile='cache-dflash')
+param([string]$Profile='qwen38fn-cache-dflash')
 $ErrorActionPreference='Stop'
 Set-StrictMode -Version Latest
 . "$PSScriptRoot/scripts/config.ps1"

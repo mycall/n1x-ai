@@ -28,7 +28,7 @@ function Update-ClientRegistrations([switch]$Remove) {
     if($PrintOnly -or $env:N1X_CLIENT_CONFIG -eq 'off'){return}
     try {
         . "$PSScriptRoot/scripts/clients.ps1"
-        Sync-N1xClients -Root $PSScriptRoot -Port $config.Port -Context $config.Context -Remove:$Remove
+        Sync-N1xClients -Root $PSScriptRoot -Port $config.Port -Context $config.Context -MaxOutputTokens $config.MaxOutputTokens -Remove:$Remove
     } catch {Write-Warning "Client registration failed: $($_.Exception.Message)"}
 }
 if($Action -eq 'help'){
@@ -38,7 +38,7 @@ n1x.ps1 - manage the n1x-ai local model server
 Actions:
   help        Show this help
   setup       Install prerequisites, download models, build image (with LMCache)
-  start       Create and start the container for the selected profile
+  start       Start the selected container or native Windows profile
   stop        Stop the container and remove client/firewall registrations
   restart     Restart the running container with its existing configuration
   recreate    Remove and re-create the container to apply configuration changes
@@ -59,18 +59,37 @@ Common options:
 
 Examples:
   .\n1x.ps1 start
-  .\n1x.ps1 status -Profile mtp
+  .\n1x.ps1 status -Profile qwen38fn-mtp
   .\n1x.ps1 wait -TimeoutSeconds 600
   .\n1x.ps1 start -PrintOnly
 "@
     return
 }
 if($Action -eq 'setup'){
+    if(Test-Path -LiteralPath "$PSScriptRoot/config.psd1"){
+        $config=Get-N1xConfig -Root $PSScriptRoot -Profile $Profile -ModelRoot $ModelRoot -Port $Port
+        if($config.ContainsKey('Backend') -and $config.Backend -eq 'native'){
+            . "$PSScriptRoot/scripts/native.ps1"
+            $paths=Get-N1xNativePaths $PSScriptRoot $config
+            if($PrintOnly){Write-Output "Validate existing native installation at $($paths.Runtime) and model at $($paths.Model); see wiki/Native-vLLM.md";return}
+            Assert-N1xNativeInstallation $paths
+            return
+        }
+    }
     if($PrintOnly){Write-Output '.\setup.ps1 -WithLMCache -ModelRoot <configured ModelRoot or ~/Models>'; return}
     & "$PSScriptRoot/setup.ps1" -WithLMCache -ModelRoot $ModelRoot -SkipDownload:$SkipDownload -SkipBuild:$SkipBuild -SkipPleCopy:$SkipPleCopy -Rebuild:$Rebuild
     return
 }
 $config = Get-N1xConfig -Root $PSScriptRoot -Profile $Profile -ModelRoot $ModelRoot -Port $Port
+$native=$config.ContainsKey('Backend') -and $config.Backend -eq 'native'
+if(Test-Path -LiteralPath "$PSScriptRoot/scripts/native.ps1"){
+    . "$PSScriptRoot/scripts/native.ps1"
+    # Cleanup must not delete the identity of a running native process.
+    if($Action -in @('clean','uninstall') -and -not $PrintOnly){Assert-N1xNoNativeProfile $PSScriptRoot}
+}
+if($native -and $Action -in @('clean','uninstall')){
+    throw 'Native dependencies and caches are externally managed. Use stop for this profile; see wiki/Native-vLLM.md.'
+}
 if($Action -in @('clean','uninstall')){
     if(-not $VhdPath){
         . "$PSScriptRoot/scripts/resources.ps1"
@@ -97,6 +116,68 @@ $fingerprint=Get-ConfigFingerprint
 $name = $config.Container
 $endpoint = "http://127.0.0.1:$($config.Port)"
 
+if($native){
+    $paths=Get-N1xNativePaths $PSScriptRoot $config
+    if($PrintOnly -and $Action -notin @('start','stop','restart','recreate')){
+        Write-Output "Native $Action for $Profile at $endpoint (state: $($paths.State))"
+        return
+    }
+    if($Action -in @('wait','test') -and (Get-N1xNativeProcess $paths.State)){
+        $saved=Get-Content -LiteralPath $paths.State -Raw | ConvertFrom-Json
+        if($saved.fingerprint -ne $fingerprint -or $saved.recipeHash -ne (Get-FileHash -LiteralPath $paths.Recipe).Hash){
+            throw 'Native settings differ from the running server. Use recreate before qualification.'
+        }
+    }
+    $nativeLock=$null
+    if(-not $PrintOnly -and $Action -in @('start','stop','restart','recreate')){
+        New-Item -ItemType Directory -Force "$PSScriptRoot/.state" | Out-Null
+        try {$nativeLock=[IO.File]::Open("$PSScriptRoot/.state/native-lifecycle.lock",[IO.FileMode]::OpenOrCreate,[IO.FileAccess]::ReadWrite,[IO.FileShare]::None)}
+        catch {throw 'Another native lifecycle command is in progress; retry after it finishes.'}
+    }
+    try { switch($Action){
+        {$_ -in @('start','restart','recreate')} {
+            if($Action -in @('restart','recreate')){
+                if($Action -eq 'restart' -and -not $PrintOnly -and (Get-N1xNativeProcess $paths.State)){
+                    $saved=Get-Content -LiteralPath $paths.State -Raw | ConvertFrom-Json
+                    if($saved.fingerprint -ne $fingerprint -or $saved.recipeHash -ne (Get-FileHash -LiteralPath $paths.Recipe).Hash){throw 'Native settings differ. Use recreate to apply changes.'}
+                }
+                Stop-N1xNative $PSScriptRoot $config -PrintOnly:$PrintOnly
+            }
+            Start-N1xNative $PSScriptRoot $config $fingerprint -PrintOnly:$PrintOnly
+            Update-ClientRegistrations
+            Update-LanAccess
+            return
+        }
+        'stop' {
+            Stop-N1xNative $PSScriptRoot $config -PrintOnly:$PrintOnly
+            Update-ClientRegistrations -Remove
+            Update-LanAccess -Remove
+            return
+        }
+        'wait' {Wait-N1xNative $PSScriptRoot $config $TimeoutSeconds;return}
+        'logs' {
+            foreach($log in @($paths.Stdout,$paths.Stderr)){
+                if(Test-Path -LiteralPath $log){Write-Host $log;Get-Content -LiteralPath $log -Tail 100}
+            }
+            return
+        }
+        'status' {
+            $process=Get-N1xNativeProcess $paths.State
+            if(-not $process){Write-Host "Selected profile '$Profile' is stopped or has not been created.";return}
+            $saved=Get-Content -LiteralPath $paths.State -Raw | ConvertFrom-Json
+            $endpoint="http://127.0.0.1:$($saved.port)"
+            Write-Host "$Profile is running (PID $($process.ProcessId))."
+            try {
+                Invoke-WebRequest "$endpoint/health" -UseBasicParsing -TimeoutSec 5 | Out-Null
+                (Invoke-RestMethod "$endpoint/v1/models" -TimeoutSec 5).data | Select-Object id,max_model_len
+            } catch {Write-Host "API not ready: $($_.Exception.Message)"}
+            return
+        }
+        'doctor' {Assert-N1xNativeInstallation $paths; & nvidia-smi;return}
+        # The shared test action below uses the qwen alias on both backends.
+    }} finally {if($null -ne $nativeLock){$nativeLock.Dispose()}}
+}
+
 function Invoke-Wslc([string[]]$Arguments) {
     & wslc @Arguments
     if ($LASTEXITCODE -ne 0) { throw "wslc failed ($LASTEXITCODE): $($Arguments -join ' ')" }
@@ -118,6 +199,7 @@ function Get-ManagedContainer {
 }
 
 function Assert-NoOtherProfile {
+    if(Get-Command Assert-N1xNoNativeProfile -ErrorAction SilentlyContinue){Assert-N1xNoNativeProfile $PSScriptRoot}
     $rows = & wslc list --filter 'label=n1x-ai.managed=true' --format json
     if ($LASTEXITCODE -ne 0) { throw 'Cannot check running project containers' }
     $others = @($rows | Where-Object { $_.Trim() } | ForEach-Object { $_ | ConvertFrom-Json } | Where-Object { $_.Names -ne $name })
@@ -127,6 +209,11 @@ function Assert-NoOtherProfile {
 }
 
 function Assert-ProfileRunning {
+    if($native){
+        if(-not(Get-N1xNativeProcess $paths.State)){throw "Selected native profile '$Profile' is not running."}
+        Invoke-WebRequest "$endpoint/health" -UseBasicParsing -TimeoutSec 15 | Out-Null
+        return
+    }
     $container = Get-ManagedContainer
     if (-not $container -or -not $container.State.Running) {
         throw "Selected profile '$Profile' is not running. Start it or select the active profile."
@@ -139,7 +226,7 @@ function Assert-Configuration($Container) {
         if($property.Value -eq $fingerprint){return}
         # Older labels included the default selection, which does not affect an
         # already selected profile. All actual settings must still match.
-        $legacyDefaults=@('baseline',$config.DefaultProfile)+@(Get-ChildItem "$PSScriptRoot/profiles" -Filter '*.psd1' -File | ForEach-Object BaseName)
+        $legacyDefaults=@('qwen38fn-baseline',$config.DefaultProfile)+@(Get-ChildItem "$PSScriptRoot/profiles" -Filter '*.psd1' -File | ForEach-Object BaseName)
         foreach($legacyDefault in ($legacyDefaults|Select-Object -Unique)){
             if($property.Value -eq (Get-ConfigFingerprint -LegacyDefault $legacyDefault)){return}
         }
@@ -266,6 +353,7 @@ switch ($Action) {
         $run+=@($config.Image,
             '--model', '/model', '--served-model-name', 'qwen', '--host', '0.0.0.0', '--port', '8000',
             '--max-model-len', [string]$config.Context, '--max-num-seqs', [string]$config.MaxSequences,
+            '--override-generation-config', (@{max_new_tokens=$config.MaxOutputTokens}|ConvertTo-Json -Compress),
             '--gpu-memory-utilization', '0.01', '--kv-cache-memory-bytes', $config.KvCacheBytes,
             '--load-format', 'safetensors', '--safetensors-load-strategy', 'lazy',
             '--enable-prefix-caching', '--enable-chunked-prefill',
@@ -276,8 +364,8 @@ switch ($Action) {
         )
         if ($config.ContainsKey('CudaGraphMode')) { $run += "-cc.cudagraph_mode=$($config.CudaGraphMode)" }
         else { $run += '--enforce-eager' }
-        if ($config.Mtp) { $run += @('--config', '/profiles/mtp.yaml') }
-        if ($config.DFlash) { $run += @('--config', '/profiles/dflash.yaml', '--kv-cache-dtype-skip-layers', 'sliding_window') }
+        if ($config.Mtp) { $run += @('--config', '/profiles/qwen38fn-mtp.yaml') }
+        if ($config.DFlash) { $run += @('--config', '/profiles/qwen38fn-dflash.yaml', '--kv-cache-dtype-skip-layers', 'sliding_window') }
         if ($PrintOnly) { Write-Output ('wslc ' + (($run | ForEach-Object { '"' + $_ + '"' }) -join ' ')); return }
         # WSLC refuses a name collision if another process created it meanwhile.
         if($config.UseLMCache){Start-MemoryMonitor}
@@ -355,7 +443,7 @@ switch ($Action) {
     'test' {
         Assert-ProfileRunning
         if ($Suite -ne 'smoke') {
-            & (Join-Path $PSScriptRoot 'test.ps1') -Suite $Suite -ResultName "$Suite-$Profile" -Port $config.Port
+            & (Join-Path $PSScriptRoot 'test.ps1') -Suite $Suite -Profile $Profile -ResultName "$Suite-$Profile" -Port $config.Port
             return
         }
         $tests = @(

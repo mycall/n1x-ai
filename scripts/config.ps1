@@ -6,7 +6,7 @@ function Get-N1xConfig {
     if(Test-Path -LiteralPath $localPath){$local=Import-PowerShellDataFile $localPath}
     if(-not $Profile){$Profile=if($local.ContainsKey('DefaultProfile')){$local.DefaultProfile}else{$config.DefaultProfile}}
     if($Profile -notmatch '^[a-z][a-z0-9-]*$'){throw 'Invalid profile name'}
-    if($Profile -ne 'baseline'){
+    if($Profile -ne 'qwen38fn-baseline'){
         $path=Join-Path $Root "profiles/$Profile.psd1"
         if(-not(Test-Path -LiteralPath $path)){throw "Unknown profile: $Profile"}
         $overrides=Import-PowerShellDataFile $path
@@ -19,6 +19,16 @@ function Get-N1xConfig {
     $config.ModelRoot=[IO.Path]::GetFullPath($config.ModelRoot)
     if($Port){$config.Port=$Port}
     if($config.Port -lt 1 -or $config.Port -gt 65535){throw 'Port must be between 1 and 65535'}
+    if($config.MaxOutputTokens -isnot [int] -or $config.MaxOutputTokens -lt 1 -or $config.MaxOutputTokens -ge $config.Context){
+        throw 'MaxOutputTokens must be a positive integer smaller than Context'
+    }
+    if($config.ContainsKey('Backend')){
+        if($config.Backend -ne 'native'){throw 'Unknown serving backend'}
+        foreach($key in @('NativeRuntimeRoot','NativeConfig','NativeModel')){
+            if(-not $config.ContainsKey($key) -or -not $config[$key]){throw "Missing native setting: $key"}
+        }
+        if($config.UseLMCache -or $config.DFlash -or -not $config.Mtp){throw 'The native RTX Spark recipe requires MTP without DFlash or LMCache'}
+    }
     if($config.Container -notmatch '^[a-zA-Z0-9][a-zA-Z0-9_.-]+$'){throw 'Invalid container name'}
     if($config.WindowsMinimumGiB -lt 4){throw 'Keep at least 4 GiB of Windows headroom'}
     if($config.LmcacheL2GiB -lt 0){throw 'LMCache SSD budget cannot be negative'}

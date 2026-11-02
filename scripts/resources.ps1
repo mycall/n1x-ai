@@ -45,7 +45,7 @@ function Get-N1xResourcePlan($Containers,$Images,$Volumes,[string[]]$KeepImages,
 
 function Invoke-N1xResourceCleanup([string]$Root,[switch]$Uninstall,[switch]$PrintOnly){
     . "$Root/scripts/config.ps1"
-    $profiles=@('baseline')+@(Get-ChildItem "$Root/profiles" -Filter '*.psd1' | ForEach-Object BaseName)
+    $profiles=@('qwen38fn-baseline')+@(Get-ChildItem "$Root/profiles" -Filter '*.psd1' | ForEach-Object BaseName)
     $configs=@($profiles | ForEach-Object {Get-N1xConfig -Root $Root -Profile $_})
     $keepImages=@($configs | ForEach-Object Image)+@('n1x-ai:benchmarks','n1x-ai-base:cuda13.4-ubuntu26.04-vllm0.32.0')
     $cacheVolumes=@($configs | ForEach-Object CacheVolume)+@($configs | ForEach-Object LmcacheVolume)+@('n1x-lmcache-tests')

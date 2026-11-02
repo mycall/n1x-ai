@@ -3,7 +3,7 @@ $ErrorActionPreference='Stop'
 Set-StrictMode -Version Latest
 . "$PSScriptRoot/scripts/config.ps1"
 . "$PSScriptRoot/scripts/models.ps1"
-$config=Get-N1xConfig -Root $PSScriptRoot -Profile baseline -ModelRoot $ModelRoot
+$config=Get-N1xConfig -Root $PSScriptRoot -Profile qwen38fn-baseline -ModelRoot $ModelRoot
 foreach($command in @('git','wslc')){if(-not(Get-Command $command -ErrorAction SilentlyContinue)){throw "Install $command and add it to PATH before setup"}}
 $models=@(
     @('Saren/Qwen3.8-Flash-Next-W4A16-AutoRound-hybrid','8b82f0b7abe3d1150a7827d298c75e86267636ae','Qwen3.8-Flash-Next-W4A16-AutoRound-hybrid','main'),
@@ -42,7 +42,7 @@ if(-not $SkipPleCopy){
 $localPath=Join-Path $PSScriptRoot 'config.local.psd1'
 $settings=if(Test-Path -LiteralPath $localPath){Import-PowerShellDataFile $localPath}else{@{}}
 $settings['ModelRoot']=$config.ModelRoot
-$settings['DefaultProfile']=if($WithLMCache){'cache-dflash'}else{'baseline'}
+$settings['DefaultProfile']=if($WithLMCache){'qwen38fn-cache-dflash'}else{'qwen38fn-baseline'}
 $lines=@('@{')
 foreach($key in ($settings.Keys|Sort-Object)){
     $value=$settings[$key]

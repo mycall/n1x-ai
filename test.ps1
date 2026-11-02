@@ -74,6 +74,7 @@ if ($Suite -in @('features','all')) {
     Run-Check 'json_output' {
         $reply = Chat @(@{role='user'; content='Return a JSON object with exactly these values: color is green and count is 7.'}) @{response_format=@{type='json_object'}}
         Write-JsonFile $reply "$ResultName-json-response.json"
+        Assert-True ($reply.choices[0].finish_reason -eq 'stop') 'JSON answer did not finish normally'
         $value = $reply.choices[0].message.content | ConvertFrom-Json
         Assert-True ($value.color -eq 'green' -and $value.count -eq 7) 'Incorrect JSON values'
         $value
@@ -93,12 +94,14 @@ if ($Suite -in @('features','all')) {
         $messages += @{role='tool'; tool_call_id=$call.id; content='{"sku":"AX-42","count":23}'}
         $second = Chat $messages @{tools=$tools; tool_choice='none'}
         Write-JsonFile $second "$ResultName-tool-result.json"
+        Assert-True ($second.choices[0].finish_reason -eq 'stop') 'Tool-result answer did not finish normally'
         Assert-True ($second.choices[0].message.content.Trim() -match '^23[.!]?$') 'Incorrect tool-result answer'
         @{tool=$call.function.name; arguments=$arguments; answer=$second.choices[0].message.content}
     }
     Run-Check 'reasoning' {
         $reply = Chat @(@{role='user'; content='A box has 9 rows of 7 marbles. Think through the calculation, then give the total as a number.'}) @{max_tokens=512; chat_template_kwargs=@{enable_thinking=$true}}
         Write-JsonFile $reply "$ResultName-reasoning.json"
+        Assert-True ($reply.choices[0].finish_reason -eq 'stop') 'Reasoning answer did not finish normally'
         $message = $reply.choices[0].message
         $reasoning = @($message.PSObject.Properties | Where-Object { $_.Name -in @('reasoning','reasoning_content') } | ForEach-Object { [string]$_.Value }) -join ''
         Assert-True (-not [string]::IsNullOrWhiteSpace($reasoning)) 'No separate reasoning field returned'
@@ -164,6 +167,7 @@ if ($Suite -in @('context','all')) {
             Write-Host "Sending $tokenCount input tokens; no throughput measurement."
             $reply = Chat @(@{role='user'; content=$text}) @{max_tokens=128}
             Write-JsonFile $reply "$ResultName-context-$target.json"
+            Assert-True ($reply.choices[0].finish_reason -eq 'stop') 'Context answer did not finish normally'
             $answer = $reply.choices[0].message.content
             Assert-True ($answer -match '(?s)CEDAR-5831.*MAPLE-9264.*BIRCH-1748') 'Failed to retrieve all three codes in order'
             @{input_tokens=$reply.usage.prompt_tokens; target_tokens=$target; content=$answer; finish_reason=$reply.choices[0].finish_reason}

@@ -7,18 +7,18 @@ try {
     Copy-Item "$root/n1x.ps1","$root/config.psd1" $temporary
     Copy-Item "$root/scripts/config.ps1" "$temporary/scripts/config.ps1"
     Set-Content "$temporary/scripts/firewall.ps1" 'function Set-N1xFirewall { param($Root,$Port,[switch]$Remove); Set-Content (Join-Path $Root "firewall-mode.txt") ([string][bool]$Remove) }'
-    Set-Content "$temporary/scripts/clients.ps1" 'function Sync-N1xClients { param($Root,$Port,$Context,[switch]$Remove) }'
-    Copy-Item "$root/profiles/cache-mtp.psd1" "$temporary/profiles/cache-mtp.psd1"
+    Set-Content "$temporary/scripts/clients.ps1" 'function Sync-N1xClients { param($Root,$Port,$Context,$MaxOutputTokens,[switch]$Remove) }'
+    Copy-Item "$root/profiles/qwen38fn-cache-mtp.psd1" "$temporary/profiles/qwen38fn-cache-mtp.psd1"
     $modelRoot=Join-Path $temporary 'models'
     $model=Join-Path $modelRoot 'Qwen3.8-Flash-Next-W4A16-AutoRound-hybrid'
     Set-Content "$model/config.json" '{}'
     Set-Content "$model/model.safetensors.index.json" '{"weight_map":{"weight":"part.safetensors"}}'
     Set-Content "$model/part.safetensors" 'fixture'
-    $preview=& "$temporary/n1x.ps1" start -Profile cache-mtp -ModelRoot $modelRoot -PrintOnly
+    $preview=& "$temporary/n1x.ps1" start -Profile qwen38fn-cache-mtp -ModelRoot $modelRoot -PrintOnly
     $fingerprint=[regex]::Match($preview,'n1x-ai.config-sha=([0-9a-f]{64})').Groups[1].Value
     if(-not $fingerprint){throw 'Missing launch fingerprint'}
-    Set-Content "$temporary/config.local.psd1" "@{DefaultProfile='baseline'}"
-    $changedDefault=& "$temporary/n1x.ps1" start -Profile cache-mtp -ModelRoot $modelRoot -PrintOnly
+    Set-Content "$temporary/config.local.psd1" "@{DefaultProfile='qwen38fn-baseline'}"
+    $changedDefault=& "$temporary/n1x.ps1" start -Profile qwen38fn-cache-mtp -ModelRoot $modelRoot -PrintOnly
     $changedFingerprint=[regex]::Match($changedDefault,'n1x-ai.config-sha=([0-9a-f]{64})').Groups[1].Value
     if($changedFingerprint -ne $fingerprint){throw 'Changing only the default selection invalidated an explicit profile'}
     $recoveryState=[pscustomobject]@{exitCode=1; fingerprint=$fingerprint; exists=$true; imageExists=$true; calls=[Collections.Generic.List[string]]::new()}
@@ -55,7 +55,7 @@ try {
     }
     foreach($action in @('start','restart')){
         $recoveryState.calls.Clear()
-        & "$temporary/n1x.ps1" $action -Profile cache-mtp -ModelRoot $modelRoot | Out-Null
+        & "$temporary/n1x.ps1" $action -Profile qwen38fn-cache-mtp -ModelRoot $modelRoot | Out-Null
         if($recoveryState.calls -notcontains 'rm n1x-qwen38-cache-mtp' -or -not @($recoveryState.calls|Where-Object {$_ -like 'run -d *'}).Count){throw "Failed cache container was not replaced by $action"}
         if($recoveryState.calls -contains 'start n1x-qwen38-cache-mtp'){throw 'Failed cache container was reused'}
         $launch=@($recoveryState.calls | Where-Object {$_ -like 'run -d *'})[0]
@@ -65,37 +65,37 @@ try {
     foreach($action in @('start','restart')){
         # restart with an unsuccessful exit delegates to start.
         $recoveryState.exitCode=1
-        & "$temporary/n1x.ps1" $action -Profile cache-mtp -ModelRoot $modelRoot -DenyFirewall | Out-Null
+        & "$temporary/n1x.ps1" $action -Profile qwen38fn-cache-mtp -ModelRoot $modelRoot -DenyFirewall | Out-Null
         if((Get-Content "$temporary/firewall-mode.txt") -ne 'True'){throw "$action lost DenyFirewall"}
     }
     $recoveryState.exitCode=0
     $recoveryState.calls.Clear()
-    & "$temporary/n1x.ps1" start -Profile cache-mtp -ModelRoot $modelRoot | Out-Null
+    & "$temporary/n1x.ps1" start -Profile qwen38fn-cache-mtp -ModelRoot $modelRoot | Out-Null
     if((Get-Content "$temporary/firewall-mode.txt") -ne 'False'){throw 'Plain start should enable the firewall allowance'}
     if($recoveryState.calls -notcontains 'start n1x-qwen38-cache-mtp' -or @($recoveryState.calls|Where-Object {$_ -like 'rm *'}).Count){throw 'Cleanly stopped container should be reused'}
     . "$root/scripts/config.ps1"
-    $legacyConfig=Get-N1xConfig -Root $temporary -Profile cache-mtp -ModelRoot $modelRoot
+    $legacyConfig=Get-N1xConfig -Root $temporary -Profile qwen38fn-cache-mtp -ModelRoot $modelRoot
     $legacyCanonical=[ordered]@{}
     foreach($key in ($legacyConfig.Keys|Sort-Object)){$legacyCanonical[$key]=$legacyConfig[$key]}
     $sha=[Security.Cryptography.SHA256]::Create()
     try {$fingerprint=([BitConverter]::ToString($sha.ComputeHash([Text.Encoding]::UTF8.GetBytes(($legacyCanonical|ConvertTo-Json -Compress))))).Replace('-','').ToLowerInvariant()}
     finally {$sha.Dispose()}
     $recoveryState.fingerprint=$fingerprint
-    & "$temporary/n1x.ps1" start -Profile cache-mtp -ModelRoot $modelRoot | Out-Null
-    Set-Content "$temporary/config.local.psd1" "@{DefaultProfile='baseline';Port=8005}"
+    & "$temporary/n1x.ps1" start -Profile qwen38fn-cache-mtp -ModelRoot $modelRoot | Out-Null
+    Set-Content "$temporary/config.local.psd1" "@{DefaultProfile='qwen38fn-baseline';Port=8005}"
     try {
-        & "$temporary/n1x.ps1" start -Profile cache-mtp -ModelRoot $modelRoot | Out-Null
+        & "$temporary/n1x.ps1" start -Profile qwen38fn-cache-mtp -ModelRoot $modelRoot | Out-Null
         throw 'Changed runtime settings accepted'
     } catch {if($_.Exception.Message -notlike 'Container settings differ.*'){throw}}
     $recoveryState.exists=$false
     try {
-        & "$temporary/n1x.ps1" wait -Profile cache-mtp -ModelRoot $modelRoot
+        & "$temporary/n1x.ps1" wait -Profile qwen38fn-cache-mtp -ModelRoot $modelRoot
         throw 'Wait accepted a missing container'
     } catch {if($_.Exception.Message -notlike "Container '*does not exist in this WSLC session.*"){throw}}
     $recoveryState.imageExists=$false
     $recoveryState.calls.Clear()
     try {
-        & "$temporary/n1x.ps1" start -Profile cache-mtp -ModelRoot $modelRoot
+        & "$temporary/n1x.ps1" start -Profile qwen38fn-cache-mtp -ModelRoot $modelRoot
         throw 'Start accepted a missing image'
     } catch {if($_.Exception.Message -notlike "Local image '*unavailable in this WSLC session.*"){throw}}
     if(@($recoveryState.calls | Where-Object {$_ -like 'run *'}).Count){throw 'Missing image triggered an implicit pull'}

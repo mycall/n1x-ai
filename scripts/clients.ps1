@@ -51,6 +51,7 @@ function Update-N1xClientEntry {
 function Sync-N1xClients {
     [CmdletBinding()]
     param([string]$Root,[int]$Port=8000,[int]$Context=262144,[switch]$Remove,
+          [ValidateRange(1,2147483647)][int]$MaxOutputTokens=8192,
           [string]$OpenCodeDirectory='', [string]$CodexDirectory='', [string]$PiDirectory='')
     if($env:N1X_CLIENT_CONFIG -eq 'off'){return}
     if(-not $OpenCodeDirectory){
@@ -60,7 +61,7 @@ function Sync-N1xClients {
     if(-not $CodexDirectory){$CodexDirectory=if($env:CODEX_HOME){$env:CODEX_HOME}else{Join-Path $env:USERPROFILE '.codex'}}
     if(-not $PiDirectory){$PiDirectory=if($env:PI_CODING_AGENT_DIR){$env:PI_CODING_AGENT_DIR}else{Join-Path $env:USERPROFILE '.pi/agent'}}
     $url="http://127.0.0.1:$Port/v1"
-    $output=[math]::Min(8192,[math]::Floor($Context/4))
+    $output=[math]::Min($MaxOutputTokens,$Context-1)
     $openCode=[ordered]@{
         name='N1X local';package='@opencode/ai/providers/openai-compatible'
         settings=@{baseURL=$url}

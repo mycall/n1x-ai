@@ -59,7 +59,10 @@ class Probe:
 
     def snapshot(self, name):
         values = {}
-        for service, url in [('vllm', self.args.url+'/metrics'), ('lmcache', 'http://127.0.0.1:8080/metrics')]:
+        services = [('vllm', self.args.url+'/metrics')]
+        if not getattr(self.args, 'no_lmcache_metrics', False):
+            services.append(('lmcache', 'http://127.0.0.1:8080/metrics'))
+        for service, url in services:
             raw = request(url)
             (self.out / f'{name}-{service}.prom').write_text(raw)
             for line in raw.splitlines():
@@ -212,11 +215,15 @@ def main():
     parser.add_argument('--url',default='http://127.0.0.1:8000')
     parser.add_argument('--out',type=Path,required=True)
     parser.add_argument('--agent-thinking',action='store_true')
+    parser.add_argument('--no-lmcache-metrics', action='store_true',
+                        help='Collect only vLLM metrics (agents only; no external restore qualification).')
     parser.add_argument('--agent-concurrency', type=int, nargs='+', choices=range(1,17))
     parser.add_argument('--agent-output-tokens', type=int)
     parser.add_argument('--agent-sessions', type=int, choices=range(1,17), default=4)
     parser.add_argument('--agent-turns', type=int, choices=range(1,101), default=3)
     args=parser.parse_args()
+    if args.no_lmcache_metrics and args.phase != 'agents':
+        parser.error('--no-lmcache-metrics is only supported for agents')
     if args.agent_output_tokens is not None and args.agent_output_tokens < 1:
         parser.error('--agent-output-tokens must be positive')
     probe=Probe(args)

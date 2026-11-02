@@ -4,6 +4,8 @@ Serve Qwen3.8 Flash Next locally on Windows ARM64 using NVIDIA N1X and WSLC.
 
 - [Installation](Installation.md): prerequisites, downloads, and setup.
 - [Configuration](Configuration.md): profiles, paths, lifecycle commands, [LAN access](Configuration.md#lan-access), and [agent clients](Configuration.md#agent-clients).
+- [Native Windows vLLM](Native-vLLM.md): experimental `qwen38fn-myllmbox` profile and matched agent comparison.
+- [Remaining work and test matrix](Test-plan.md): deferred rerun, read/write measurement, output-budget study and hybrid integration plan.
 - [LMCache](LMCache.md): cache tiers, memory budgets, and privacy settings.
 - [Benchmarks](Benchmarks.md): thinking-enabled DFlash2 agent throughput, MTP comparison, and cache qualification.
 - [Troubleshooting](Troubleshooting.md): startup, memory, and response checks.

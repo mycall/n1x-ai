@@ -56,7 +56,7 @@ Setup reuses the expected local image tags when they exist. After changing image
 
 For manually verified downloads, add `-SkipDownload`. Advanced bypasses are `-SkipBuild` and `-SkipPleCopy`; use them only when the required images and verified native PLE volume already exist. Normal setup after `clean` reuses images and native PLE without rebuilding them.
 
-`n1x.ps1 setup` prepares LMCache and selects `cache-dflash`. For the smaller baseline installation, use `setup.ps1` directly without `-WithLMCache`. Settings are saved in ignored `config.local.psd1`. Stop the service before setup needs to build images or prepare a new native PLE copy. Setup does not start the model; run `n1x.ps1 start` afterward.
+`n1x.ps1 setup` prepares LMCache and selects `qwen38fn-cache-dflash`. For the smaller baseline installation, use `setup.ps1` directly without `-WithLMCache`. Settings are saved in ignored `config.local.psd1`. Stop the service before setup needs to build images or prepare a new native PLE copy. Setup does not start the model; run `n1x.ps1 start` afterward.
 
 ## Start and verify
 

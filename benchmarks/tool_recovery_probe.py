@@ -48,8 +48,9 @@ def run(args):
                 calls=message.get('tool_calls') or []
                 if calls:
                     assistant=dict(role='assistant',content=message.get('content'),tool_calls=calls)
-                    if message.get('reasoning'):
-                        assistant['reasoning']=message['reasoning']
+                    for field_name in ('reasoning', 'reasoning_content'):
+                        if message.get(field_name):
+                            assistant[field_name]=message[field_name]
                     messages.append(assistant)
                     try:
                         valid=(choice['finish_reason']=='tool_calls' and len(calls)==1
@@ -105,4 +106,5 @@ if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--url',default='http://127.0.0.1:8000')
     parser.add_argument('--out',type=Path,required=True)
+    parser.add_argument('--no-lmcache-metrics', action='store_true')
     run(parser.parse_args())

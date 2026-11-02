@@ -1,6 +1,10 @@
 # Benchmarks
 
-The benchmark reference is **DFlash2 with thinking enabled**, using the `cache-dflash` profile. The primary measure is correct work per second in warm, multi-turn agent conversations. Token generation alone is not a correctness measure.
+The benchmark reference is **DFlash2 with thinking enabled**, using the `qwen38fn-cache-dflash` profile. The primary measure is correct work per second in warm, multi-turn agent conversations. Token generation alone is not a correctness measure.
+
+The [native Windows MTP profile results](Native-vLLM.md#integration-results-november-1-2026) record a separate 72-task run and clearly distinguish its 96 GiB GPU allocation from this LMCache baseline's 88 GiB allocation.
+
+Token-rate tuples are ordered **(read, write)**. Prefer directly measured prompt-processing duration (PP); only when unavailable use **PP = e2e - decode**. Derived PP includes request overhead/queueing. `—` means the required measurement was not retained. Whole-run aggregate throughput is labelled separately from per-request PP/decode phase rates. See the [test matrix and measurement plan](Test-plan.md).
 
 ## Test configuration
 
@@ -57,14 +61,16 @@ This establishes a bounded mixed-workload check at concurrency four. It does not
 
 vLLM's serving benchmark uses 16 requests per point, thinking enabled, and 128 generated tokens with EOS ignored. Rates include prefill and reasoning output; these fixed-length requests do not measure answer correctness. Mean request latency excludes waiting in the client's concurrency queue.
 
-| Input target | Concurrency | Generated tokens/s | Mean first token (s) | Mean completion (s) |
+| Input target | Concurrency | Whole-run (input, output), tk/s | Mean first token (s) | Mean completion (s) |
 | --- | ---: | ---: | ---: | ---: |
-| 4K | 1 | 19.3 | 2.29 | 6.62 |
-| 4K | 2 | 24.8 | 2.88 | 10.34 |
-| 4K | 4 | 29.2 | 3.55 | 17.19 |
-| 16K | 1 | 11.1 | 7.43 | 11.58 |
-| 16K | 2 | 12.8 | 9.75 | 19.92 |
-| 16K | 4 | 13.8 | 10.02 | 36.65 |
+| 4K | 1 | (—, 19.3) | 2.29 | 6.62 |
+| 4K | 2 | (—, 24.8) | 2.88 | 10.34 |
+| 4K | 4 | (—, 29.2) | 3.55 | 17.19 |
+| 16K | 1 | (—, 11.1) | 7.43 | 11.58 |
+| 16K | 2 | (—, 12.8) | 9.75 | 19.92 |
+| 16K | 4 | (—, 13.8) | 10.02 | 36.65 |
+
+These retained output rates include prompt processing and queueing; they are not pure decode-phase speed. Input throughput and directly measured PP were not retained in this curated table, so they are not inferred from target input lengths. The rerun will report phase tuples as well.
 
 All **96/96 requests complete**. Concurrency improves aggregate throughput while increasing per-request latency. The warm-agent table measures a different workload and should guide correct-work throughput decisions.
 
@@ -97,15 +103,17 @@ All **16/16 samples complete without truncation**. Input leaves room for reasoni
 
 ## Generation overlap and decode rates
 
-The scheduling probe submits four independent requests together, with 256 generated tokens each and EOS ignored. It observes four running requests and four overlapping generation intervals, with zero preemptions: **55.2 aggregate generated tokens/s**, 5.42 s mean first-token latency, and 18.13 s mean completion time. Intervals begin at the first reasoning or content token; this is not a correctness score.
+The scheduling probe submits four independent requests together, with 256 generated tokens each and EOS ignored. It observes four running requests and four overlapping generation intervals, with zero preemptions: whole-run **(input unrecorded, output 55.2) tk/s**, 5.42 s mean first-token latency, and 18.13 s mean completion time. This retained aggregate is not a per-request decode-phase rate. Intervals begin at the first reasoning or content token; this is not a correctness score.
 
 The short-generation probe runs each prompt twice at concurrency one with a shared per-task cache salt. The mean streamed decode-rate estimate excludes initial prefill and includes reasoning tokens, using `(completion_tokens - 1) / (completion time - first generated-token time)`.
 
-| Task | Mean generated tokens/s | Outcome |
+| Task | Mean phase rates (read, write), tk/s | Outcome |
 | --- | ---: | --- |
-| JSON | 78.1 | Both answers exact; normal completion |
-| Python LRU-cache example | 61.1 | Both hit the 2,048-token cap; no code-quality score |
-| B-tree explanation | 63.4 | Both hit the 2,048-token cap; no quality score |
+| JSON | (—, 78.1) | Both answers exact; normal completion |
+| Python LRU-cache example | (—, 61.1) | Both hit the 2,048-token cap; no code-quality score |
+| B-tree explanation | (—, 63.4) | Both hit the 2,048-token cap; no quality score |
+
+Read rates were not retained in this historical summary. The write column uses the streamed decode estimate described above.
 
 Reasoning consumes the shared output budget. These capped code and explanation samples do not establish complete-answer throughput; application prompts may need larger budgets.
 
@@ -154,21 +162,21 @@ Start the reference profile, then run its thinking-enabled agent benchmark:
 
 ```powershell
 # Stop any other model profile using the API port first.
-.\n1x.ps1 start -Profile cache-dflash
-.\n1x.ps1 wait -Profile cache-dflash -TimeoutSeconds 1800
+.\n1x.ps1 start -Profile qwen38fn-cache-dflash
+.\n1x.ps1 wait -Profile qwen38fn-cache-dflash -TimeoutSeconds 1800
 .\benchmark.ps1 -Build -Suite agents
 
 # vLLM serving, AIPerf multi-turn retrieval, and the RULER subset.
 .\benchmark.ps1 -Suite all
 
 # Thinking-enabled tool selection, retries, and argument repair.
-.\benchmark.ps1 -Suite recovery -Profile cache-dflash
+.\benchmark.ps1 -Suite recovery -Profile qwen38fn-cache-dflash
 
 # Thinking-enabled long retrieval, vision, arithmetic, and tools together.
-.\benchmark.ps1 -Suite mixed -Profile cache-dflash
+.\benchmark.ps1 -Suite mixed -Profile qwen38fn-cache-dflash
 
 # Seeds two 131K entries, restarts the service, then verifies SSD restores.
-.\test-restores.ps1 -Profile cache-dflash
+.\test-restores.ps1 -Profile qwen38fn-cache-dflash
 ```
 
 Supply `-PowerMode` with the actual MSI setting to record it; the option does not change system settings. Avoid other model requests during measurements. The agent suite does not accept `-Smoke`; use its explicit workload controls instead.
@@ -186,10 +194,10 @@ Supply `-PowerMode` with the actual MSI setting to record it; the option does no
 
 ```powershell
 # Rebuild the benchmark client once to pick up the new options.
-.\benchmark.ps1 -Build -Suite agents -Profile cache-dflash -AgentConcurrency 1,2,4 -AgentOutputTokens 8192
+.\benchmark.ps1 -Build -Suite agents -Profile qwen38fn-cache-dflash -AgentConcurrency 1,2,4 -AgentOutputTokens 8192
 
 # One continuous conversation, twelve tasks, repeated in two sweeps.
-.\benchmark.ps1 -Suite agents -Profile cache-dflash -AgentConcurrency 1 -AgentSessions 1 -AgentTurns 12 -AgentOutputTokens 8192
+.\benchmark.ps1 -Suite agents -Profile qwen38fn-cache-dflash -AgentConcurrency 1 -AgentSessions 1 -AgentTurns 12 -AgentOutputTokens 8192
 ```
 
 These controls change the client workload, not the serving profile's scheduling or context limits. Client concurrency cannot exceed the number of conversations actually submitted. Keep settings identical when comparing profiles; changed output allowances or conversation lengths are separate measurements from the historical results above. The configured context must hold both the rendered prompt and output allowance.

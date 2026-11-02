@@ -1,7 +1,9 @@
 @{
     ModelRoot = 'D:\Models'
-    DefaultProfile = 'cache-dflash'
+    DefaultProfile = 'qwen38fn-cache-dflash'
     Port = 8000
+    # Output allowance/cap when clients omit a smaller limit; includes reasoning.
+    MaxOutputTokens = 8192
     # Set false for localhost-only serving; recreate after changing.
     LanAccess = $true
     # Optional cache budget and bounded restore admission:

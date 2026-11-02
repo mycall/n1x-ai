@@ -4,6 +4,8 @@ Run Qwen3.8 Flash Next with vLLM on NVIDIA N1X, Windows ARM64, and WSLC. PowerSh
 
 See [requirements and installation](wiki/Installation.md) before starting. The LMCache integration includes experimental compatibility patches for this platform.
 
+The test branch also provides [`qwen38fn-myllmbox`](wiki/Native-vLLM.md), a native Windows ARM64 vLLM profile using the tested 90 GB NVFP4 recipe, with Windows benchmark clients for comparison against `qwen38fn-cache-dflash`.
+
 ## Quick start
 
 Install Git, WSLC with GPU support, and the [Hugging Face CLI](https://huggingface.co/docs/huggingface_hub/guides/cli), then run these commands from the repository in PowerShell:
@@ -15,7 +17,7 @@ Install Git, WSLC with GPU support, and the [Hugging Face CLI](https://huggingfa
 .\n1x.ps1 test
 ```
 
-Setup downloads pinned model revisions into `$HOME\models`, builds the images, copies the PLE table into a native volume, and selects the `cache-dflash` profile. Allow substantial disk space and time for downloads and the initial build. To reuse downloaded models:
+Setup downloads pinned model revisions into `$HOME\models`, builds the images, copies the PLE table into a native volume, and selects the `qwen38fn-cache-dflash` profile. Allow substantial disk space and time for downloads and the initial build. To reuse downloaded models:
 
 ```powershell
 .\n1x.ps1 setup -ModelRoot D:\Models

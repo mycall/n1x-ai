@@ -18,7 +18,7 @@ For less host-cache pressure, edit `config.local.psd1`:
 
 ```powershell
 @{
-    DefaultProfile = 'cache-dflash'
+    DefaultProfile = 'qwen38fn-cache-dflash'
     LmcacheL1GiB = 4
     RestoreWaitMs = 2000
 }

@@ -69,8 +69,9 @@ def run(args):
         if not valid:
             return dict(kind='tool',correct=False)
         assistant=dict(role='assistant',content=choice['message'].get('content'),tool_calls=calls)
-        if choice['message'].get('reasoning'):
-            assistant['reasoning']=choice['message']['reasoning']
+        for field_name in ('reasoning', 'reasoning_content'):
+            if choice['message'].get(field_name):
+                assistant[field_name]=choice['message'][field_name]
         messages.extend([assistant,dict(role='tool',tool_call_id=calls[0]['id'],
                          content=json.dumps(dict(sku=sku,count=23+cycle)))])
         answer=chat(messages,salt,tools=tools,tool_choice='none')
@@ -99,6 +100,8 @@ def run(args):
         counters={k:after.get(k,0)-before.get(k,0) for k in (
             'vllm:num_preemptions_total','vllm:external_prefix_cache_hits_total',
             'lmcache_mp_num_finished_retrieves_total','lmcache_mp_l2_prefetch_load_completed_chunks_total')}
+        if getattr(args, 'no_lmcache_metrics', False):
+            counters={k:v for k,v in counters.items() if not k.startswith('lmcache_')}
         checks=[check for row in rows for check in row['checks']]
         save(args.out/'summary.json',dict(completed_cycles=len(rows),planned_cycles=12,
              correct=sum(check['correct'] for check in checks),checks=len(checks),
@@ -110,4 +113,5 @@ if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--url',default='http://127.0.0.1:8000')
     parser.add_argument('--out',type=Path,required=True)
+    parser.add_argument('--no-lmcache-metrics', action='store_true')
     run(parser.parse_args())

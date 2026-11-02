@@ -2,6 +2,10 @@ param([Parameter(Mandatory)][string]$Root, [Parameter(Mandatory)][string]$ModelR
     [switch]$PrintOnly, [string]$VhdPath='')
 $ErrorActionPreference='Stop'
 Set-StrictMode -Version Latest
+if(-not $PrintOnly -and (Test-Path -LiteralPath "$PSScriptRoot/native.ps1")){
+    . "$PSScriptRoot/native.ps1"
+    Assert-N1xNoNativeProfile $Root
+}
 $rootPath=[IO.Path]::GetFullPath($Root).TrimEnd('\','/')
 $prefix=$rootPath+[IO.Path]::DirectorySeparatorChar
 $modelPath=[IO.Path]::GetFullPath($ModelRoot).TrimEnd('\','/')

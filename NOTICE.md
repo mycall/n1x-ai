@@ -4,6 +4,7 @@ The MIT license covers this repository's original scripts and documentation.
 It does not replace licenses for dependencies, upstream code, or model weights.
 
 - [magi-v5-public](https://github.com/Saren-Arterius/qwen3.8-Flash-DGX-AutoRound/tree/magi-v5-public): Apache-2.0. The build uses the pinned upstream recipe and its hybrid-weight and PLE patches.
+- [vllm-for-rtx-spark](https://github.com/devjeonghwan/vllm-for-rtx-spark/tree/5d6ca18458673405663c25f2f6353dd55a176d5e): Apache-2.0. `profiles/qwen38fn-myllmbox.yaml` copies its 90 GB BF16 draft-KV recipe; the optional native profile uses its separately installed Windows ARM64 wheel. Upstream notices remain in that installation.
 - [vLLM](https://github.com/vllm-project/vllm) and [LMCache](https://github.com/LMCache/LMCache): Apache-2.0. The optional runtime applies local compatibility modifications to their installed code. A copy of the license is in [licenses/Apache-2.0.txt](licenses/Apache-2.0.txt).
 - The separate benchmark image includes [AIPerf](https://github.com/ai-dynamo/aiperf) and [RULER](https://github.com/NVIDIA/RULER), both Apache-2.0. It applies a local-directory tokenizer loading fix to AIPerf 0.13.0; upstream licenses remain inside the image.
 - NVIDIA CUDA, PyTorch, FlashInfer, and other dependencies retain their respective licenses inside the runtime images and packages.

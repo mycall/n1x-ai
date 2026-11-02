@@ -32,6 +32,7 @@ for task, prompt in tasks.items():
         start = time.perf_counter()
         first = None
         text = ''
+        reasoning = ''
         usage = {}
         finish = None
         with http.open(req, timeout=600) as r:
@@ -46,17 +47,25 @@ for task, prompt in tasks.items():
                 for choice in chunk.get('choices', []):
                     piece = choice.get('delta', {}).get('content') or ''
                     delta = choice.get('delta', {})
+                    reasoning += delta.get('reasoning') or delta.get('reasoning_content') or ''
                     if (piece or delta.get('reasoning') or delta.get('reasoning_content')) and first is None:
                         first = time.perf_counter()
                     text += piece
                     if choice.get('finish_reason'):
                         finish = choice['finish_reason']
         end = time.perf_counter()
-        row = dict(task=task, repeat=repeat, thinking=args.thinking, ttft=first - start, elapsed=end - start, decode_tps=(usage['completion_tokens'] - 1) / (end - first), usage=usage, finish=finish, text=text)
+        row = dict(task=task, repeat=repeat, thinking=args.thinking, ttft=first - start if first else None, elapsed=end - start,
+                   decode_tps=(usage['completion_tokens'] - 1) / (end - first) if first and usage else None,
+                   usage=usage, finish=finish, text=text, reasoning=reasoning, request=body)
         if task == 'json':
-            row['correct'] = json.loads(text) == [dict(n=n, square=n * n, cube=n ** 3) for n in range(1, 21)]
+            try:
+                row['correct'] = json.loads(text) == [dict(n=n, square=n * n, cube=n ** 3) for n in range(1, 21)]
+            except (ValueError, TypeError):
+                row['correct'] = False
         rows.append(row)
         (out / 'results.json').write_text(json.dumps(rows, indent=2))
+        if row['decode_tps'] is None:
+            raise RuntimeError('Missing generated tokens or usage; inspect results.json')
         if task == 'json' and (not row['correct'] or finish != 'stop'):
             raise RuntimeError('JSON correctness check failed; inspect results.json')
         print(arm, task, repeat, round(row['decode_tps'], 2), finish, row.get('correct', 'manual review'), flush=True)
