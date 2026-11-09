@@ -18,7 +18,7 @@ while($true){
     if($state.State.Running){$seenRunning=$true}
     elseif($seenRunning -or (Get-Date) -gt $startupDeadline){break}
     $os=Get-CimInstance Win32_OperatingSystem
-    $json=@{availableGiB=$os.FreePhysicalMemory/1MB;updatedUnixSeconds=[DateTimeOffset]::UtcNow.ToUnixTimeSeconds()}|ConvertTo-Json -Compress
+    $json=@{availableGiB=$os.FreePhysicalMemory/1MB;availableCommitGiB=$os.FreeVirtualMemory/1MB;updatedUnixSeconds=[DateTimeOffset]::UtcNow.ToUnixTimeSeconds()}|ConvertTo-Json -Compress
     # WSLC readers can hold a Windows handle that prevents atomic replacement.
     # Update the small snapshot in place; the supervisor retries partial JSON.
     try {[IO.File]::WriteAllText($OutputPath,$json,$utf8)}

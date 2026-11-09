@@ -13,6 +13,14 @@ foreach($file in $files){
 & python -m unittest discover -s "$root/tests" -p 'test_*.py'
 if($LASTEXITCODE -ne 0){throw 'Python tests failed'}
 & "$root/tests/test_configuration.ps1"
+& "$root/tests/test_fingerprint.ps1"
+& "$root/tests/test_tool_feature.ps1"
+& "$root/tests/test_native.ps1"
+& "$root/tests/test_myllmbox.ps1"
+& "$root/tests/test_myllmbox_monitor.ps1"
+& "$root/tests/test_benchmark_partition.ps1"
+& "$root/tests/test_speed.ps1"
+& "$root/tests/test_restores_partition.ps1"
 & "$root/tests/test_recovery.ps1"
 & "$root/tests/test_maintenance.ps1"
 & "$root/tests/test_proxy.ps1"

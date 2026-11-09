@@ -1,4 +1,14 @@
-function Get-N1xResourcePlan($Containers,$Images,$Volumes,[string[]]$KeepImages,[string[]]$CacheVolumes,[string[]]$PleVolumes,[switch]$Uninstall,[switch]$Preview){
+function Get-N1xResourceMonitorId($Record){
+    $property=$Record.PSObject.Properties['pid']
+    if($null -eq $property){$property=$Record.PSObject.Properties['processId']}
+    $monitorId=0
+    if($null -eq $property -or -not [int]::TryParse([string]$property.Value,[ref]$monitorId) -or $monitorId -le 0){
+        throw 'Invalid saved memory monitor process ID'
+    }
+    return $monitorId
+}
+
+function Get-N1xResourcePlan($Containers,$Images,$Volumes,[string[]]$KeepImages,[string[]]$CacheVolumes,[string[]]$PleVolumes,[switch]$Uninstall,[switch]$Preview,[string[]]$KeepVolumes=@()){
     $owned=@($Containers | Where-Object {
         $label=$null
         if($null -ne $_.Config.Labels){$label=$_.Config.Labels.PSObject.Properties['n1x-ai.managed']}
@@ -18,6 +28,7 @@ function Get-N1xResourcePlan($Containers,$Images,$Volumes,[string[]]$KeepImages,
     if($Uninstall){$targets+=@($PleVolumes)}
     foreach($volume in ($targets | Sort-Object -Unique)){
         if($volume -notin $Volumes){continue}
+        if(-not $Uninstall -and $volume -in $KeepVolumes){continue}
         if(@($others | Where-Object {@($_.Mounts | Where-Object { $_.Type -eq 'volume' -and $_.Name -eq $volume }).Count}).Count){
             Write-Warning "Preserving volume referenced by another container: $volume"; continue
         }
@@ -45,11 +56,19 @@ function Get-N1xResourcePlan($Containers,$Images,$Volumes,[string[]]$KeepImages,
 
 function Invoke-N1xResourceCleanup([string]$Root,[switch]$Uninstall,[switch]$PrintOnly){
     . "$Root/scripts/config.ps1"
-    $profiles=@('baseline')+@(Get-ChildItem "$Root/profiles" -Filter '*.psd1' | ForEach-Object BaseName)
+    $profiles=@('qwen38fn-baseline')+@(Get-ChildItem "$Root/profiles" -Filter '*.psd1' | ForEach-Object BaseName)
     $configs=@($profiles | ForEach-Object {Get-N1xConfig -Root $Root -Profile $_})
     $keepImages=@($configs | ForEach-Object Image)+@('n1x-ai:benchmarks','n1x-ai-base:cuda13.4-ubuntu26.04-vllm0.32.0')
     $cacheVolumes=@($configs | ForEach-Object CacheVolume)+@($configs | ForEach-Object LmcacheVolume)+@('n1x-lmcache-tests')
     $pleVolumes=@($configs | ForEach-Object PleVolume)
+    # MyLLMBox's runtime cache also contains its prepared PLE map. Startup
+    # requires this existing volume even when every model file is retained.
+    # The prepared-installation check also requires its configured LMCache
+    # volume; clean must not leave the selected profile unable to start.
+    $keepVolumes=@($configs | Where-Object {$_.ContainsKey('Backend') -and $_.Backend -eq 'wslc-myllmbox'} | ForEach-Object {
+        $_.CacheVolume
+        if($_.UseLMCache){$_.LmcacheVolume}
+    })
     $rows=@(& wslc list --all --format json)
     if($LASTEXITCODE -ne 0){throw 'Cannot list containers for cleanup'}
     $names=@($rows | Where-Object {$_.Trim()} | ForEach-Object {($_ | ConvertFrom-Json).Names})
@@ -65,7 +84,7 @@ function Invoke-N1xResourceCleanup([string]$Root,[switch]$Uninstall,[switch]$Pri
     $raw=& wslc volume list --format json
     if($LASTEXITCODE -ne 0){throw 'Cannot list volumes for cleanup'}
     $volumes=@($raw | Where-Object {$_.Trim()} | ForEach-Object {($_ | ConvertFrom-Json).Name})
-    $plan=@(Get-N1xResourcePlan $containers $images $volumes $keepImages $cacheVolumes $pleVolumes -Uninstall:$Uninstall -Preview:$PrintOnly)
+    $plan=@(Get-N1xResourcePlan $containers $images $volumes $keepImages $cacheVolumes $pleVolumes -Uninstall:$Uninstall -Preview:$PrintOnly -KeepVolumes $keepVolumes)
     foreach($item in $plan){
         Write-Host "$($item.Kind): $($item.Name)"
         if($PrintOnly){continue}
@@ -73,9 +92,12 @@ function Invoke-N1xResourceCleanup([string]$Root,[switch]$Uninstall,[switch]$Pri
             $pidFile=Join-Path $Root ".state/$($item.Name)/monitor.json"
             if(Test-Path -LiteralPath $pidFile){
                 $saved=Get-Content -LiteralPath $pidFile -Raw | ConvertFrom-Json
-                $process=Get-CimInstance Win32_Process -Filter "ProcessId=$($saved.processId)"
+                $monitorId=Get-N1xResourceMonitorId $saved
+                $process=Get-CimInstance Win32_Process -Filter "ProcessId=$monitorId"
+                $sameCreation=$null -eq $saved.PSObject.Properties['startTicks'] -or
+                    ($null -ne $process -and $process.CreationDate.ToUniversalTime().Ticks -eq $saved.startTicks)
                 if($null -ne $process -and $process.CommandLine -match '\-File\s+"?[^"\r\n]*monitor-memory.ps1' -and
-                    $process.CommandLine -match [regex]::Escape($Root) -and $process.CommandLine -match [regex]::Escape($item.Name)){
+                    $sameCreation -and $process.CommandLine -match [regex]::Escape($Root) -and $process.CommandLine -match [regex]::Escape($item.Name)){
                     Stop-Process -Id $process.ProcessId -Force
                 }
             }

@@ -1,0 +1,22 @@
+{
+  "observed_utc": "2026-11-08T01:14:01.936914+00:00",
+  "scope": "Static inspection of installed local template only; no rendering, server calls, weights loaded or historical runtime inference",
+  "model_directory": "Qwen3.8-Flash-Next-W4A16-AutoRound-hybrid",
+  "template": "chat_template.jinja",
+  "sha256": "c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041",
+  "default_effort": "xhigh",
+  "supported_efforts": [
+    "xhigh",
+    "medium",
+    "low"
+  ],
+  "inspection_checks": {
+    "thinking_defaults_enabled": true,
+    "default_effort_expression": true,
+    "supported_efforts_checked": true,
+    "xhigh_instruction_branch": true,
+    "low_instruction_branch": true,
+    "disabled_thinking_branch": true
+  },
+  "default_expression": "reasoning_effort|default('xhigh')"
+}

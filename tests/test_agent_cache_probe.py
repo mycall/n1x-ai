@@ -14,6 +14,16 @@ spec.loader.exec_module(module)
 
 
 class AgentProbeTests(unittest.TestCase):
+    def test_native_metrics_do_not_contact_lmcache(self):
+        with tempfile.TemporaryDirectory() as directory:
+            args = SimpleNamespace(out=Path(directory), url='http://fixture', no_lmcache_metrics=True)
+            probe = module.Probe(args)
+            with patch.object(module, 'request', return_value='vllm:num_preemptions_total 2\n') as request:
+                values = probe.snapshot('native')
+            request.assert_called_once_with('http://fixture/metrics')
+            self.assertEqual(values['vllm:num_preemptions_total'], 2)
+            self.assertFalse((Path(directory) / 'native-lmcache.prom').exists())
+
     def test_workload_controls_preserve_reasoning_and_tool_history(self):
         owner = self
 

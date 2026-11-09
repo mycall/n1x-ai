@@ -2,8 +2,9 @@
 
 These instructions are for applications and agent harnesses using the service.
 
-- Use `http://127.0.0.1:8000/v1`, model `qwen`; check `/health` before sending work. The port is configurable.
+- Use `http://127.0.0.1:8000/v1`, model `qwen/qwen38fn-best`; check `/health` before sending work. The port is configurable.
 - Thinking is on by default. Set `chat_template_kwargs.enable_thinking` explicitly when overriding it; reasoning consumes the generation budget and is returned separately from final content.
+- The configured output default/cap is 8,192 tokens, including reasoning; explicit smaller request limits still apply. Reserve output space within the context window. See [output allowance](wiki/Configuration.md#output-allowance).
 - For tool workflows, preserve returned tool-call reasoning for the continuation. The [inventory benchmark](wiki/Benchmarks.md#agent-and-restore-qualification) passes with MTP and DFlash2 using thinking and a 1,024-token output allowance; validate your own tasks.
 - Preserve tool-call IDs, assistant tool calls, and matching tool results. Validate arguments and outputs before acting.
 - Treat an empty final answer as unsuccessful when the task requires content, even with `finish_reason=stop`. Retry generation once with the same history, preserve completed tool results, and report persistent failures; never count reasoning alone as the answer.

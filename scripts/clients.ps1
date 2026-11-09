@@ -51,6 +51,7 @@ function Update-N1xClientEntry {
 function Sync-N1xClients {
     [CmdletBinding()]
     param([string]$Root,[int]$Port=8000,[int]$Context=262144,[switch]$Remove,
+          [ValidateRange(1,2147483647)][int]$MaxOutputTokens=8192,
           [string]$OpenCodeDirectory='', [string]$CodexDirectory='', [string]$PiDirectory='')
     if($env:N1X_CLIENT_CONFIG -eq 'off'){return}
     if(-not $OpenCodeDirectory){
@@ -60,11 +61,11 @@ function Sync-N1xClients {
     if(-not $CodexDirectory){$CodexDirectory=if($env:CODEX_HOME){$env:CODEX_HOME}else{Join-Path $env:USERPROFILE '.codex'}}
     if(-not $PiDirectory){$PiDirectory=if($env:PI_CODING_AGENT_DIR){$env:PI_CODING_AGENT_DIR}else{Join-Path $env:USERPROFILE '.pi/agent'}}
     $url="http://127.0.0.1:$Port/v1"
-    $output=[math]::Min(8192,[math]::Floor($Context/4))
+    $output=[math]::Min($MaxOutputTokens,$Context-1)
     $openCode=[ordered]@{
         name='N1X local';package='@opencode/ai/providers/openai-compatible'
         settings=@{baseURL=$url}
-        models=@{qwen=@{modelID='qwen';name='Qwen3.8 Flash Next (N1X)'
+        models=@{'qwen/qwen38fn-best'=@{modelID='qwen/qwen38fn-best';name='Qwen3.8 Flash Next (N1X)'
             capabilities=@{tools=$true;input=@('text','image');output=@('text');reasoning=@{supported=$true}}
             limit=@{context=$Context;output=$output}
             compatibility=@{reasoningField='reasoning'}
@@ -75,7 +76,7 @@ function Sync-N1xClients {
             body=@{chat_template_kwargs=@{enable_thinking=$true;reasoning_effort='medium'}}}}
     }
     $pi=[ordered]@{baseUrl=$url;api='openai-completions';apiKey='n1x-local'
-        models=@(@{id='qwen';name='Qwen3.8 Flash Next (N1X)';reasoning=$true;input=@('text','image')
+        models=@(@{id='qwen/qwen38fn-best';name='Qwen3.8 Flash Next (N1X)';reasoning=$true;input=@('text','image')
             contextWindow=$Context;maxTokens=$output
             cost=@{input=0;output=0;cacheRead=0;cacheWrite=0}
             samplingParams=@{chat_template_kwargs=@{enable_thinking=$true}}
@@ -83,7 +84,7 @@ function Sync-N1xClients {
     $compact=[math]::Floor($Context*0.85)
     $codex=@"
 # Managed by n1x.ps1. Select with: codex --profile n1x
-model = "qwen"
+model = "qwen/qwen38fn-best"
 model_provider = "n1x"
 model_context_window = $Context
 model_auto_compact_token_limit = $compact

@@ -1,11 +1,13 @@
 @{
-    DefaultProfile = 'cache-dflash'
+    DefaultProfile = 'qwen38fn-best'
     Image = 'n1x-ai:magi-v5'
     Container = 'n1x-qwen38'
     ModelRoot = ''
     Port = 8000
     LanAccess = $true
     Context = 32768
+    # Default output allowance and server cap, including reasoning tokens.
+    MaxOutputTokens = 8192
     MaxSequences = 1
     KvCacheBytes = '4g'
     KvCacheDtype = 'auto'

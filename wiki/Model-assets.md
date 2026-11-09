@@ -1,0 +1,38 @@
+# Model files used by best and the top ten
+
+`qwen38fn-best` and `qwen38fn-lmcache-4k` share the **W4 target + DFlash2 + prepared PLE** bundle. Changing prefill batch, KV size, slots, RecoverSSM, indexer precision or LMCache budgets does not create another checkpoint. The [top-ten table](Profile-review.md#top-10-component-combinations) maps every row to its bundle; the [machine-readable inventory](data/model-assets.json) enumerates every filename, size and metadata hash, including the earlier historical ranks.
+
+Paths below are relative to `ModelRoot` (observed locally as `C:/Users/michael/models`). Container paths describe mounts, not extra copies.
+
+## Required files and volumes
+
+| Asset | Exact files / location | Used by |
+| --- | --- | --- |
+| W4 target weights | `Qwen3.8-Flash-Next-W4A16-AutoRound-hybrid/model-00001-of-00067.safetensors` through `model-00067-of-00067.safetensors`, plus `model_extra_tensors.safetensors`; all 68 files explicitly listed by `model.safetensors.index.json` | Best, 4K alternate and all ten combinations |
+| Target configuration | Same folder: `config.json`, `generation_config.json`, `quantization_config.json`, `model.safetensors.index.json` | All |
+| Text/template files | Same folder: `tokenizer.json`, `tokenizer_config.json`, `chat_template.jinja` | All, including draft tokenization |
+| Processor files | Same folder: `preprocessor_config.json`, `processor_config.json` | Preserve for the target's supported multimodal API; text benchmarks do not establish vision quality |
+| Target provenance | Same folder: `LICENSE`, `README.md`, `config.json.autoround` | Preserve with the checkpoint; provenance, not additional inference weights |
+| DFlash2 checkpoint | `Qwen3.8-Flash-Next-DFlash2/config.json` and `model.safetensors`, mounted at `/drafter` | Best, 4K alternate and top-ten rows 1–9 |
+| MTP checkpoint | Target's `model_extra_tensors.safetensors`: 1,565 `mtp.*` index entries | Top-ten row 10 uses these tensors for drafting; no separate MTP download |
+| FP8 PLE table | Volume `n1x-ple-native`, mounted at `/ple-table-fp8:ro`: `model-00005-of-00131.safetensors` through `model-00037-of-00131.safetensors` (33 files) | Both bundles; preserve `n1x-copy-manifest.json` for provenance |
+| Prepared PLE map | Volume `n1x-mbx-w4-dflash-test-cache`, `/cache/ple-nvme-fp8/map-c24ea2b9ebbc`, 52,429,053,952 bytes | Both bundles; the selected offline installation reuses this map |
+| LMCache storage | Volume `n1x-c8-lmc4-ssd160-v1`, mounted at `/lmcache`; namespace `qwen-c8-w4-std-fp32-idxbf16-kv11-b4k-v1` | Best and 4K alternate; generated prompt cache, recreated empty by setup if missing |
+
+The selected launcher's installation check requires **all indexed target shards**, including MTP extras even when DFlash2 is selected. Do not remove that file on the assumption that DFlash2 never uses it: changing the checkpoint/index and loader contract would be separate work. Likewise, prepared PLE is model-derived data, not disposable benchmark output. Compiler caches elsewhere in `/cache` are regenerable, but the volume also contains the PLE map.
+
+## Pinned sources
+
+| Asset | Publisher | Revision | Download directory under ModelRoot |
+| --- | --- | --- | --- |
+| W4 target | [Saren](https://huggingface.co/Saren/Qwen3.8-Flash-Next-W4A16-AutoRound-hybrid) | `8b82f0b7abe3d1150a7827d298c75e86267636ae` | `Qwen3.8-Flash-Next-W4A16-AutoRound-hybrid` |
+| FP8 PLE source | [Saren](https://huggingface.co/Saren/Qwen3.8-Flash-Next-ple-table-fp8) | `50511b0a41aa1d34b8beb7e5d4bb06a0b650dc14` | `ple-table-fp8` |
+| DFlash2 | [incoai](https://huggingface.co/incoai/Qwen3.8-Flash-Next-DFlash2) | `a22a1744e85c17364dcc54a6a420af7135d4c7f6` | `Qwen3.8-Flash-Next-DFlash2` |
+
+The host PLE source is used during preparation; best serves from the prepared volumes above. The inventory verifies existence and sizes and hashes metadata. It does not claim fresh full-weight hashes or per-request file-access tracing. It was collected without loading a model.
+
+## Local retirement record
+
+The native Windows `qwen38fn-myllmbox` reference separately needs `Qwen3.8-Flash-Next-FP4-Local` and its native runtime/PLE preparation; it does not use this W4 bundle. On 2026-11-08, the local Basalt and native FP4 checkpoints, redundant host `ple-table-fp8` source copy, Basalt model volume and ten obsolete trial/build volumes were retired. These reference assets must be restored before rerunning the affected profiles. Historical results and the top-ten inventory remain available.
+
+The current LMCache volume was also deliberately removed before a future runtime/library rebuild. Previous warm prompt entries are gone. The target, DFlash2, both prepared PLE volumes and pinned runtime image were retained. Offline compaction reduced the main WSLC disk from 784.81 to 173.24 GiB. These are dated local observations, not installation requirements or a claim that newer libraries have been built. See [cleanup procedures](Configuration.md#cleanup-and-disk-reclamation) to manage storage on another installation.

@@ -11,7 +11,7 @@ try {
             else {$global:LASTEXITCODE=1}
         } elseif($args[0] -ne 'list'){throw 'Unexpected monitor command'}
     }
-    function Get-CimInstance {param($ClassName); [pscustomobject]@{FreePhysicalMemory=8*1MB}}
+    function Get-CimInstance {param($ClassName); [pscustomobject]@{FreePhysicalMemory=8*1MB;FreeVirtualMemory=6*1MB}}
     function Start-Sleep {
         param($Seconds)
         $monitorState.sleeps++
@@ -19,6 +19,6 @@ try {
     }
     & "$(Split-Path $PSScriptRoot -Parent)/scripts/monitor-memory.ps1" -Container fixture -OutputPath $snapshot
     $data=Get-Content $snapshot -Raw | ConvertFrom-Json
-    if($monitorState.inspections -ne 2 -or $data.availableGiB -ne 8){throw 'Monitor lifecycle regression'}
+    if($monitorState.inspections -ne 2 -or $data.availableGiB -ne 8 -or $data.availableCommitGiB -ne 6){throw 'Monitor lifecycle or memory snapshot regression'}
     Write-Host 'Memory monitor exits after container removal.'
 } finally {Remove-Item -LiteralPath $snapshot -Force}

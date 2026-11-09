@@ -2,6 +2,10 @@ param([Parameter(Mandatory)][string]$Root, [Parameter(Mandatory)][string]$ModelR
     [switch]$PrintOnly, [string]$VhdPath='')
 $ErrorActionPreference='Stop'
 Set-StrictMode -Version Latest
+if(-not $PrintOnly -and (Test-Path -LiteralPath "$PSScriptRoot/native.ps1")){
+    . "$PSScriptRoot/native.ps1"
+    Assert-N1xNoNativeProfile $Root
+}
 $rootPath=[IO.Path]::GetFullPath($Root).TrimEnd('\','/')
 $prefix=$rootPath+[IO.Path]::DirectorySeparatorChar
 $modelPath=[IO.Path]::GetFullPath($ModelRoot).TrimEnd('\','/')
@@ -56,7 +60,11 @@ if(-not $VhdPath){
     if($LASTEXITCODE -ne 0){throw 'Cannot check running project containers'}
     if(@($running | Where-Object {$_.Trim()}).Count){throw 'Stop project containers before cleaning. Use clean -PrintOnly to preview.'}
 }
-foreach($file in $files){Remove-Item -LiteralPath $file.FullName -Force}
+foreach($file in $files){
+    # Generated caches may disappear after enumeration (or be reached through
+    # overlapping ignored entries). An already absent file is already clean.
+    if(Test-Path -LiteralPath $file.FullName -PathType Leaf){Remove-Item -LiteralPath $file.FullName -Force}
+}
 # Include empty Git directories (objects/info, refs/tags, etc.), which have
 # no deleted file whose parent cleanup could discover them.
 foreach($directory in ($directories | Sort-Object Length -Descending)){

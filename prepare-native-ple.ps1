@@ -5,7 +5,7 @@ $running=@(& wslc list --filter 'label=n1x-ai.managed=true' --format json)
 if ($LASTEXITCODE -ne 0) { throw 'Cannot inspect containers' }
 if (@($running | Where-Object { $_.Trim() }).Count) { throw 'Stop managed containers before copying the table' }
 . "$PSScriptRoot/scripts/config.ps1"
-$config=Get-N1xConfig -Root $PSScriptRoot -Profile baseline -ModelRoot $ModelRoot
+$config=Get-N1xConfig -Root $PSScriptRoot -Profile qwen38fn-baseline -ModelRoot $ModelRoot
 $table=Join-Path $config.ModelRoot 'ple-table-fp8'
 $run=@('run','--rm','--name','n1x-prepare-ple','--label','n1x-ai.managed=true','--entrypoint','python',
     '--volume',"${table}:/source-table:ro",'--volume',"${Volume}:/native-table",'--volume',"${PSScriptRoot}:/workspace:ro",

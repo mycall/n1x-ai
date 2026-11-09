@@ -14,14 +14,19 @@ try {
     Sync-N1xClients @args -Port 8123 -Context 32768
     $doc=Get-Content $path -Raw|ConvertFrom-Json
     if($doc.model -ne 'other/model' -or $doc.providers.other.name -ne 'keep'){throw 'Existing config changed'}
-    if($doc.providers.n1x.settings.baseURL -ne 'http://127.0.0.1:8123/v1' -or $doc.providers.n1x.models.qwen.limit.context -ne 32768){throw 'Active settings missing'}
-    if($doc.providers.n1x.models.qwen.body.chat_template_kwargs.reasoning_effort -ne 'medium'){throw 'OpenCode default effort must be medium'}
-    foreach($variant in $doc.providers.n1x.models.qwen.variants){
+    if($doc.providers.n1x.settings.baseURL -ne 'http://127.0.0.1:8123/v1' -or $doc.providers.n1x.models.'qwen/qwen38fn-best'.limit.context -ne 32768){throw 'Active settings missing'}
+    if($doc.providers.n1x.models.'qwen/qwen38fn-best'.body.chat_template_kwargs.reasoning_effort -ne 'medium'){throw 'OpenCode default effort must be medium'}
+    if($doc.providers.n1x.models.'qwen/qwen38fn-best'.limit.output -ne 8192){throw 'Default client output allowance missing'}
+    foreach($variant in $doc.providers.n1x.models.'qwen/qwen38fn-best'.variants){
         if(-not $variant.body.chat_template_kwargs.enable_thinking -or $variant.body.chat_template_kwargs.reasoning_effort -ne 'medium'){throw 'OpenCode variant must use medium thinking'}
     }
-    Sync-N1xClients @args -Port 8124
+    Sync-N1xClients @args -Port 8124 -MaxOutputTokens 4096
     $doc=Get-Content $path -Raw|ConvertFrom-Json
     if($doc.providers.n1x.settings.baseURL -notmatch ':8124/v1$'){throw 'Idempotent update failed'}
+    $pi=Get-Content "$temporary/pi/models.json" -Raw|ConvertFrom-Json
+    if($doc.providers.n1x.models.'qwen/qwen38fn-best'.modelID -ne 'qwen/qwen38fn-best' -or $pi.providers.n1x.models[0].id -ne 'qwen/qwen38fn-best'){throw 'Client HTTP model IDs disagree'}
+    if((Get-Content "$temporary/codex/n1x.config.toml" -Raw) -notmatch 'model = "qwen/qwen38fn-best"'){throw 'Codex HTTP model ID disagrees'}
+    if($doc.providers.n1x.models.'qwen/qwen38fn-best'.limit.output -ne 4096 -or $pi.providers.n1x.models[0].maxTokens -ne 4096){throw 'Client output allowance override ignored'}
     $doc|Add-Member custom 'user edit'
     $doc|ConvertTo-Json -Depth 50|Set-Content $path
     Sync-N1xClients @args -Remove
@@ -42,7 +47,7 @@ try {
     if([IO.File]::ReadAllText($path) -cne $before){throw 'JSONC migration overwrote user-edited JSON'}
     . "$PSScriptRoot/../scripts/jsonc.ps1"
     $jsonc=Read-N1xJsonc ([IO.File]::ReadAllText("$temporary/opencode/opencode.jsonc"))
-    if(-not $jsonc.Document.providers.n1x.models.qwen.capabilities.reasoning.supported){throw 'JSONC integration missing reasoning'}
+    if(-not $jsonc.Document.providers.n1x.models.'qwen/qwen38fn-best'.capabilities.reasoning.supported){throw 'JSONC integration missing reasoning'}
     Sync-N1xClients @args -Remove
     if([IO.File]::ReadAllText("$temporary/opencode/opencode.jsonc") -cne $jsoncBefore){throw 'JSONC integration did not unpatch'}
     Set-Content "$temporary/pi/models.json" '{invalid json'

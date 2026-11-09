@@ -1,0 +1,42 @@
+gpu-memory-utilization: 0.01
+dtype: bfloat16
+engram-config:
+  cpu_offload: false
+load-format: mbx
+moe-backend: marlin
+distributed-executor-backend: mp
+max-model-len: 262144
+max-num-seqs: 8
+max-num-batched-tokens: 4096
+kv-cache-memory-bytes: 11811160064
+kv-cache-dtype: fp8
+kv-cache-dtype-skip-layers:
+- sliding_window
+mamba-ssm-cache-dtype: float32
+mamba-cache-mode: align
+block-size: 4096
+prefix-match-unit: 64
+compilation-config:
+  cudagraph_mode: FULL_AND_PIECEWISE
+  cudagraph_capture_sizes: [1, 2, 3, 4, 8, 12, 16, 20, 24, 28, 32]
+  compile_ranges_endpoints: [32]
+enable-prefix-caching: true
+enable-prompt-tokens-details: true
+enable-per-request-metrics: true
+enable-auto-tool-choice: true
+tool-call-parser: qwen3_xml
+reasoning-parser: qwen3
+async-scheduling: true
+use-replayssm: false
+default-chat-template-kwargs:
+  preserve_thinking: false
+speculative-config:
+  method: dflash
+  model: /drafter
+  num_speculative_tokens: 3
+  disable_eagle_block_drop: true
+  max_model_len: 262144
+  kv_cache_dtype: auto
+  draft_load_config:
+    load_format: safetensors
+  attention_backend: TRITON_ATTN

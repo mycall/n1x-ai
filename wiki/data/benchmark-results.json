@@ -1,0 +1,950 @@
+{
+  "recordedDate": "2026-11-08",
+  "defaultProfile": "qwen38fn-best",
+  "settings": {
+    "prefillBatch": 8192,
+    "gpuKvGiB": 11,
+    "lmcacheRamGiB": 4,
+    "lmcacheSsdGiB": 160,
+    "slots": 8,
+    "contextTokens": 262144,
+    "outputAllowance": 8192,
+    "thinking": true,
+    "reasoningEffort": "xhigh",
+    "gpuPartitionGiB": 88
+  },
+  "scope": "Bounded near-full archive/retrieval first attempts. C2 unmeasured. No general coding-quality claim.",
+  "timing": "read/write are weighted request-phase rates, separate from correct tasks / batch seconds",
+  "archive": "n1x-ai-benchmark-archive-20261108.zip",
+  "audits": [
+    {
+      "archivePath": "results/benchmarks/20261108-c1-rematch/lmcache2/pairs-audit.json",
+      "sourceSha256": "0afef71483e5100e75ef5e4b35588e85d3cd5e1ca3785782a8f6b1d6f74d92a1",
+      "protocol": "n1x-c1-matched-pairs-audit-v1",
+      "recordedUtc": "2026-11-08T22:20:12.414809+00:00",
+      "variant": "lmcache",
+      "matchedPairsComplete": true,
+      "firstCorrect": 16,
+      "planned": 16,
+      "points": [
+        {
+          "phase": "cold",
+          "planned": 8,
+          "firstCorrect": 8,
+          "elapsedSeconds": 1636.4352744999633,
+          "requestWallSeconds": 1636.374526300002,
+          "readWriteTks": [
+            1282.283197848318,
+            38.53794581469011
+          ],
+          "inputRange": [
+            253936,
+            253946
+          ],
+          "generatedRange": [
+            85,
+            381
+          ],
+          "cachedTokens": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "correctTasksPerSecond": 0.004888674868270923,
+          "nativeHitTokens": 0.0,
+          "externalHitTokens": 0.0
+        },
+        {
+          "phase": "warm",
+          "planned": 8,
+          "firstCorrect": 8,
+          "elapsedSeconds": 87.43338309999672,
+          "requestWallSeconds": 84.0385180999292,
+          "readWriteTks": [
+            68303.77199383343,
+            38.76504710417844
+          ],
+          "inputRange": [
+            253936,
+            253946
+          ],
+          "generatedRange": [
+            92,
+            459
+          ],
+          "cachedTokens": [
+            249856,
+            249856,
+            249856,
+            249856,
+            249856,
+            249856,
+            249856,
+            249856
+          ],
+          "correctTasksPerSecond": 0.0914982323267816,
+          "nativeHitTokens": 1998848.0,
+          "externalHitTokens": 0.0
+        }
+      ],
+      "resources": {
+        "passed": true,
+        "sampledPhysicalMinimumGiB": 5.2096099853515625,
+        "sampledCommitMinimumGiB": 24.42121124267578,
+        "sampledGpuSpareMiB": 3922.0,
+        "validMemorySamples": 432,
+        "otherMemoryObservations": 0,
+        "validGpuSamples": 1032,
+        "measurementWindows": null,
+        "scope": "Sampled reserves, not instantaneous peak proof. GPU reserve includes a 128 MiB driver-accounting allowance."
+      }
+    },
+    {
+      "archivePath": "results/benchmarks/20261108-lmc-prefill8192/pairs-audit.json",
+      "sourceSha256": "d4c0bdbd54c4f53cf9a4c69b4170eb25454e162a5aa88877132adb51e2f79486",
+      "protocol": "n1x-c1-matched-pairs-audit-v1",
+      "recordedUtc": "2026-11-08T22:55:26.605902+00:00",
+      "variant": "b8192",
+      "matchedPairsComplete": true,
+      "firstCorrect": 16,
+      "planned": 16,
+      "points": [
+        {
+          "phase": "cold",
+          "planned": 8,
+          "firstCorrect": 8,
+          "elapsedSeconds": 961.6776395000052,
+          "requestWallSeconds": 961.6022364000091,
+          "readWriteTks": [
+            2194.5962628064926,
+            57.53842247304277
+          ],
+          "inputRange": [
+            253936,
+            253946
+          ],
+          "generatedRange": [
+            77,
+            420
+          ],
+          "cachedTokens": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "correctTasksPerSecond": 0.008318795895222598,
+          "nativeHitTokens": 0.0,
+          "externalHitTokens": 0.0
+        },
+        {
+          "phase": "warm",
+          "planned": 8,
+          "firstCorrect": 8,
+          "elapsedSeconds": 77.27058109999052,
+          "requestWallSeconds": 73.97677559993463,
+          "readWriteTks": [
+            57550.758528217964,
+            58.94378131328307
+          ],
+          "inputRange": [
+            253936,
+            253946
+          ],
+          "generatedRange": [
+            83,
+            393
+          ],
+          "cachedTokens": [
+            245760,
+            245760,
+            245760,
+            245760,
+            245760,
+            245760,
+            245760,
+            245760
+          ],
+          "correctTasksPerSecond": 0.10353228727046523,
+          "nativeHitTokens": 0.0,
+          "externalHitTokens": 1966080.0
+        }
+      ],
+      "resources": {
+        "passed": true,
+        "sampledPhysicalMinimumGiB": 5.241424560546875,
+        "sampledCommitMinimumGiB": 22.573925018310547,
+        "sampledGpuSpareMiB": 2405.0,
+        "validMemorySamples": 296,
+        "otherMemoryObservations": 0,
+        "validGpuSamples": 708,
+        "measurementWindows": null,
+        "scope": "Sampled reserves, not instantaneous peak proof. GPU reserve includes a 128 MiB driver-accounting allowance."
+      }
+    },
+    {
+      "archivePath": "results/benchmarks/20261108-c8-lmcache/mbx-c8-lmc1/c8-audit.json",
+      "sourceSha256": "7e123101dce843c8caaedc9921dfee266499edd8425a96eb405b791f2e9ad311",
+      "protocol": "n1x-near-full-c8-cache-audit-v1",
+      "recordedUtc": "2026-11-08T17:45:22.173830+00:00",
+      "case": "mbx-c8-lmc1",
+      "collectionComplete": true,
+      "firstAttemptQualityPassed": true,
+      "evidencePassed": true,
+      "coldInitialsPassed": true,
+      "partialRestoreScreenPassed": false,
+      "scaling": {
+        "cold": {
+          "c8ToC1CorrectWorkRatio": 1.4528313659051486,
+          "requiredRatio": 6.4,
+          "nearLinearPassed": false
+        },
+        "replay": {
+          "c8ToC1CorrectWorkRatio": 0.08619099245730935,
+          "requiredRatio": 6.4,
+          "nearLinearPassed": false
+        }
+      },
+      "points": [
+        {
+          "phase": "cold-c8",
+          "clientConcurrency": 8,
+          "planned": 8,
+          "firstAttemptCorrect": 8,
+          "phaseRatesMeasured": true,
+          "readWriteTks": [
+            1804.3070004310468,
+            3.1274576889665155
+          ],
+          "wholeBatchInputOutputTks": [
+            1835.1179707944138,
+            1.681982580386261
+          ],
+          "correctTasksPerSecond": 0.007226563181036567,
+          "coldInputsPassed": true,
+          "preemptions": 0.0,
+          "measurementWindow": [
+            1794155162.584721,
+            1794156269.6116438
+          ],
+          "elapsedSeconds": 1107.0269226999953,
+          "requestSuccessDelta": 8.0,
+          "noExtraModelTrafficEvidence": true,
+          "submittedBeforeFirstCompletion": 8,
+          "declaredConcurrencyObserved": true,
+          "inputRange": [
+            253936,
+            253946
+          ],
+          "maxObservedScheduled": 2.0,
+          "maxObservedWaiting": 7.0
+        },
+        {
+          "phase": "pressure-before-c8",
+          "clientConcurrency": 1,
+          "planned": 3,
+          "firstAttemptCorrect": 3,
+          "phaseRatesMeasured": true,
+          "readWriteTks": [
+            953.7055823644371,
+            33.49451389219104
+          ],
+          "wholeBatchInputOutputTks": [
+            930.8224210437206,
+            0.7355334127052705
+          ],
+          "correctTasksPerSecond": 0.003665448900524604,
+          "coldInputsPassed": true,
+          "preemptions": 0.0,
+          "measurementWindow": [
+            1794156270.0146487,
+            1794157088.46829
+          ],
+          "elapsedSeconds": 818.4536414000031,
+          "requestSuccessDelta": 3.0,
+          "noExtraModelTrafficEvidence": true,
+          "submittedBeforeFirstCompletion": 1,
+          "declaredConcurrencyObserved": true,
+          "inputRange": [
+            253941,
+            253947
+          ],
+          "maxObservedScheduled": 1.0,
+          "maxObservedWaiting": 0.0
+        },
+        {
+          "phase": "restore-c8",
+          "clientConcurrency": 8,
+          "planned": 8,
+          "firstAttemptCorrect": 8,
+          "phaseRatesMeasured": true,
+          "readWriteTks": [
+            1855.9098859727949,
+            2.926174367703788
+          ],
+          "wholeBatchInputOutputTks": [
+            1864.8439111450148,
+            1.5504221537632714
+          ],
+          "correctTasksPerSecond": 0.007343621805865111,
+          "coldInputsPassed": false,
+          "preemptions": 0.0,
+          "measurementWindow": [
+            1794157088.936904,
+            1794158178.3176227
+          ],
+          "externalRestoreEstablished": false,
+          "strictFullChunkCoveragePassed": false,
+          "restoreCoverageByTask": {
+            "near-limit-7": {
+              "cachedTokens": 0,
+              "expectedFullChunkTokens": 249856
+            },
+            "near-limit-1": {
+              "cachedTokens": 249856,
+              "expectedFullChunkTokens": 249856
+            },
+            "near-limit-0": {
+              "cachedTokens": 249856,
+              "expectedFullChunkTokens": 249856
+            },
+            "near-limit-4": {
+              "cachedTokens": 0,
+              "expectedFullChunkTokens": 249856
+            },
+            "near-limit-6": {
+              "cachedTokens": 0,
+              "expectedFullChunkTokens": 249856
+            },
+            "near-limit-5": {
+              "cachedTokens": 0,
+              "expectedFullChunkTokens": 249856
+            },
+            "near-limit-2": {
+              "cachedTokens": 0,
+              "expectedFullChunkTokens": 249856
+            },
+            "near-limit-3": {
+              "cachedTokens": 0,
+              "expectedFullChunkTokens": 249856
+            }
+          },
+          "counterDeltas": {
+            "vllm:prefix_cache_hits_total": 0.0,
+            "vllm:external_prefix_cache_hits_total": 499712.0,
+            "vllm:num_preemptions_total": 0.0,
+            "lmcache_mp_num_finished_retrieves_total": 2.0,
+            "lmcache_mp_l2_prefetch_load_completed_chunks_total": 126.0
+          },
+          "elapsedSeconds": 1089.380718600005,
+          "requestSuccessDelta": 8.0,
+          "noExtraModelTrafficEvidence": true,
+          "submittedBeforeFirstCompletion": 8,
+          "declaredConcurrencyObserved": true,
+          "inputRange": [
+            253936,
+            253946
+          ],
+          "maxObservedScheduled": 2.0,
+          "maxObservedWaiting": 7.0,
+          "partialRestoreEligible": false,
+          "uncachedInputTokensByTask": {
+            "near-limit-7": 253936,
+            "near-limit-1": 4090,
+            "near-limit-0": 4090,
+            "near-limit-4": 253940,
+            "near-limit-6": 253936,
+            "near-limit-5": 253940,
+            "near-limit-2": 253940,
+            "near-limit-3": 253941
+          }
+        },
+        {
+          "phase": "pressure-before-c1",
+          "clientConcurrency": 1,
+          "planned": 3,
+          "firstAttemptCorrect": 3,
+          "phaseRatesMeasured": true,
+          "readWriteTks": [
+            58195.692228570246,
+            38.59041713951578
+          ],
+          "wholeBatchInputOutputTks": [
+            22923.738713588045,
+            18.80635137003751
+          ],
+          "correctTasksPerSecond": 0.09027048657618006,
+          "coldInputsPassed": false,
+          "preemptions": 0.0,
+          "measurementWindow": [
+            1794158178.734528,
+            1794158211.9679813
+          ],
+          "elapsedSeconds": 33.23345330002485,
+          "requestSuccessDelta": 3.0,
+          "noExtraModelTrafficEvidence": true,
+          "submittedBeforeFirstCompletion": 1,
+          "declaredConcurrencyObserved": true,
+          "inputRange": [
+            253941,
+            253947
+          ],
+          "maxObservedScheduled": 1.0,
+          "maxObservedWaiting": 0.0
+        },
+        {
+          "phase": "restore-c1",
+          "clientConcurrency": 1,
+          "planned": 8,
+          "firstAttemptCorrect": 8,
+          "phaseRatesMeasured": true,
+          "readWriteTks": [
+            57239.62567655884,
+            37.310547036047595
+          ],
+          "wholeBatchInputOutputTks": [
+            21636.18097411603,
+            18.723080519558447
+          ],
+          "correctTasksPerSecond": 0.08520173160208623,
+          "coldInputsPassed": false,
+          "preemptions": 0.0,
+          "measurementWindow": [
+            1794158212.383339,
+            1794158306.2781441
+          ],
+          "externalRestoreEstablished": true,
+          "strictFullChunkCoveragePassed": true,
+          "restoreCoverageByTask": {
+            "near-limit-0": {
+              "cachedTokens": 249856,
+              "expectedFullChunkTokens": 249856
+            },
+            "near-limit-1": {
+              "cachedTokens": 249856,
+              "expectedFullChunkTokens": 249856
+            },
+            "near-limit-2": {
+              "cachedTokens": 249856,
+              "expectedFullChunkTokens": 249856
+            },
+            "near-limit-3": {
+              "cachedTokens": 249856,
+              "expectedFullChunkTokens": 249856
+            },
+            "near-limit-4": {
+              "cachedTokens": 249856,
+              "expectedFullChunkTokens": 249856
+            },
+            "near-limit-5": {
+              "cachedTokens": 249856,
+              "expectedFullChunkTokens": 249856
+            },
+            "near-limit-6": {
+              "cachedTokens": 249856,
+              "expectedFullChunkTokens": 249856
+            },
+            "near-limit-7": {
+              "cachedTokens": 249856,
+              "expectedFullChunkTokens": 249856
+            }
+          },
+          "counterDeltas": {
+            "vllm:prefix_cache_hits_total": 0.0,
+            "vllm:external_prefix_cache_hits_total": 1998848.0,
+            "vllm:num_preemptions_total": 0.0,
+            "lmcache_mp_num_finished_retrieves_total": 8.0,
+            "lmcache_mp_l2_prefetch_load_completed_chunks_total": 504.0
+          },
+          "elapsedSeconds": 93.89480529999128,
+          "requestSuccessDelta": 8.0,
+          "noExtraModelTrafficEvidence": true,
+          "submittedBeforeFirstCompletion": 1,
+          "declaredConcurrencyObserved": true,
+          "inputRange": [
+            253936,
+            253946
+          ],
+          "maxObservedScheduled": 1.0,
+          "maxObservedWaiting": 1.0,
+          "partialRestoreEligible": true,
+          "uncachedInputTokensByTask": {
+            "near-limit-0": 4090,
+            "near-limit-1": 4090,
+            "near-limit-2": 4084,
+            "near-limit-3": 4085,
+            "near-limit-4": 4084,
+            "near-limit-5": 4084,
+            "near-limit-6": 4080,
+            "near-limit-7": 4080
+          }
+        },
+        {
+          "phase": "cold-c1",
+          "clientConcurrency": 1,
+          "planned": 8,
+          "firstAttemptCorrect": 8,
+          "phaseRatesMeasured": true,
+          "readWriteTks": [
+            1301.0722857571516,
+            44.27456148750411
+          ],
+          "wholeBatchInputOutputTks": [
+            1263.132125214747,
+            1.1682973447427472
+          ],
+          "correctTasksPerSecond": 0.004974123873306002,
+          "coldInputsPassed": true,
+          "preemptions": 0.0,
+          "measurementWindow": [
+            1794158306.7132895,
+            1794159915.0367258
+          ],
+          "elapsedSeconds": 1608.3234362000076,
+          "requestSuccessDelta": 8.0,
+          "noExtraModelTrafficEvidence": true,
+          "submittedBeforeFirstCompletion": 1,
+          "declaredConcurrencyObserved": true,
+          "inputRange": [
+            253936,
+            253946
+          ],
+          "maxObservedScheduled": 1.0,
+          "maxObservedWaiting": 1.0
+        }
+      ],
+      "resources": {
+        "passed": true,
+        "sampledPhysicalMinimumGiB": 5.815944671630859,
+        "sampledCommitMinimumGiB": 25.536602020263672,
+        "sampledGpuSpareMiB": 3500.0,
+        "validMemorySamples": 1036,
+        "otherMemoryObservations": 0,
+        "validGpuSamples": 2475,
+        "measurementWindows": null,
+        "scope": "Sampled reserves, not instantaneous peak proof. GPU reserve includes a 128 MiB driver-accounting allowance."
+      }
+    },
+    {
+      "archivePath": "results/benchmarks/20261108-lmc-prefill8192-c8/c8-audit.json",
+      "sourceSha256": "ff928a19fc06652809a435a8ddbd657c4a5d8ca7ed32be18722f76735e9c3533",
+      "protocol": "n1x-lmc-prefill8192-c8-audit-v1",
+      "recordedUtc": "2026-11-08T23:26:47.033550+00:00",
+      "case": "mbx-lmc-prefill8192-c8",
+      "batchTokens": 8192,
+      "collectionComplete": true,
+      "firstAttemptQualityPassed": true,
+      "evidencePassed": true,
+      "points": [
+        {
+          "clientConcurrency": 8,
+          "planned": 8,
+          "firstAttemptCorrect": 8,
+          "elapsedSeconds": 1412.311918099993,
+          "correctTasksPerSecond": 0.005664471068659206,
+          "readWriteTks": [
+            1441.863360790639,
+            1.3760072575159399
+          ],
+          "wholeBatchInputOutputTks": [
+            1438.4393234697368,
+            1.238394987385619
+          ],
+          "actualInputRange": [
+            253936,
+            253946
+          ],
+          "generatedRange": [
+            82,
+            349
+          ],
+          "coldInputsPassed": true,
+          "phaseRatesMeasured": true,
+          "requestSuccessDelta": 8.0,
+          "noExtraModelTrafficEvidence": true,
+          "preemptions": 0.0,
+          "concurrentEightObserved": true,
+          "maxObservedScheduled": 2.0,
+          "maxObservedWaiting": 7.0
+        }
+      ],
+      "c8ToC1CorrectWorkRatio": 0.6809243957905321,
+      "requiredRatio": 6.4,
+      "nearLinearPassed": false,
+      "resources": {
+        "passed": true,
+        "sampledPhysicalMinimumGiB": 5.695842742919922,
+        "sampledCommitMinimumGiB": 22.982769012451172,
+        "sampledGpuSpareMiB": 2353.0,
+        "validMemorySamples": 368,
+        "otherMemoryObservations": 0,
+        "validGpuSamples": 875,
+        "measurementWindows": null,
+        "scope": "Sampled reserves, not instantaneous peak proof. GPU reserve includes a 128 MiB driver-accounting allowance."
+      }
+    },
+    {
+      "archivePath": "results/benchmarks/20261108-c8-native/mbx-c8-b8192/c8-audit.json",
+      "sourceSha256": "31006bc9011fb076bb3ed7b5174cd03dd3dc4519e35996627e65fe89fded9cce",
+      "protocol": "n1x-near-full-c8-native-audit-v1",
+      "recordedUtc": "2026-11-08T19:32:47.937953+00:00",
+      "case": "mbx-c8-b8192",
+      "batchTokens": 8192,
+      "collectionComplete": true,
+      "firstAttemptQualityPassed": true,
+      "evidencePassed": true,
+      "points": [
+        {
+          "clientConcurrency": 8,
+          "planned": 8,
+          "firstAttemptCorrect": 8,
+          "elapsedSeconds": 1333.6270167000184,
+          "correctTasksPerSecond": 0.005998678715879294,
+          "readWriteTks": [
+            1500.8073564556364,
+            1.7701352670086576
+          ],
+          "wholeBatchInputOutputTks": [
+            1523.3082222845853,
+            1.5139165409200368
+          ],
+          "actualInputRange": [
+            253936,
+            253946
+          ],
+          "generatedRange": [
+            83,
+            619
+          ],
+          "coldInputsPassed": true,
+          "phaseRatesMeasured": true,
+          "requestSuccessDelta": 8.0,
+          "noExtraModelTrafficEvidence": true,
+          "preemptions": 0.0,
+          "concurrentEightObserved": true,
+          "maxObservedScheduled": 2.0,
+          "maxObservedWaiting": 7.0
+        },
+        {
+          "clientConcurrency": 1,
+          "planned": 8,
+          "firstAttemptCorrect": 8,
+          "elapsedSeconds": 1318.8342346000136,
+          "correctTasksPerSecond": 0.006065963250056443,
+          "readWriteTks": [
+            1590.9964928115726,
+            45.32734575436621
+          ],
+          "wholeBatchInputOutputTks": [
+            1540.3944989463644,
+            1.3170722706685052
+          ],
+          "actualInputRange": [
+            253936,
+            253946
+          ],
+          "generatedRange": [
+            93,
+            412
+          ],
+          "coldInputsPassed": true,
+          "phaseRatesMeasured": true,
+          "requestSuccessDelta": 8.0,
+          "noExtraModelTrafficEvidence": true,
+          "preemptions": 0.0,
+          "concurrentEightObserved": null,
+          "maxObservedScheduled": 1.0,
+          "maxObservedWaiting": 0.0
+        }
+      ],
+      "c8ToC1CorrectWorkRatio": 0.9889078566085076,
+      "requiredRatio": 6.4,
+      "nearLinearPassed": false,
+      "resources": {
+        "passed": true,
+        "sampledPhysicalMinimumGiB": 8.204849243164062,
+        "sampledCommitMinimumGiB": 26.704402923583984,
+        "sampledGpuSpareMiB": 2482.0,
+        "validMemorySamples": 611,
+        "otherMemoryObservations": 0,
+        "validGpuSamples": 1460,
+        "measurementWindows": null,
+        "scope": "Sampled reserves, not instantaneous peak proof. GPU reserve includes a 128 MiB driver-accounting allowance."
+      }
+    },
+    {
+      "archivePath": "results/benchmarks/20261108-c8-native/mbx-c8-b4096/c8-audit.json",
+      "sourceSha256": "0feabfa9a9c97ea796b835b44587032d85d1ef208a1fe76752206cb4290eeac0",
+      "protocol": "n1x-near-full-c8-native-audit-v1",
+      "recordedUtc": "2026-11-08T18:41:37.492461+00:00",
+      "case": "mbx-c8-b4096",
+      "batchTokens": 4096,
+      "collectionComplete": true,
+      "firstAttemptQualityPassed": true,
+      "evidencePassed": true,
+      "points": [
+        {
+          "clientConcurrency": 8,
+          "planned": 8,
+          "firstAttemptCorrect": 8,
+          "elapsedSeconds": 1519.1970856999978,
+          "correctTasksPerSecond": 0.005265939538261985,
+          "readWriteTks": [
+            1314.1951359462532,
+            1.899241681548746
+          ],
+          "wholeBatchInputOutputTks": [
+            1337.2359775584598,
+            1.1756210019169882
+          ],
+          "actualInputRange": [
+            253936,
+            253946
+          ],
+          "generatedRange": [
+            82,
+            386
+          ],
+          "coldInputsPassed": true,
+          "phaseRatesMeasured": true,
+          "requestSuccessDelta": 8.0,
+          "noExtraModelTrafficEvidence": true,
+          "preemptions": 0.0,
+          "concurrentEightObserved": true,
+          "maxObservedScheduled": 2.0,
+          "maxObservedWaiting": 7.0
+        },
+        {
+          "clientConcurrency": 1,
+          "planned": 8,
+          "firstAttemptCorrect": 8,
+          "elapsedSeconds": 1433.6399474999926,
+          "correctTasksPerSecond": 0.00558020164961959,
+          "readWriteTks": [
+            1458.7978217124448,
+            44.51997054511169
+          ],
+          "wholeBatchInputOutputTks": [
+            1417.0398945304296,
+            1.1557992666774575
+          ],
+          "actualInputRange": [
+            253936,
+            253946
+          ],
+          "generatedRange": [
+            94,
+            335
+          ],
+          "coldInputsPassed": true,
+          "phaseRatesMeasured": true,
+          "requestSuccessDelta": 8.0,
+          "noExtraModelTrafficEvidence": true,
+          "preemptions": 0.0,
+          "concurrentEightObserved": null,
+          "maxObservedScheduled": 1.0,
+          "maxObservedWaiting": 0.0
+        }
+      ],
+      "c8ToC1CorrectWorkRatio": 0.9436826603965058,
+      "requiredRatio": 6.4,
+      "nearLinearPassed": false,
+      "resources": {
+        "passed": true,
+        "sampledPhysicalMinimumGiB": 8.628211975097656,
+        "sampledCommitMinimumGiB": 28.211715698242188,
+        "sampledGpuSpareMiB": 3859.0,
+        "validMemorySamples": 671,
+        "otherMemoryObservations": 0,
+        "validGpuSamples": 1606,
+        "measurementWindows": null,
+        "scope": "Sampled reserves, not instantaneous peak proof. GPU reserve includes a 128 MiB driver-accounting allowance."
+      }
+    },
+    {
+      "archivePath": "results/benchmarks/20261108-c8-memory/mbx-c8-kv15-s4/c8-audit.json",
+      "sourceSha256": "2a4f98c0aba236f1a7179e8707e179f58da177b01667e01da4088f8ebf3f1a5c",
+      "protocol": "n1x-near-full-c8-memory-audit-v1",
+      "recordedUtc": "2026-11-08T20:26:45.164426+00:00",
+      "case": "mbx-c8-kv15-s4",
+      "batchTokens": 4096,
+      "collectionComplete": true,
+      "firstAttemptQualityPassed": true,
+      "evidencePassed": false,
+      "points": [
+        {
+          "clientConcurrency": 8,
+          "planned": 8,
+          "firstAttemptCorrect": 8,
+          "elapsedSeconds": 1398.731435499998,
+          "correctTasksPerSecond": 0.005719468224534667,
+          "readWriteTks": [
+            1412.694398059631,
+            1.386184013921465
+          ],
+          "wholeBatchInputOutputTks": [
+            1452.4053356059737,
+            1.317622492227174
+          ],
+          "actualInputRange": [
+            253936,
+            253946
+          ],
+          "generatedRange": [
+            92,
+            430
+          ],
+          "coldInputsPassed": true,
+          "phaseRatesMeasured": true,
+          "requestSuccessDelta": 8.0,
+          "noExtraModelTrafficEvidence": true,
+          "preemptions": 0.0,
+          "concurrentEightObserved": true,
+          "maxObservedScheduled": 3.0,
+          "maxObservedWaiting": 7.0
+        },
+        {
+          "clientConcurrency": 1,
+          "planned": 8,
+          "firstAttemptCorrect": 8,
+          "elapsedSeconds": 1409.2901851999923,
+          "correctTasksPerSecond": 0.0056766165577635955,
+          "readWriteTks": [
+            1500.2375730073095,
+            39.209970276599556
+          ],
+          "wholeBatchInputOutputTks": [
+            1441.523556563836,
+            1.4191541394408989
+          ],
+          "actualInputRange": [
+            253936,
+            253946
+          ],
+          "generatedRange": [
+            81,
+            647
+          ],
+          "coldInputsPassed": true,
+          "phaseRatesMeasured": true,
+          "requestSuccessDelta": 8.0,
+          "noExtraModelTrafficEvidence": true,
+          "preemptions": 0.0,
+          "concurrentEightObserved": null,
+          "maxObservedScheduled": 1.0,
+          "maxObservedWaiting": 0.0
+        }
+      ],
+      "c8ToC1CorrectWorkRatio": 1.0075488041749914,
+      "requiredRatio": 6.4,
+      "nearLinearPassed": false,
+      "resources": {
+        "passed": false,
+        "sampledPhysicalMinimumGiB": 8.922149658203125,
+        "sampledCommitMinimumGiB": 25.701522827148438,
+        "sampledGpuSpareMiB": 1249.0,
+        "validMemorySamples": 643,
+        "otherMemoryObservations": 0,
+        "validGpuSamples": 1538,
+        "measurementWindows": null,
+        "scope": "Sampled reserves, not instantaneous peak proof. GPU reserve includes a 128 MiB driver-accounting allowance."
+      }
+    },
+    {
+      "archivePath": "results/benchmarks/20261108-c1-rematch/former/pairs-audit.json",
+      "sourceSha256": "407e37425902fa26cf74d9401c954b38a2552b811c51e90077587b904ba72f7f",
+      "protocol": "n1x-c1-matched-pairs-audit-v1",
+      "recordedUtc": "2026-11-08T22:20:11.783187+00:00",
+      "variant": "former",
+      "matchedPairsComplete": true,
+      "firstCorrect": 16,
+      "planned": 16,
+      "points": [
+        {
+          "phase": "cold",
+          "planned": 8,
+          "firstCorrect": 8,
+          "elapsedSeconds": 1221.3655714000342,
+          "requestWallSeconds": 1221.3128552000271,
+          "readWriteTks": [
+            1724.259707691707,
+            50.185032759866516
+          ],
+          "inputRange": [
+            253936,
+            253946
+          ],
+          "generatedRange": [
+            74,
+            496
+          ],
+          "cachedTokens": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "correctTasksPerSecond": 0.006550045446941584,
+          "nativeHitTokens": 0.0,
+          "externalHitTokens": 0.0
+        },
+        {
+          "phase": "warm",
+          "planned": 8,
+          "firstCorrect": 8,
+          "elapsedSeconds": 1348.2187227999966,
+          "requestWallSeconds": 1347.6413235999644,
+          "readWriteTks": [
+            1566.387348686428,
+            41.59222978766343
+          ],
+          "inputRange": [
+            253936,
+            253946
+          ],
+          "generatedRange": [
+            81,
+            495
+          ],
+          "cachedTokens": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "correctTasksPerSecond": 0.005933755305953255,
+          "nativeHitTokens": 0.0,
+          "externalHitTokens": 0.0
+        }
+      ],
+      "resources": {
+        "passed": true,
+        "sampledPhysicalMinimumGiB": 9.49325942993164,
+        "sampledCommitMinimumGiB": 27.55715560913086,
+        "sampledGpuSpareMiB": 2693.0,
+        "validMemorySamples": 598,
+        "otherMemoryObservations": 0,
+        "validGpuSamples": 1429,
+        "measurementWindows": null,
+        "scope": "Sampled reserves, not instantaneous peak proof. GPU reserve includes a 128 MiB driver-accounting allowance."
+      }
+    }
+  ]
+}

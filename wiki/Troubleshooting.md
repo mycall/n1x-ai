@@ -20,19 +20,31 @@ First confirm `n1x.ps1 wait` succeeds locally. Then follow [LAN access](Configur
 
 ## Missing models or PLE table
 
-Verify ModelRoot and directory names in [Installation](Installation.md). Rerun setup to download missing files. To rebuild only the native PLE copy:
+Check `ModelRoot` against the [asset inventory](Model-assets.md). The recovery path depends on the runtime:
+
+| Runtime | Recovery |
+| --- | --- |
+| Best / 4K alternate | Restore missing weights or prepared PLE first. Best's setup validates them; it only creates missing LMCache storage. See [prerequisites](MyLLMBox.md#existing-installation). |
+| Original WSLC reference | Rerun [reference setup](Installation.md#original-wslc-reference) to resume downloads and prepare missing native PLE. |
+| Native Windows reference | Restore the external FP4 model/runtime using [native installation guidance](Native-vLLM.md#installation-and-configuration). |
+
+To rebuild the original native PLE copy from an available host source:
 
 ```powershell
 .\prepare-native-ple.ps1
 ```
 
-The launch validates a pinned-revision native-volume manifest. It does not automatically recopy a large table.
+This does not generate the MyLLMBox prepared PLE map. Launch validation does not automatically restore large assets removed during cleanup.
 
 ## Memory or cache failures
 
 Check Windows available memory, the GPU partition, and container logs. Adjust the [memory budget](LMCache.md#memory-budget), then recreate. For a stale or missing memory-monitor message, restart the profile to refresh the monitor; do not disable the guard as a memory fix.
 
-For `invalid resource handle` during cache sharing, verify that the cache profile uses the project's patched `n1x-ai:lmcache` image. Rebuild it with `build.ps1 -CacheOnly`. An unpatched upstream image does not include this platform's VMM adaptations.
+For `invalid resource handle` during cache sharing, verify that the selected image includes the project's [compatibility patches](LMCache.md#compatibility). Best uses the [MyLLMBox build path](MyLLMBox.md#rebuild-lmcache-and-the-runtime); the original reference uses `build.ps1 -CacheOnly`. An unpatched upstream image does not include these adaptations.
+
+## Disk usage remains high after cleanup
+
+Cache limits apply per volume; old trial volumes can accumulate separately. Deleting data inside WSLC does not necessarily shrink its backing VHDX. Follow [cleanup and offline compaction](Configuration.md#cleanup-and-disk-reclamation), preserving the assets listed in [Model assets](Model-assets.md).
 
 ## Unexpected responses
 

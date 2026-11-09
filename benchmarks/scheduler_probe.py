@@ -8,6 +8,10 @@ import statistics
 import time
 import uuid
 import aiohttp
+try:
+    from benchmarks.timing import phase_timing
+except ModuleNotFoundError:
+    from timing import phase_timing
 
 
 async def main():
@@ -54,7 +58,7 @@ async def main():
                 + "\nWrite a detailed fictional story about building a helpful robot."
             )
             body = {
-                "model": "qwen",
+                "model": "qwen/qwen38fn-best",
                 "messages": [{"role": "user", "content": text}],
                 "max_tokens": args.output_tokens,
                 "ignore_eos": True,
@@ -67,6 +71,7 @@ async def main():
             start = time.monotonic()
             first = None
             usage = None
+            request_metrics = {}
             content = ""
             async with session.post(
                 args.url + "/v1/chat/completions", json=body
@@ -80,18 +85,22 @@ async def main():
                         continue
                     event = json.loads(line[6:])
                     usage = event.get("usage") or usage
+                    request_metrics = event.get("metrics") or request_metrics
                     for choice in event.get("choices", []):
                         text = choice.get("delta", {}).get("content") or ""
                         delta = choice.get("delta", {})
                         if (text or delta.get("reasoning") or delta.get("reasoning_content")) and first is None:
                             first = time.monotonic()
                         content += text
+            end = time.monotonic()
             rows.append(
                 {
                     "id": i,
                     "start": start,
                     "first": first,
-                    "end": time.monotonic(),
+                    "end": end,
+                    "metrics": request_metrics,
+                    "timing": phase_timing(usage, request_metrics, end-start, first-start if first else None),
                     "usage": usage,
                     "content": content,
                 }
@@ -118,6 +127,9 @@ async def main():
         "thinking": args.thinking,
         "output_tokens": args.output_tokens,
         "duration_s": duration,
+        "aggregate_input_output_tks": [sum(r['usage']['prompt_tokens'] for r in rows)/duration,
+                                       sum(r['usage']['completion_tokens'] for r in rows)/duration],
+        "aggregate_rate_basis": "whole-run wall time; not per-request PP/decode",
         "output_tokens_s": sum(r["usage"]["completion_tokens"] for r in rows)
         / duration,
         "max_running": max(s.get("num_requests_running", 0) for s in samples),

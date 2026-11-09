@@ -1,0 +1,13 @@
+{
+  "archiveSha256": "3a931b7dca96bd25d0ea74fdacef4e5aee60edd09b916af27ad869ed73909d25",
+  "verifiedFiles": 18110,
+  "originalBytes": 1772831125,
+  "archiveBytes": 112214076,
+  "archive": "n1x-ai-benchmark-archive-20261108.zip",
+  "location": "Sibling of this checkout; local archive, not committed.",
+  "contents": "Raw results/benchmarks, retired .build trial material, and pre-cleanup changed/untracked source and documentation.",
+  "verification": "Every archived file was read back and its SHA-256 checked before cleanup.",
+  "restore": "Extract into a separate directory. Paths match the former checkout. ARCHIVE-MANIFEST.json lists every file, size and SHA-256.",
+  "retiredOriginals": "../n1x-ai-retired-20261108 (outside repository; retained originals because bulk deletion was blocked)",
+  "diskReclamationClaimed": false
+}
