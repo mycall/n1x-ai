@@ -38,6 +38,39 @@ $config.UseLMCache=$false
 $off=@(Get-N1xMyllmboxArguments $root $config 'cache-off-fixture')
 if($off -notcontains 'N1X_LMCACHE_ENABLED=0' -or @($off|Where-Object {$_.EndsWith(':/lmcache')}).Count){throw 'Cache-off launch inherited cache storage'}
 $config.UseLMCache=$true
+$originalNamespace=$config.LmcacheNamespace
+$depthNamespaces=@()
+foreach($depth in 1..7){
+    $config.DFlashTokens=$depth
+    foreach($slots in @(1,2,8)){
+        $config.MaxSequences=$slots
+        $depthArguments=@(Get-N1xMyllmboxArguments $root $config 'depth-fixture')
+        $depthSpec=OptionValue $depthArguments '--speculative-config'|ConvertFrom-Json
+        $graphs=OptionValue $depthArguments '--compilation-config'|ConvertFrom-Json
+        if($depthSpec.num_speculative_tokens -ne $depth){throw 'Requested DFlash2 depth was overridden'}
+        $maximum=($depth+1)*$slots
+        if($graphs.compile_ranges_endpoints[0] -ne $maximum -or $graphs.cudagraph_capture_sizes[-1] -ne $maximum){throw 'Graph bounds do not follow depth and slots'}
+        for($requests=1;$requests -le $slots;$requests++){
+            if($graphs.cudagraph_capture_sizes -notcontains (($depth+1)*$requests)){throw 'Missing graph size for a DFlash2 query batch'}
+        }
+        if($graphs.cudagraph_capture_sizes.Count -ne @($graphs.cudagraph_capture_sizes|Sort-Object -Unique).Count){throw 'Duplicate graph capture sizes'}
+        if($depth -eq 3 -and $slots -eq 8 -and ($graphs.cudagraph_capture_sizes -join ',') -ne '1,2,3,4,8,12,16,20,24,28,32'){throw 'K3 graph coverage changed'}
+    }
+    $namespace=(Get-N1xMyllmboxEnvironment $root $config).N1X_CACHE_NAMESPACE
+    if($depth -eq 3 -and $namespace -ne $originalNamespace){throw 'K3 cache namespace changed'}
+    $depthNamespaces+=$namespace
+}
+if(@($depthNamespaces|Sort-Object -Unique).Count -ne 7 -or $config.LmcacheNamespace -ne $originalNamespace){throw 'Depth cache namespaces collide or mutate configuration'}
+$config.DFlashTokens=3
+$unpatched=[pscustomobject]@{Config=[pscustomobject]@{Labels=$null}}
+$patched=[pscustomobject]@{Config=[pscustomobject]@{Labels=[pscustomobject]@{'n1x-ai.qsa-ring'='power-of-two-v1'}}}
+Assert-N1xMyllmboxDepthImage $config $unpatched
+$config.DFlashTokens=5
+try{Assert-N1xMyllmboxDepthImage $config $unpatched;throw 'Unpatched large-depth image accepted'}catch{
+    if($_.Exception.Message -notlike 'DFlashTokens 5-7 require*'){throw}
+}
+Assert-N1xMyllmboxDepthImage $config $patched
+$config.DFlashTokens=3
 $preview=& "$root/n1x.ps1" start -Profile qwen38fn-best -ModelRoot "C:\model files\owner's models" -PrintOnly
 function wslc { $script:previewArguments=@($args) }
 try{

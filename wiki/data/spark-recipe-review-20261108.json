@@ -1,0 +1,302 @@
+{
+  "schema": "n1x-spark-recipe-review-v1",
+  "review_date": "2026-11-08",
+  "timezone": "America/Los_Angeles",
+  "review_type": "static installed-asset and runtime-source inspection; no inference",
+  "repository_revision": "eaeeca5ed3f080fbc28be7edcaef5c4e83b0c4ce",
+  "upstream": {
+    "repository": "https://github.com/styles01/sparkrun-recipes",
+    "revision": "d7e6f33e3ed173263d9b9baaec37021add8e2191"
+  },
+  "container": {
+    "name": "n1x-qwen38fn-best",
+    "state_before": "exited",
+    "state_after": "exited",
+    "image_id": "sha256:de420cb63cedf084f8838e1e11a7db611e43418c04b3cebc756bc4a5955571aa",
+    "source": "Copied source from existing stopped container with wslc cp; no image pull"
+  },
+  "target": {
+    "directory": "C:\\Users\\michael\\models\\Qwen3.8-Flash-Next-W4A16-AutoRound-hybrid",
+    "indexed_file_count": 68,
+    "missing_files": [],
+    "mtp_index_entries": 1565,
+    "mtp_files": [
+      "model_extra_tensors.safetensors"
+    ],
+    "head_quantization_bits": 8,
+    "declared_ssm_dtype": "float32",
+    "inspected_tensors": {
+      "model.language_model.embed_tokens.weight": {
+        "shard": "model-00062-of-00067.safetensors",
+        "dtype": "BF16",
+        "shape": [
+          248320,
+          2560
+        ],
+        "data_offsets": [
+          0,
+          1271398400
+        ],
+        "bytes": 1271398400
+      },
+      "lm_head.qweight": {
+        "shard": "model-00067-of-00067.safetensors",
+        "dtype": "I32",
+        "shape": [
+          640,
+          248320
+        ],
+        "data_offsets": [
+          0,
+          635699200
+        ],
+        "bytes": 635699200
+      },
+      "lm_head.qzeros": {
+        "shard": "model-00067-of-00067.safetensors",
+        "dtype": "I32",
+        "shape": [
+          20,
+          62080
+        ],
+        "data_offsets": [
+          635699200,
+          640665600
+        ],
+        "bytes": 4966400
+      },
+      "lm_head.scales": {
+        "shard": "model-00067-of-00067.safetensors",
+        "dtype": "F16",
+        "shape": [
+          20,
+          248320
+        ],
+        "data_offsets": [
+          653793280,
+          663726080
+        ],
+        "bytes": 9932800
+      }
+    },
+    "metadata_sha256": {
+      "config.json": "eee162b6e243f7e1620f78a62d5e2004bc34a5c205fce65b05b01a3da00fd332",
+      "model.safetensors.index.json": "4da5d411d90f4b2d89d4e13fdf201516f6f877cb70a06aec3c1d4fd61509571f"
+    },
+    "safetensors_header_sha256": {
+      "model-00062-of-00067.safetensors": "b657d949dc58b53f46fc4343d1d349b8d2dd96d85786abb9d89fabe0a024440b",
+      "model-00067-of-00067.safetensors": "487f5bc8256046db283130943e5cb623922e2abc392b57f8f779e5d707de0a2a"
+    }
+  },
+  "draft": {
+    "directory": "C:\\Users\\michael\\models\\Qwen3.8-Flash-Next-DFlash2",
+    "weight_file_bytes": 1206140008,
+    "config": {
+      "architectures": [
+        "DFlash2DraftModel"
+      ],
+      "attention_bias": false,
+      "attention_dropout": 0.0,
+      "bos_token_id": 248044,
+      "dflash_config": {
+        "block_size": 8,
+        "conv_group_size": 16,
+        "conv_kernel_size": 2,
+        "mask_token_id": 248077,
+        "selector_rank": 256,
+        "selector_top_k": 16,
+        "target_layer_ids": [
+          5,
+          15,
+          25,
+          35,
+          45
+        ]
+      },
+      "dtype": "bfloat16",
+      "eos_token_id": 248044,
+      "head_dim": 128,
+      "hidden_act": "silu",
+      "hidden_size": 2560,
+      "initializer_range": 0.02,
+      "intermediate_size": 7680,
+      "is_causal": false,
+      "layer_types": [
+        "sliding_attention",
+        "sliding_attention",
+        "sliding_attention",
+        "sliding_attention",
+        "sliding_attention"
+      ],
+      "max_position_embeddings": 262144,
+      "max_window_layers": 5,
+      "model_type": "qwen3",
+      "num_attention_heads": 32,
+      "num_hidden_layers": 5,
+      "num_key_value_heads": 8,
+      "num_target_layers": 48,
+      "pad_token_id": null,
+      "rms_norm_eps": 1e-06,
+      "rope_parameters": {
+        "rope_theta": 10000,
+        "rope_type": "default"
+      },
+      "sliding_window": 2048,
+      "tie_word_embeddings": false,
+      "transformers_version": "5.12.1",
+      "use_cache": false,
+      "use_sliding_window": true,
+      "vocab_size": 248320
+    },
+    "config_sha256": "2409575986f9ea24d455343eb469c0e6940def5edab1d1be503bb8eb4cc3b1b9",
+    "safetensors_header_sha256": "5ef4772f77b6a3ea349c6515aceffdb999868946aafb04578416494c64ef0513",
+    "head_or_embedding_tensor_names": []
+  },
+  "native_fp4_checkpoint_present": false,
+  "present_named_volumes": [
+    "n1x-ple-native",
+    "n1x-mbx-w4-dflash-test-cache",
+    "n1x-c8-lmc4-ssd160-v1"
+  ],
+  "retained_named_images": [
+    "n1x-ai:mbx-cache-test",
+    "n1x-ai:lmcache"
+  ],
+  "generated_launch": {
+    "speculative_config": {
+      "max_model_len": 262144,
+      "method": "dflash",
+      "kv_cache_dtype": "auto",
+      "disable_eagle_block_drop": true,
+      "attention_backend": "TRITON_ATTN",
+      "num_speculative_tokens": 3,
+      "model": "/drafter",
+      "draft_load_config": {
+        "load_format": "safetensors"
+      }
+    },
+    "compilation_config": {
+      "cudagraph_mode": "FULL_AND_PIECEWISE",
+      "compile_ranges_endpoints": [
+        32
+      ],
+      "cudagraph_capture_sizes": [
+        1,
+        2,
+        3,
+        4,
+        8,
+        12,
+        16,
+        20,
+        24,
+        28,
+        32
+      ]
+    }
+  },
+  "runtime_source_receipts": {
+    "vllm/models/qwen4_exp/nvidia/model.py": {
+      "sha256": "2e7e6bd8fddd5e91597c4c84aba64dda1a89acfb4e8229190488fe6b2906a34e",
+      "inspected_line_ranges": [
+        [
+          743,
+          749
+        ],
+        [
+          839,
+          851
+        ],
+        [
+          853,
+          885
+        ]
+      ]
+    },
+    "vllm/model_executor/models/qwen3_dflash2.py": {
+      "sha256": "11ac6ba8c6db702375970e68cd042b98783a5c43b87f9bfa27e88463316bf499",
+      "inspected_line_ranges": [
+        [
+          248,
+          259
+        ],
+        [
+          395,
+          413
+        ]
+      ]
+    },
+    "vllm/v1/spec_decode/dflash.py": {
+      "sha256": "758318d6058caefbd3dbe91feddfba88006f872309f7c3275c6cc412d8c5733f",
+      "inspected_line_ranges": [
+        [
+          23,
+          46
+        ],
+        [
+          121,
+          127
+        ]
+      ]
+    },
+    "vllm/v1/spec_decode/llm_base_proposer.py": {
+      "sha256": "8df7969c47e177dd8940303680f65ac8a71f316af5108977316281887b91769b",
+      "inspected_line_ranges": [
+        [
+          1508,
+          1556
+        ]
+      ]
+    },
+    "vllm/model_executor/layers/mamba/mamba_utils.py": {
+      "sha256": "8df87600920398cc5e4dbdbf3473f8f2090e42a3e1dc522d5751e3bae909e9c0",
+      "inspected_line_ranges": [
+        [
+          97,
+          110
+        ],
+        [
+          121,
+          130
+        ]
+      ]
+    },
+    "vllm/v1/worker/gpu/spec_decode/mtp/speculator.py": {
+      "sha256": "154d82a26c7d9c14e895a9fd36c0ccd01a558ab35733c3e82fe15daf72c728f0",
+      "inspected_line_ranges": [
+        [
+          15,
+          27
+        ]
+      ]
+    },
+    "mbx_draft_head2.py": {
+      "sha256": "657364786a3a1245f4f928982dab52060a6f1c97cdbf785f8325e4f96fe8e44c",
+      "inspected_line_ranges": [
+        [
+          1,
+          23
+        ]
+      ]
+    }
+  },
+  "repository_source_sha256": {
+    "scripts/myllmbox.ps1": "d6d073c1f6fe979958729024cc6aac040df866c7c92e5506b1e46264236951b7",
+    "scripts/config.ps1": "046e1605e9c98b94d6eef82dd13797e272b6d2baa77317daf8f6e2aa25304947",
+    "profiles/qwen38fn-best.yaml": "e11d0e7a27701123f2323bb41fbda7578d77a0e718fc381fdb3ed6bf236fc3e9",
+    "runtime/myllmbox/environment.psd1": "0b020f94ddf875481ab7a647e5abb990e1d9b122b555855eadab02528cd7b357"
+  },
+  "limitations": [
+    "No full weight-file hashes or tensor-value verification",
+    "No GPU model load, throughput, correctness, or restore trial",
+    "Source support does not establish end-to-end BF16 or other-depth qualification",
+    "Runtime source copies remain outside the repository"
+  ],
+  "changes": {
+    "model_downloads": false,
+    "image_pulls": false,
+    "serving_defaults_changed": false,
+    "service_started": false,
+    "documentation_only": true
+  }
+}

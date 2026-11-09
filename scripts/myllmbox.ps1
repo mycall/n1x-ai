@@ -23,6 +23,9 @@ function Get-N1xMyllmboxEnvironment {
         $environment.N1X_LMCACHE_STAGED_TRANSFER='1'
         $environment.N1X_RESTORE_WAIT_MS=[string]$Config.RestoreWaitMs
         $environment.N1X_CACHE_NAMESPACE=$Config.LmcacheNamespace
+        # K3 keeps its qualified namespace. Other depths have different SSM
+        # state shapes and must never restore K3 (or each other's) entries.
+        if($Config.DFlashTokens -ne 3){$environment.N1X_CACHE_NAMESPACE+="-dflash-k$($Config.DFlashTokens)"}
     }
     $environment.N1X_WINDOWS_MINIMUM_GIB=[string]$Config.WindowsMinimumGiB
     $environment.N1X_CACHE_BLOCK_TOKENS=[string]$Config.CacheBlockTokens
@@ -36,10 +39,13 @@ function Get-N1xMyllmboxArguments {
     $environment=Get-N1xMyllmboxEnvironment $Root $Config
     $recipeDirectory=Split-Path $paths.Recipe -Parent
     $recipeName=Split-Path $paths.Recipe -Leaf
-    $captures=@(1,2,3,4)
-    for($size=8;$size -le 4*$Config.MaxSequences;$size+=4){$captures+=$size}
-    $compilation=@{cudagraph_mode='FULL_AND_PIECEWISE';cudagraph_capture_sizes=$captures;compile_ranges_endpoints=@(4*$Config.MaxSequences)}
-    $spec=@{method='dflash';model='/drafter';num_speculative_tokens=3;disable_eagle_block_drop=$true;
+    $queryTokens=1+$Config.DFlashTokens
+    $maxCapture=$queryTokens*$Config.MaxSequences
+    $captures=@(@(1,2,3,4)|Where-Object {$_ -le $maxCapture})
+    for($size=$queryTokens;$size -le $maxCapture;$size+=$queryTokens){$captures+=$size}
+    $captures=@($captures|Sort-Object -Unique)
+    $compilation=@{cudagraph_mode='FULL_AND_PIECEWISE';cudagraph_capture_sizes=$captures;compile_ranges_endpoints=@($maxCapture)}
+    $spec=@{method='dflash';model='/drafter';num_speculative_tokens=$Config.DFlashTokens;disable_eagle_block_drop=$true;
         max_model_len=$Config.Context;kv_cache_dtype='auto';draft_load_config=@{load_format='safetensors'};attention_backend='TRITON_ATTN'}
     $publish=if($Config.LanAccess){'0.0.0.0'}else{'127.0.0.1'}
     $arguments=@('run','-d','--name',$Config.Container,'--label','n1x-ai.managed=true',
@@ -74,6 +80,16 @@ function Confirm-N1xMyllmboxCacheVolume {
     Write-Host "Created empty LMCache volume $($Config.LmcacheVolume); prompt KV will regenerate on use."
 }
 
+function Assert-N1xMyllmboxDepthImage {
+    param([hashtable]$Config,$Image)
+    if($Config.DFlashTokens -le 4){return}
+    $labels=$Image.Config.Labels
+    $marker=if($null -ne $labels){$labels.PSObject.Properties['n1x-ai.qsa-ring']}else{$null}
+    if($null -eq $marker -or $marker.Value -ne 'power-of-two-v1'){
+        throw 'DFlashTokens 5-7 require a runtime built with the QSA ring fix; rebuild/select a qualified MyLLMBox candidate'
+    }
+}
+
 function Assert-N1xMyllmboxInstallation {
     param([string]$Root,[hashtable]$Config,[switch]$PrepareCache)
     $paths=Get-N1xMyllmboxPaths $Root $Config
@@ -85,6 +101,11 @@ function Assert-N1xMyllmboxInstallation {
     foreach($shard in ($index.weight_map.PSObject.Properties.Value|Sort-Object -Unique)){
         if(-not(Test-Path -LiteralPath (Join-Path $paths.Model $shard))){throw "Missing model shard: $shard"}
     }
+    $draftConfig=Get-Content -LiteralPath "$($paths.Drafter)/config.json" -Raw|ConvertFrom-Json
+    if($draftConfig.architectures -notcontains 'DFlash2DraftModel' -or
+        $Config.DFlashTokens -ge $draftConfig.dflash_config.block_size){
+        throw 'DFlashTokens must fit the installed DFlash2 block size including its bonus token'
+    }
     $tool=Get-Command wslc.exe -ErrorAction Stop
     $version=[Diagnostics.FileVersionInfo]::GetVersionInfo($tool.Source).FileVersion
     if($version -ne $Config.MyllmboxWSLCVersion){throw "This MyLLMBox recipe requires WSLC $($Config.MyllmboxWSLCVersion); found $version"}
@@ -92,6 +113,7 @@ function Assert-N1xMyllmboxInstallation {
     if($LASTEXITCODE -ne 0){throw "Prepared MyLLMBox image '$($Config.Image)' is missing; see wiki/MyLLMBox.md"}
     $image=@(($raw -join "`n")|ConvertFrom-Json)[0]
     if($image.Id -ne $Config.ImageId){throw 'MyLLMBox image identity changed; qualify the new build before updating ImageId'}
+    Assert-N1xMyllmboxDepthImage $Config $image
     & wslc volume inspect $Config.PleVolume | Out-Null
     if($LASTEXITCODE -ne 0){throw "Missing existing FP8 PLE volume: $($Config.PleVolume)"}
     & wslc volume inspect $Config.CacheVolume | Out-Null

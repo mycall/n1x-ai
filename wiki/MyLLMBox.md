@@ -50,6 +50,8 @@ A fresh build reproduces the pinned stack; it does not automatically select newe
 
 Changed vendor versions or source fail validation until reviewed. Compile extensions against the new guest stack and run the [local and GPU checks](Development.md) before comparing model correctness and performance.
 
+Candidate builds also apply `runtime/myllmbox/patch_qsa_ring.py`, guarded by the audited QSA source hash. It makes the speculative raw-key ring fit power-of-two attention blocks for DFlash2 depths 5-7. The prepared image listed above predates this fix. Selecting another draft depth does not patch an existing image; see [experimental draft depth](Configuration.md#experimental-draft-depth).
+
 ### Select a candidate
 
 Successful builds print their immutable image ID. Set `Image` and `ImageId` together in `config.local.psd1`, then run `setup` and `recreate` for the selected profile. Validate GPU behavior and first-attempt quality before retaining the override. Remove both overrides to return to the pinned runtime.

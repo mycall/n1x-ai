@@ -153,6 +153,8 @@ function Get-ConfigFingerprint([string]$LegacyDefault='') {
     $canonical=[ordered]@{}
     $canonical['__ServedModelName']='qwen/qwen38fn-best'
     foreach($key in ($config.Keys|Sort-Object)){
+        # K3 was implicit before DFlashTokens existed; its launch is unchanged.
+        if($key -eq 'DFlashTokens' -and $config[$key] -eq 3){continue}
         if($key -eq 'DefaultProfile'){
             if($LegacyDefault){$canonical[$key]=$LegacyDefault}
         } else {$canonical[$key]=$config[$key]}
@@ -355,6 +357,7 @@ switch ($Action) {
         if($myllmbox){
             $run=Get-N1xMyllmboxArguments $PSScriptRoot $config $fingerprint
             if($PrintOnly){Write-Output ('wslc '+(($run|ForEach-Object {"'"+$_.Replace("'","''")+"'"}) -join ' '));return}
+            if($config.DFlashTokens -gt 4){Assert-N1xMyllmboxInstallation $PSScriptRoot $config}
             Write-Headroom
             Start-MemoryMonitor
             Invoke-Wslc $run

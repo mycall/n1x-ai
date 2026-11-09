@@ -138,6 +138,22 @@ The opt-out affects both registration and removal. To remove existing managed en
 
 DFlash2 uses a separate drafter; MTP uses the target's indexed extra tensors. See [Model assets](Model-assets.md) for their exact dependencies. Best and the reference DFlash2 profile use three draft tokens, but differ in indexer precision, cache geometry, and runtime. Keep those per-profile settings together. The first launch may compile additional FlashInfer kernels. See [historical DFlash2/MTP results](Benchmarks.md#dflash2-comparison) before drawing performance conclusions.
 
+### Experimental draft depth
+
+For the MyLLMBox profiles (`qwen38fn-best` and `qwen38fn-lmcache-4k`), set `DFlashTokens` in `config.local.psd1` and recreate to test another depth:
+
+```powershell
+DFlashTokens = 5
+```
+
+The setting accepts integers 1-7; the installed DFlash2 checkpoint's block must also accommodate the draft tokens plus one bonus token. K3 remains the qualified default. The launcher sets the effective speculative configuration on the command line and derives graph coverage from `(DFlashTokens + 1) * MaxSequences`. Editing only the YAML's `num_speculative_tokens` does not override this setting. Other backends ignore this MyLLMBox option and retain their existing recipes. `list profiles` shows the effective DFlash2 depth for each profile.
+
+Depths 5-7 also require a runtime with the QSA ring fix. Earlier images compute a 12-slot ring that cannot divide the supplied 4,096-token block. New MyLLMBox builds apply a source-guarded patch that rounds the ring to 16 slots while retaining the existing ring sizes at depths 1-4. Setup and new large-depth launches check the image's `n1x-ai.qsa-ring=power-of-two-v1` marker before loading weights. Follow the [candidate build and selection procedure](MyLLMBox.md#select-a-candidate) when using a rebuilt image.
+
+K3 retains its existing LMCache namespace and configuration identity. Other depths append `-dflash-kN` to the configured namespace to prevent cross-depth restores. Named volumes and prepared PLE are reused; no additional model download is needed. Changing depth changes recurrent-state/cache geometry and can require more memory or fail startup. Validate tools, actual context capacity, and restored answers before selecting a candidate. Remove the override or set it to `3`, then recreate, to return to K3.
+
+The [DFlash2 depth trial](DFlash-depth-trial.md) records the tested candidate image, bounded correctness and speed results, and remaining qualification gaps. Returning to the original runtime also requires removing candidate `Image` and `ImageId` overrides.
+
 ## Storage
 
 - Main weights: read-only mount from ModelRoot.

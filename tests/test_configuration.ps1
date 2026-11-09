@@ -11,6 +11,7 @@ try {
     Copy-Item "$root/profiles/qwen38fn-best.psd1" "$temporary/profiles/qwen38fn-best.psd1"
     $config=Get-N1xConfig -Root $temporary
     if($config.MaxOutputTokens -ne 8192){throw 'Default output allowance must be 8192'}
+    if($config.DFlashTokens -ne 3){throw 'Default DFlash2 depth must remain K3'}
     if($config.Profile -ne 'qwen38fn-best' -or -not $config.DFlash -or -not $config.UseLMCache -or $config.Mtp){throw 'Selected default must use the promoted LMCache DFlash2 best profile'}
     if($config.Backend -ne 'wslc-myllmbox' -or $config.Context -ne 262144 -or $config.RequiredPartitionMiB -ne 90112 -or $config.KvCacheBytes -ne '11811160064'){throw 'Selected default differs from the near-full qualified configuration'}
     $reference=Get-N1xConfig -Root $temporary -Profile qwen38fn-cache-dflash
@@ -48,6 +49,24 @@ try {
         try{Get-N1xConfig -Root $temporary;throw 'Invalid output allowance accepted'}catch{
             if($_.Exception.Message -ne 'MaxOutputTokens must be a positive integer smaller than Context'){throw}
         }
+    }
+    foreach($depth in 1..7){
+        [IO.File]::WriteAllText("$temporary/config.local.psd1","@{DFlashTokens=$depth}")
+        if((Get-N1xConfig -Root $temporary).DFlashTokens -ne $depth){throw 'Local DFlashTokens override ignored'}
+    }
+    foreach($invalid in @('0','-1','1.5','8',"'5'",'$true')){
+        [IO.File]::WriteAllText("$temporary/config.local.psd1","@{DFlashTokens=$invalid}")
+        try{Get-N1xConfig -Root $temporary;throw 'Invalid DFlashTokens accepted'}catch{
+            if($_.Exception.Message -ne 'DFlashTokens must be an integer from 1 through 7'){throw}
+        }
+    }
+    [IO.File]::WriteAllText("$temporary/config.local.psd1",'@{DFlashTokens=5}')
+    if((Get-N1xConfig -Root $temporary -Profile qwen38fn-cache-dflash).DFlashTokens -ne 3){throw 'Reference recipe inherited an unsupported MyLLMBox depth'}
+    $inventory=@(Get-N1xProfileList -Root $temporary)
+    if($inventory.Count -ne 4){throw 'A local draft-depth override broke profile inventory'}
+    if(($inventory|Where-Object Profile -eq 'qwen38fn-best').Speculation -ne 'DFlash2 K5' -or
+        ($inventory|Where-Object Profile -eq 'qwen38fn-cache-dflash').Speculation -ne 'DFlash2 K3'){
+        throw 'Profile inventory does not show effective DFlash2 depths'
     }
     [IO.File]::WriteAllText("$temporary/config.local.psd1",'@{CacheBlockTokens=1024;LmcacheChunkTokens=1536}')
     try{Get-N1xConfig -Root $temporary;throw 'Misaligned cache geometry accepted'}catch{

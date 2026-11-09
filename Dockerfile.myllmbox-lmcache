@@ -25,6 +25,9 @@ RUN python3 /tmp/n1x-patches/verify_patches.py
 COPY runtime/native/n1x_dflash_capture.py runtime/myllmbox/patch_dflash.py /opt/n1x/
 RUN python3 /opt/n1x/patch_dflash.py /usr/local/lib/python3.12/dist-packages \
     /opt/n1x/mbx-vllm-before-cache-patches.json
+COPY runtime/myllmbox/patch_qsa_ring.py /opt/n1x/
+RUN python3 /opt/n1x/patch_qsa_ring.py /usr/local/lib/python3.12/dist-packages
+LABEL n1x-ai.qsa-ring="power-of-two-v1"
 COPY runtime/lmcache/serve.py /opt/n1x/serve.py
 COPY LICENSE NOTICE.md licenses/Apache-2.0.txt /opt/n1x/licenses/
 ENTRYPOINT ["python3", "-u", "/opt/n1x/serve.py"]

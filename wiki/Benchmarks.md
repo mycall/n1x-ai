@@ -2,6 +2,8 @@
 
 This page retains measured performance and correctness evidence. Near-full comparisons appear first, followed by historical reference results with their original workloads. See [Component review](Profile-review.md) for the selected profile and top ten, [Speed and capacity benchmarks](Speed-benchmarks.md) for reusable tools, [request parameter trials](Parameter-trials.md) for the DFlash2 reasoning/temperature comparison, and [Test coverage](Test-plan.md) for unmeasured cases.
 
+The [completed best-profile speed matrix](Qwen38fn-speed-matrix.md) uses the common `vllm bench serve` benchmark at C1–C8 and 4K/8K/64K/262K, with three cold bursts per cell and fixed 512-token generation. It reports per-request read/write rates, queueing and whole-burst throughput separately. The correctness workloads below retain their original protocols.
+
 ## Matched prefill comparison
 
 Same W4 target, DFlash2 K3, standard FP32 SSM, BF16 indexer, KV11, RAM4/SSD160 and eight server slots. Only prefill batch changed 4,096 → 8,192, apart from required run identities. All points use **253,936–253,946 actual input tokens**, a **262,144 total context**, thinking/**xhigh**, and an **8,192-token output allowance including reasoning**. Each cell contains eight first attempts, all correct. Generated lengths vary; these are completed retrieval tasks, not fixed 8K output streams.

@@ -4,6 +4,10 @@ The reusable `speed` suite renders configurations by context depth in one table 
 
 Use explicit depths for nearly full 262K comparisons; the default grid also supports shorter-context applications. [Test coverage](Test-plan.md) distinguishes completed work from open questions.
 
+## Completed common-benchmark matrix
+
+See the [qwen38fn-best matrix](Qwen38fn-speed-matrix.md) for all 32 C1–C8 × 4K/8K/64K/262K cells, collected with installed `vllm bench serve`. It includes interactive charts, exact request counts and commands, three cold bursts per cell, 512-token outputs, client TTFT, queue times and aggregate throughput. The 262K window reserves 512 output tokens. This protocol remains separate from the reusable `n1x-speed-v1` suite described below.
+
 ## Preview the matrix without serving
 
 

@@ -8,7 +8,7 @@ function Get-N1xProfileList {
             Default=if($name -eq $settings.DefaultProfile){'*'}else{''}
             Runtime=if($settings.ContainsKey('Backend') -and $settings.Backend -eq 'native'){'Windows'}else{'WSLC'}
             Context=$settings.Context
-            Speculation=if($settings.DFlash){'DFlash2'}elseif($settings.Mtp){'MTP'}else{'Off'}
+            Speculation=if($settings.DFlash){"DFlash2 K$($settings.DFlashTokens)"}elseif($settings.Mtp){'MTP'}else{'Off'}
             LMCache=$settings.UseLMCache
         }
     }
@@ -37,6 +37,14 @@ function Get-N1xConfig {
     if($config.Port -lt 1 -or $config.Port -gt 65535){throw 'Port must be between 1 and 65535'}
     if($config.MaxOutputTokens -isnot [int] -or $config.MaxOutputTokens -lt 1 -or $config.MaxOutputTokens -ge $config.Context){
         throw 'MaxOutputTokens must be a positive integer smaller than Context'
+    }
+    if($config.DFlashTokens -isnot [int] -or $config.DFlashTokens -lt 1 -or $config.DFlashTokens -gt 7){
+        throw 'DFlashTokens must be an integer from 1 through 7'
+    }
+    if($config.DFlashTokens -ne 3 -and (-not $config.ContainsKey('Backend') -or $config.Backend -ne 'wslc-myllmbox')){
+        # Other backends keep their fixed recipes; discard this MyLLMBox-only
+        # override when inventory/cleanup enumerates those profiles.
+        $config.DFlashTokens=3
     }
     if($config.ContainsKey('Backend')){
         if($config.Backend -notin @('native','wslc-myllmbox')){throw 'Unknown serving backend'}

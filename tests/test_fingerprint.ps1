@@ -10,13 +10,19 @@ try {
     # Run the actual function against isolated files; no service/model commands.
     $source=$function.Extent.Text.Replace('$PSScriptRoot',("'"+$temporary.Replace("'","''")+"'"))
     . ([scriptblock]::Create($source))
-    $config=@{DefaultProfile='first';Context=262144;MyllmboxConfig='profiles/model.yaml';MyllmboxEnvironment='runtime/environment.psd1'}
+    $config=@{DefaultProfile='first';Context=262144;DFlashTokens=3;MyllmboxConfig='profiles/model.yaml';MyllmboxEnvironment='runtime/environment.psd1'}
     $myllmbox=$true
     Set-Content "$temporary/profiles/model.yaml" 'use-replayssm: true'
     Set-Content "$temporary/runtime/environment.psd1" '@{HF_HUB_OFFLINE="1"}'
     $first=Get-ConfigFingerprint
+    $config.Remove('DFlashTokens')
+    if((Get-ConfigFingerprint) -ne $first){throw 'The implicit historical K3 fingerprint changed'}
+    $config.DFlashTokens=3
     $config.DefaultProfile='another-default'
     if((Get-ConfigFingerprint) -ne $first){throw 'Default selection changed an explicitly selected profile hash'}
+    $config.DFlashTokens=5
+    if((Get-ConfigFingerprint) -eq $first){throw 'Changed draft depth retained its running fingerprint'}
+    $config.DFlashTokens=3
     Set-Content "$temporary/profiles/model.yaml" 'use-replayssm: false'
     if((Get-ConfigFingerprint) -eq $first){throw 'Changed server YAML retained its running configuration fingerprint'}
     Set-Content "$temporary/profiles/model.yaml" 'use-replayssm: true'

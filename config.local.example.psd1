@@ -4,6 +4,8 @@
     Port = 8000
     # Output allowance/cap when clients omit a smaller limit; includes reasoning.
     MaxOutputTokens = 8192
+    # Experimental MyLLMBox DFlash2 depth, 1-7; K3 is the qualified default.
+    # DFlashTokens = 3
     # Set true for local-subnet access; recreate after changing.
     LanAccess = $false
     # Optional cache budget and bounded restore admission:

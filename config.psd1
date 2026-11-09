@@ -17,6 +17,8 @@
     PleVolume = 'n1x-ple-native'
     Mtp = $false
     DFlash = $false
+    # MyLLMBox DFlash2 draft tokens; other backends retain their fixed recipes.
+    DFlashTokens = 3
     UseLMCache = $false
     LmcacheL1GiB = 8
     LmcacheL2GiB = 16
