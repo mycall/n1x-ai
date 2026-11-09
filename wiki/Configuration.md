@@ -5,29 +5,37 @@ Settings merge in this order: `config.psd1`, the selected profile in `profiles/`
 ```powershell
 @{
     ModelRoot = 'D:\Models'
-    DefaultProfile = 'qwen38fn-cache-dflash'
+    DefaultProfile = 'qwen38fn-best'
     Port = 8000
 }
 ```
 
 ## Profiles
 
-Selectable profile names include the model family prefix `qwen38fn-`; old profile names are not accepted. Update any local default and use `recreate -Profile <new-name>` for containers created before the rename. Existing container names, model data and cache volumes are preserved.
+Run `.\n1x.ps1 list profiles` to list available profiles, mark the configured default with `*`, and show each profile's effective runtime, context, speculation and LMCache settings. The list includes the built-in baseline and discovers profile files automatically; local overrides are reflected in the displayed settings. Listing does not start a server.
+
+Profile names use the model family prefix `qwen38fn-`. The table describes checked-in defaults; local overrides can change them.
 
 | Profile | Context | Speculation | LMCache | KV allocation |
 | --- | --- | --- | --- | --- |
+| qwen38fn-best (default, MyLLMBox Linux; batch8K) | 262,144 | Three DFlash2 draft tokens | On | 11 GiB FP8, BF16 draft KV |
+| qwen38fn-lmcache-4k (batch4K alternate) | 262,144 | Three DFlash2 draft tokens | On | 11 GiB FP8, BF16 draft KV |
 | qwen38fn-baseline | 32,768 | Off | Off | 4 GiB |
 | qwen38fn-mtp | 32,768 | One draft token, Triton | Off | 4 GiB |
 | qwen38fn-cache | 262,144 | Off | On | 8 GiB FP8 |
 | qwen38fn-cache-mtp | 262,144 | One draft token, Triton | On | 8 GiB FP8 |
-| qwen38fn-cache-dflash (default) | 262,144 | Three DFlash2 draft tokens | On | 8 GiB FP8 |
+| qwen38fn-cache-dflash | 262,144 | Three DFlash2 draft tokens | On | 8 GiB FP8 |
 | qwen38fn-myllmbox (native Windows, test) | 409,600 | Dynamic MTP depth 3–7, HEAD2 | Off | 12 GB FP8, BF16 draft KV |
 
-The [native Windows profile](Native-vLLM.md) uses a separately installed RTX Spark wheel and FP4 model. It defaults to localhost and supports the normal lifecycle commands plus a Windows agent-benchmark client. The WSLC setup and cleanup instructions below apply to the container profiles.
+Best and the 4K alternate use standard FP32 SSM with RecoverSSM off, a BF16 indexer, and eight server slots. See [MyLLMBox](MyLLMBox.md) for runtime prerequisites, [LMCache](LMCache.md#ssd-budget) for RAM/SSD budgets, and [Component review](Profile-review.md) for measured tradeoffs.
 
-Context includes input and output. DFlash2 allows four scheduled sequences; the other cache profiles allow up to 16, but concurrent requests share the KV pool. Output length, simultaneous prefill, vision, and host applications affect capacity. See [LMCache](LMCache.md#memory-budget) for memory controls and [Benchmarks](Benchmarks.md) for measured workloads.
+The [native Windows reference](Native-vLLM.md) has separate weights and dependencies. Container setup and cleanup instructions do not manage that external installation.
 
-MTP changes acceptance and throughput with workload. Choose the profile using representative application requests rather than assuming more draft tokens are faster.
+Context includes input and output. Concurrent clients share the KV pool and queue when resident capacity is exhausted; eight slots do not guarantee eight full-window histories fit. Output length, simultaneous prefill, vision, and host applications affect capacity.
+
+## Memory headroom
+
+`WindowsMinimumGiB` defaults to 4. Startup and monitoring check both free physical RAM and Windows commit headroom, the remaining Windows allocation allowance. The GPU partition and `KvCacheBytes` are separate settings. See [memory monitoring and partition checks](LMCache.md#memory-budget) for runtime behavior; the scripts do not change the hardware partition.
 
 ## Output allowance
 
@@ -41,22 +49,25 @@ Both native and WSLC launches pass this through vLLM's `--override-generation-co
 
 The setting must be a positive integer smaller than `Context`. Reserve room for output when constructing prompts; it does not increase the context window or force the model to generate 8,192 tokens. OpenCode/Pi registrations use the configured allowance on the next normal start, subject to the existing client-registration opt-out. Clients that explicitly send 1,024 still use 1,024. Fixed benchmark budgets are unchanged.
 
-The new setting takes effect on the next launch of a stopped native server, or after `recreate` for an existing container. Changing this setting updates the configuration fingerprint. The [budget comparison](Native-vLLM.md#code-and-explanation-budget-comparison-november-1-2026) motivated the 8K choice; it does not establish universal answer correctness.
+Apply changes with `recreate`. Fixed benchmark budgets remain independent; the [coverage table](Test-plan.md) records the outstanding matched output-budget experiment.
 
 ## Scheduling
 
-`BatchedTokens` is the scheduler's per-step token budget, not the number of sessions. DFlash2 and MTP use 4,096; their cache blocks are 1,664 and 2,048 tokens respectively. A budget of one block can serialize admission. The target-only `qwen38fn-cache` profile uses 2,048.
+`BatchedTokens` is the scheduler's per-step token budget, not the number of sessions. The reference DFlash2 and MTP cache profiles use 4,096; their cache blocks are 1,664 and 2,048 tokens respectively. A budget of one block can serialize admission. The target-only `qwen38fn-cache` profile uses 2,048. `qwen38fn-best` uses an 8,192-token batch and 4,096-token block with its separately qualified MyLLMBox runtime.
 
 Set `BatchedTokens` in `config.local.psd1` and recreate the service to apply an override. Larger budgets require memory validation. `CacheBlockTokens` and `LmcacheChunkTokens` must be compatible: the chunk size must be a positive multiple of the block size, and the runtime validates each attention group's layout. Keep the supplied per-profile values unless testing a new layout. See [agent concurrency measurements](Benchmarks.md#agent-and-restore-qualification) for the benchmark reference profile.
 
 ## Lifecycle
 
-```powershell
-.\n1x.ps1 start
-.\n1x.ps1 wait
-.\n1x.ps1 status
-.\n1x.ps1 stop
-```
+| Action | Purpose |
+| --- | --- |
+| `start` / `wait` | Launch the selected profile / wait for API readiness |
+| `status` / `logs` / `doctor` | Inspect readiness, logs, and installation diagnostics |
+| `test` | Run API smoke checks; [additional suites](Development.md#service-validation) are explicit |
+| `stop` | Stop serving and remove managed client/firewall registrations |
+| `restart` | Restart using a matching existing configuration |
+| `recreate` | Replace the selected container to apply runtime changes; preserve named volumes |
+| `start -PrintOnly` | Preview launch arguments without model files or WSLC access |
 
 Use the same profile argument across commands, or set `DefaultProfile`. Only one project profile should run at a time. Commands refuse to modify containers without the project's ownership label.
 
@@ -69,29 +80,29 @@ Existing containers retain their creation settings. After configuration changes:
 .\n1x.ps1 wait
 ```
 
-This replaces the selected container and preserves named volumes. Also recreate after rebuilding an image to use the new image. `start -PrintOnly` previews the launch without requiring downloaded models or WSLC access. `restart` reuses a matching configuration.
+Also recreate after selecting a rebuilt image or changing the HTTP model name. MyLLMBox image selection requires a matching tag and immutable ID; see [candidate selection](MyLLMBox.md#select-a-candidate). Configuration and recipe fingerprints prevent silently reusing stale settings.
 
 ## LAN access
 
-Use `n1x.ps1 start -DenyFirewall` to start without adding a firewall allowance and remove any existing N1X allowance for this checkout. The switch also works with `restart` and `recreate`. Removing an existing rule requires UAC; when no rule exists, no firewall elevation is needed. This is a per-command choice: a subsequent plain `start` enables the allowance again. It does not change the container's listening address or override other firewall rules; use `LanAccess = $false` and recreate for localhost-only serving.
+Best defaults to localhost. Set `LanAccess = $true` in `config.local.psd1` and recreate to publish on all IPv4 interfaces. Startup adds a Windows Firewall rule for the configured port, restricted to `LocalSubnet` across all network profiles, including Public Wi-Fi. The API has no authentication.
 
-`start` and `restart` publish the API on all IPv4 interfaces and add a Windows Firewall rule for the configured TCP port (8000 by default), restricted to `LocalSubnet`. The rule applies to all Windows network profiles, including Public Wi-Fi. Other computers on that subnet can use `http://<Windows-LAN-IP>:8000/v1`, model `qwen`, after the API is ready. The API has no authentication; computers on the allowed subnet can submit requests.
+Use `Get-NetIPConfiguration` to find the host's LAN IPv4 address. From another computer, check `http://<Windows-LAN-IP>:8000/health`, then use the `/v1` API. Substitute the configured port. Router policy and Wi-Fi isolation can still block access; LMCache's internal ports are not published.
 
-`stop`, online `clean`, and `uninstall` remove this checkout's rule. Firewall changes request Windows UAC elevation separately; keep running the main commands from your normal terminal so WSLC uses the same session. A failed or cancelled firewall update is reported as an error, even if the container started successfully. Other applications' firewall rules are not changed. This does not configure router forwarding or guarantee access through organizational firewall policy or Wi-Fi client isolation.
+`start -DenyFirewall` removes this checkout's allowance without changing the listening address; it also works with `restart` and `recreate`. A later plain start follows `LanAccess` again. For persistent localhost-only serving, set `LanAccess = $false` and recreate.
 
-Existing localhost-only containers need `n1x.ps1 recreate` once to apply the new binding. Set `LanAccess = $false` in `config.local.psd1` and recreate to keep serving only on localhost. Client registrations continue to use localhost on this computer. From another LAN computer, verify with `Invoke-RestMethod http://<Windows-LAN-IP>:8000/health`; after stop the connection should fail.
-
-Find the serving computer's LAN address with `Get-NetIPConfiguration` and use the IPv4 address on its connected Ethernet or Wi-Fi adapter. Substitute your configured port if it differs from 8000. Only the model API is exposed; these commands do not publish LMCache's internal ports. Closing N1X's rule does not remove allowances created by other software.
+`stop`, online `clean`, and `uninstall` remove the managed rule. Firewall changes request UAC separately; keep the main command in your normal terminal so WSLC uses the same session. Failed or cancelled elevation is reported even if serving started. Other applications' firewall rules remain unchanged. Local client registrations always use localhost.
 
 ## Agent clients
 
 ### REST reasoning control
 
+The API base URL is `http://127.0.0.1:8000/v1` by default. Its client-facing model ID is `qwen/qwen38fn-best`. Reference profiles use the same alias when explicitly launched. Containers created with the former `qwen` alias require `recreate`; reload clients after registration refreshes.
+
 For `POST /v1/chat/completions`, choose reasoning effort per request:
 
 ```json
 {
-  "model": "qwen",
+  "model": "qwen/qwen38fn-best",
   "messages": [{"role": "user", "content": "Explain this code."}],
   "max_tokens": 8192,
   "chat_template_kwargs": {
@@ -109,49 +120,37 @@ Successful `start` and `restart` register the local model for clients whose user
 
 | Client | User configuration | Select the local model |
 | --- | --- | --- |
-| OpenCode 2 | `~/.config/opencode/opencode.jsonc` when present, otherwise `opencode.json`; provider `n1x` | Reload/reopen OpenCode, then select `n1x/qwen` in `/models` |
+| OpenCode 2 | `~/.config/opencode/opencode.jsonc` when present, otherwise `opencode.json`; provider `n1x` | Reload/reopen OpenCode, then select `n1x/qwen/qwen38fn-best` in `/models` |
 | Codex 0.134+ | `~/.codex/n1x.config.toml` | `codex --profile n1x` |
-| Pi | `~/.pi/agent/models.json`, provider `n1x` | Open `/model`, or `pi --provider n1x --model qwen` |
+| Pi | `~/.pi/agent/models.json`, provider `n1x` | Open `/model`, or `pi --provider n1x --model qwen/qwen38fn-best` |
 
 The entries follow the active port and context limit. OpenCode and Pi advertise image input and reasoning, with thinking enabled and an 8,192-token output cap (less for small contexts). Codex uses the Responses API and a compaction threshold at 85% of context. Configuration registration does not establish end-to-end client/tool compatibility; Codex specifically requires the server's `/v1/responses` support.
 
-`XDG_CONFIG_HOME`, `CODEX_HOME`, and `PI_CODING_AGENT_DIR` override the corresponding user locations. Set `$env:N1X_CLIENT_CONFIG='off'` to disable automatic changes. OpenCode JSONC is patched with a managed provider block: comments, formatting, trailing commas, and unrelated settings are preserved. Stop removes that block. Invalid configuration, name collisions, or manually edited N1X entries are preserved with a warning. Ownership sidecars stay alongside the client configs so repository cleanup cannot lose them. Existing sessions may need a client reload after start/stop; the service must be ready before sending requests. Select `n1x/qwen` for the explicit reasoning and vision metadata; OpenCode's auto-discovered `vLLM/qwen` entry is separate.
+`XDG_CONFIG_HOME`, `CODEX_HOME`, and `PI_CODING_AGENT_DIR` override the corresponding user locations. Set `$env:N1X_CLIENT_CONFIG='off'` to disable automatic changes. OpenCode JSONC is patched with a managed provider block: comments, formatting, trailing commas, and unrelated settings are preserved. Stop removes that block. Invalid configuration, name collisions, or manually edited N1X entries are preserved with a warning. Ownership sidecars stay alongside the client configs so repository cleanup cannot lose them. Existing sessions may need a client reload after start/stop; the service must be ready before sending requests. Select `n1x/qwen/qwen38fn-best` for the explicit reasoning and vision metadata; OpenCode's auto-discovered `vLLM/qwen/qwen38fn-best` entry is separate.
 
 Install and launch a client once to create its user configuration directory, then run `n1x.ps1 start` again to register it; an already-running matching container is reused. These are configuration entries, not executable patches or client installations. Configuration is updated only on this Windows user account; configure clients on other computers with the LAN endpoint separately.
 
-OpenCode defaults to medium reasoning for `n1x/qwen`. Its `medium` variant and the backward-compatible `thinking` variant both send `chat_template_kwargs = {enable_thinking: true, reasoning_effort: "medium"}`. Desktop may still display "No reasoning" because of its [v2 model tooltip bug](https://github.com/anomalyco/opencode/issues/50257). The label does not establish whether the model is reasoning; check the response's reasoning field. This limitation affects the desktop display even when the CLI and service load the correct request settings.
+OpenCode defaults to medium reasoning for `n1x/qwen/qwen38fn-best`. Its `medium` variant and the backward-compatible `thinking` variant both send `chat_template_kwargs = {enable_thinking: true, reasoning_effort: "medium"}`. Desktop may still display "No reasoning" because of its [v2 model tooltip bug](https://github.com/anomalyco/opencode/issues/50257). The label does not establish whether the model is reasoning; check the response's reasoning field. This limitation affects the desktop display even when the CLI and service load the correct request settings.
 
 The opt-out affects both registration and removal. To remove existing managed entries before opting out, run `n1x.ps1 stop` first. To re-enable automatic updates in the current terminal, run `Remove-Item Env:N1X_CLIENT_CONFIG`. Keep each `*.n1x-managed.json` sidecar so stop can identify its own entries safely.
 
 ## DFlash2
 
-The default `qwen38fn-cache-dflash` profile uses the DFlash2 drafter with three draft tokens, 262,144-token context, four sequence slots, and an 8 GiB FP8 KV pool. Sliding-attention KV stays BF16; the compressed indexer uses FP8. Matching 1,664-token cache blocks and LMCache chunks reduce Mamba page padding to 0.48%. Its LMCache namespace includes the speculative method, indexer precision, and cache geometry to separate incompatible entries. `qwen38fn-cache-mtp` remains available as an alternative; see [qualification results](Benchmarks.md#dflash2-comparison).
-
-At this context limit, vLLM reports approximately 520K tokens of capacity (1.99 maximum-length requests). This is a scheduler estimate, not a guarantee of two simultaneous 262K sessions. Capacity depends on context length because sliding-attention and recurrent-state overhead are included. Four sequence slots do not imply four maximum-length contexts fit together.
-
-Both DFlash2 and MTP pass the synthetic multi-turn agent check with thinking enabled and fail it with thinking disabled; see [agent qualification](Benchmarks.md#agent-and-restore-qualification). DFlash2 at concurrency 4 has the highest measured correct-work throughput in that check. Validate your application's tasks; this narrow qualification does not establish general agent reliability.
-
-```powershell
-# Setup already prepares DFlash2. To switch an existing MTP service:
-.\n1x.ps1 stop -Profile qwen38fn-cache-mtp
-.\n1x.ps1 start -Profile qwen38fn-cache-dflash
-.\n1x.ps1 wait -Profile qwen38fn-cache-dflash -TimeoutSeconds 1800
-.\n1x.ps1 test -Profile qwen38fn-cache-dflash
-```
-
-The first start compiles additional FlashInfer kernels. Use `-Profile qwen38fn-cache-dflash` for lifecycle commands when selecting it explicitly. Stop it before returning to `qwen38fn-cache-mtp`.
+DFlash2 uses a separate drafter; MTP uses the target's indexed extra tensors. See [Model assets](Model-assets.md) for their exact dependencies. Best and the reference DFlash2 profile use three draft tokens, but differ in indexer precision, cache geometry, and runtime. Keep those per-profile settings together. The first launch may compile additional FlashInfer kernels. See [historical DFlash2/MTP results](Benchmarks.md#dflash2-comparison) before drawing performance conclusions.
 
 ## Storage
 
 - Main weights: read-only mount from ModelRoot.
 - Native PLE volume: verified copy created by `prepare-native-ple.ps1`.
-- Runtime cache volume: compilation and library caches.
+- Runtime cache volume: compilation and library caches; MyLLMBox also stores its prepared PLE map here.
 - LMCache volume: local SSD cache, separated by runtime/model and speculative method.
 - `.state/`: ignored current host-memory snapshot, monitor identity, and local test output.
 
 Named volumes survive stop and recreate. The [SSD cache budget](LMCache.md#ssd-budget) bounds stored KV files; model weights, images, and compilation caches are separate. Cache reuse across engine restarts is not guaranteed by this project.
 
 ## Cleanup and disk reclamation
+
+Use the [model-file inventory](Model-assets.md) to distinguish required weights and prepared PLE from regenerable KV data. Review consumers before removing assets manually, and retain [benchmark evidence](Benchmarks.md#retained-evidence) before cleaning local results. Logical file sizes do not establish physical space recoverable from shared layers or virtual disks.
 
 ```powershell
 .\n1x.ps1 clean -PrintOnly
@@ -161,10 +160,12 @@ Named volumes survive stop and recreate. The [SSD cache budget](LMCache.md#ssd-b
 
 | Command | Removes | Preserves |
 | --- | --- | --- |
-| `clean` | Stopped project containers, obsolete project images, kernel/KV/test cache volumes, ignored build sources, environments, logs and raw test results | Models (including `.cache`), settings, current runtime/build/benchmark images, native PLE, tracked and ordinary untracked files |
+| `clean` | Stopped project containers, obsolete project images, disposable kernel/KV/test cache volumes, ignored build sources, environments, logs and raw test results | Models (including `.cache`), settings, current runtime/build/benchmark images, native PLE, MyLLMBox prepared PLE and configured LMCache volumes, tracked and ordinary untracked files |
 | `uninstall` | Project containers (stopping them first), project images and volumes including native PLE, and the same ignored files | Models, settings, repository source, unrelated/shared resources |
 
-`clean` keeps what is needed to start offline; it does not require large downloads afterward. The next start recreates empty caches and recompiles kernels, so it can be slower and previous warm KV entries are lost. Stop all project profiles first. `uninstall` requires setup before serving again and may need large downloads/builds. Preview either command with `-PrintOnly`.
+`clean` preserves the selected prepared installation, including best's LMCache volume; it does not discard that volume's warm entries. Removed disposable caches regenerate on later use. It cannot restore prerequisites already removed separately. `uninstall` removes runtime assets and requires preparation before serving again. Preview either command with `-PrintOnly`.
+
+Best's LMCache volume can be retired separately while the service is stopped. Run `n1x.ps1 setup -Profile qwen38fn-best` to create it empty before the next start. Model weights and prepared PLE are still required. Retire obsolete trial volumes explicitly: their independent budgets can accumulate, and normal cleanup is not a global prune.
 
 Export raw results you want to keep before cleaning. Resource removal is scoped to project labels, legacy `n1x-*` containers using project images, configured cache volumes, and the `n1x-ai` image repositories. Resources referenced by unrelated containers are preserved. No global image, volume, or build-cache prune is performed. Repository cleanup refuses linked paths and preserves local configuration. Normal cleanup removes stale `.state` files and empty generated directory trees, including `.build` and `results`. Offline `clean -VhdPath` preserves `.state` so an active compaction log is not deleted.
 

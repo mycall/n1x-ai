@@ -60,7 +60,7 @@ def vllm(args):
                      "cache_salt": f"{args.run_id}-vllm-{length}-{concurrency}"}
             command(["vllm", "bench", "serve", "--base-url", args.url,
                      "--backend", "openai-chat", "--endpoint", "/v1/chat/completions",
-                     "--model", "qwen", "--tokenizer", "/model", "--dataset-name", "random",
+                     "--model", "qwen/qwen38fn-best", "--tokenizer", "/model", "--dataset-name", "random",
                      "--random-input-len", length, "--random-output-len", args.output_tokens,
                      "--random-range-ratio", "0", "--num-prompts", args.requests,
                      "--max-concurrency", concurrency, "--seed", args.seed,
@@ -101,7 +101,7 @@ def aiperf(args):
         path.write_text("".join(json.dumps(row) + "\n" for row in dataset))
         save(directory / "expected.json", expected)
         snapshot(args, directory, "before")
-        command(["/opt/aiperf/bin/aiperf", "profile", "--model", "qwen",
+        command(["/opt/aiperf/bin/aiperf", "profile", "--model", "qwen/qwen38fn-best",
                  "--tokenizer", "/model", "--url", args.url, "--endpoint-type", "chat",
                  "--endpoint", "/v1/chat/completions", "--streaming",
                  "--input-file", path, "--custom-dataset-type", "multi_turn",
@@ -181,7 +181,7 @@ def ruler(args):
             snapshot(args, directory, "before")
             results = []
             for row in rows:
-                body = {"model": "qwen", "messages": [{"role": "user", "content": row["input"]}],
+                body = {"model": "qwen/qwen38fn-best", "messages": [{"role": "user", "content": row["input"]}],
                         "temperature": 0, "max_tokens": output_limit, "chat_template_kwargs": {"enable_thinking": args.thinking},
                         "cache_salt": f"{args.run_id}-{task}-{length}-{row['index']}"}
                 count = json.loads(request(args.url + "/tokenize", {k: v for k, v in body.items()

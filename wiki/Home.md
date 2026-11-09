@@ -1,14 +1,31 @@
 # n1x-ai documentation
 
-Serve Qwen3.8 Flash Next locally on Windows ARM64 using NVIDIA N1X and WSLC.
+Use this guide to install, operate, evaluate, and maintain the local model server. For an overview and first launch, start with the [README](../README.md).
 
-- [Installation](Installation.md): prerequisites, downloads, and setup.
-- [Configuration](Configuration.md): profiles, paths, lifecycle commands, [LAN access](Configuration.md#lan-access), and [agent clients](Configuration.md#agent-clients).
-- [Native Windows vLLM](Native-vLLM.md): experimental `qwen38fn-myllmbox` profile and matched agent comparison.
-- [Remaining work and test matrix](Test-plan.md): deferred rerun, read/write measurement, output-budget study and hybrid integration plan.
-- [LMCache](LMCache.md): cache tiers, memory budgets, and privacy settings.
-- [Benchmarks](Benchmarks.md): thinking-enabled DFlash2 agent throughput, MTP comparison, and cache qualification.
-- [Troubleshooting](Troubleshooting.md): startup, memory, and response checks.
-- [Development](Development.md): builds, tests, and runtime maintenance.
+## Setup and operation
 
-Start with the [README quick start](../README.md#quick-start). These pages are the source for the GitHub wiki.
+| Task | Guide |
+| --- | --- |
+| Check requirements and choose an installation path | [Installation](Installation.md) |
+| Select profiles, change settings, connect clients, or manage storage | [Configuration](Configuration.md) |
+| Identify every model file and volume needed by best and the top ten | [Model assets](Model-assets.md) |
+| Diagnose startup, memory, or connection problems | [Troubleshooting](Troubleshooting.md) |
+| Integrate an application or agent harness | [API guidance](../AGENTS.md) |
+
+## Runtime maintenance
+
+| Task | Guide |
+| --- | --- |
+| Inspect or rebuild the selected runtime; plan dependency upgrades | [MyLLMBox Linux](MyLLMBox.md) |
+| Understand cache budgets, eviction, and restore behavior | [LMCache](LMCache.md) |
+| Work with the separate Windows reference runtime | [Native vLLM](Native-vLLM.md) |
+| Change code, validate patches, or run local checks | [Development](Development.md) |
+
+## Evaluation
+
+| Task | Guide |
+| --- | --- |
+| Understand the selected profile and ranked alternatives | [Component review and top ten](Profile-review.md) |
+| Inspect measured results and retained evidence | [Benchmarks](Benchmarks.md) |
+| Plan or run speed/depth and near-full quality comparisons | [Speed and capacity benchmarks](Speed-benchmarks.md) |
+| See measured coverage and remaining gaps | [Test coverage](Test-plan.md) |

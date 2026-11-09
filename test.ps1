@@ -25,7 +25,7 @@ function Post-Json([string]$Path, $Body) {
     Invoke-RestMethod "$base$Path" -Method Post -ContentType 'application/json; charset=utf-8' -Body $utf8.GetBytes($json) -TimeoutSec 3600
 }
 function Chat($Messages, $Extra = @{}) {
-    $body = @{model='qwen'; messages=@($Messages); temperature=0; max_tokens=256; chat_template_kwargs=@{enable_thinking=$false}}
+    $body = @{model='qwen/qwen38fn-best'; messages=@($Messages); temperature=0; max_tokens=256; chat_template_kwargs=@{enable_thinking=$false}}
     if($CacheSalt){$body.cache_salt=$CacheSalt}
     foreach ($key in $Extra.Keys) { $body[$key] = $Extra[$key] }
     Post-Json '/v1/chat/completions' $body
@@ -52,7 +52,7 @@ function Run-Check([string]$Name, [scriptblock]$Check) {
 
 if ($Suite -in @('features','all')) {
     Run-Check 'streaming' {
-        $body = @{model='qwen'; messages=@(@{role='user'; content='Reply with exactly STREAM-OK and nothing else.'}); max_tokens=64; temperature=0; stream=$true; chat_template_kwargs=@{enable_thinking=$false}}
+        $body = @{model='qwen/qwen38fn-best'; messages=@(@{role='user'; content='Reply with exactly STREAM-OK and nothing else.'}); max_tokens=64; temperature=0; stream=$true; chat_template_kwargs=@{enable_thinking=$false}}
         $response = Invoke-WebRequest "$base/v1/chat/completions" -UseBasicParsing -Method Post -ContentType 'application/json; charset=utf-8' -Body $utf8.GetBytes(($body | ConvertTo-Json -Depth 10 -Compress)) -TimeoutSec 600
         $events = @($response.Content -split '\r?\n' | Where-Object { $_.StartsWith('data: ') })
         Assert-True ($events -contains 'data: [DONE]') 'Missing SSE completion marker'
@@ -82,7 +82,8 @@ if ($Suite -in @('features','all')) {
     Run-Check 'tool_round_trip' {
         $tools = @(@{type='function'; function=@{name='lookup_inventory'; description='Get the current inventory count for a product SKU.'; parameters=@{type='object'; properties=@{sku=@{type='string'}}; required=@('sku'); additionalProperties=$false}}})
         $messages = @(@{role='user'; content='Use lookup_inventory to look up product SKU AX-42. Do not guess the inventory. After the tool replies, report only the inventory count.'})
-        $first = Chat $messages @{tools=$tools; tool_choice='auto'}
+        # Tool workflows use the documented thinking-on/1024-token contract.
+        $first = Chat $messages @{tools=$tools; tool_choice='auto'; max_tokens=1024; chat_template_kwargs=@{enable_thinking=$true}}
         Write-JsonFile $first "$ResultName-tool-call.json"
         $assistant = $first.choices[0].message
         Assert-True ($assistant.tool_calls.Count -eq 1) 'Expected exactly one tool call'
@@ -90,13 +91,17 @@ if ($Suite -in @('features','all')) {
         Assert-True ($call.function.name -eq 'lookup_inventory') 'Incorrect tool name'
         $arguments = $call.function.arguments | ConvertFrom-Json
         Assert-True ($arguments.sku -eq 'AX-42') 'Incorrect tool arguments'
-        $messages += @{role='assistant'; content=$assistant.content; tool_calls=@($call)}
+        $continuation=@{role='assistant'; content=$assistant.content; tool_calls=@($call)}
+        foreach($field in @('reasoning','reasoning_content')){
+            if($assistant.PSObject.Properties[$field]){$continuation[$field]=$assistant.$field}
+        }
+        $messages += $continuation
         $messages += @{role='tool'; tool_call_id=$call.id; content='{"sku":"AX-42","count":23}'}
-        $second = Chat $messages @{tools=$tools; tool_choice='none'}
+        $second = Chat $messages @{tools=$tools; tool_choice='none'; max_tokens=1024; chat_template_kwargs=@{enable_thinking=$true}}
         Write-JsonFile $second "$ResultName-tool-result.json"
         Assert-True ($second.choices[0].finish_reason -eq 'stop') 'Tool-result answer did not finish normally'
         Assert-True ($second.choices[0].message.content.Trim() -match '^23[.!]?$') 'Incorrect tool-result answer'
-        @{tool=$call.function.name; arguments=$arguments; answer=$second.choices[0].message.content}
+        @{tool=$call.function.name; arguments=$arguments; answer=$second.choices[0].message.content; thinking=$true; max_output_tokens=1024}
     }
     Run-Check 'reasoning' {
         $reply = Chat @(@{role='user'; content='A box has 9 rows of 7 marbles. Think through the calculation, then give the total as a number.'}) @{max_tokens=512; chat_template_kwargs=@{enable_thinking=$true}}
@@ -158,7 +163,7 @@ if ($Suite -in @('context','all')) {
                 $lines[[int]($lineCount * 0.5)] = 'SPECIAL RECORD: The maple access code is MAPLE-9264.'
                 $lines[[int]($lineCount * 0.9)] = 'SPECIAL RECORD: The birch access code is BIRCH-1748.'
                 $text = "Read this archive and answer the question at its end.`n" + ($lines -join "`n") + "`nQuestion: Return the cedar, maple, and birch access codes, in that order, and nothing else."
-                $tokenized = Post-Json '/tokenize' @{model='qwen'; messages=@(@{role='user'; content=$text}); chat_template_kwargs=@{enable_thinking=$false}}
+                $tokenized = Post-Json '/tokenize' @{model='qwen/qwen38fn-best'; messages=@(@{role='user'; content=$text}); chat_template_kwargs=@{enable_thinking=$false}}
                 $tokenCount = $tokenized.count
                 if ($tokenCount -le $target -and $tokenCount -ge $target * 0.95) { break }
                 $lineCount = [math]::Max(10, [int]($lineCount * ($target - 128) / $tokenCount))

@@ -19,7 +19,7 @@ try {
     $overrideArguments=Get-N1xNativeArguments $config $paths
     if(($overrideArguments[$generationIndex+1]|ConvertFrom-Json).max_new_tokens -ne 4096){throw 'Native output allowance override ignored'}
     $config.MaxOutputTokens=8192
-    foreach($required in @('qwen','Qwen/Qwen3.8-Flash-Next','8123','127.0.0.1','409600','12000000000')){
+    foreach($required in @('qwen/qwen38fn-best','Qwen/Qwen3.8-Flash-Next','8123','127.0.0.1','409600','12000000000')){
         if($arguments -notcontains $required){throw "Missing native argument: $required"}
     }
     if($paths.Model -notlike '*model files*FP4-Local'){throw 'Native model path ignored'}

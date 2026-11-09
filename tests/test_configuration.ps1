@@ -8,9 +8,13 @@ try {
     Copy-Item "$root/config.psd1" "$temporary/config.psd1"
     Copy-Item "$root/profiles/qwen38fn-cache-mtp.psd1" "$temporary/profiles/qwen38fn-cache-mtp.psd1"
     Copy-Item "$root/profiles/qwen38fn-cache-dflash.psd1" "$temporary/profiles/qwen38fn-cache-dflash.psd1"
+    Copy-Item "$root/profiles/qwen38fn-best.psd1" "$temporary/profiles/qwen38fn-best.psd1"
     $config=Get-N1xConfig -Root $temporary
     if($config.MaxOutputTokens -ne 8192){throw 'Default output allowance must be 8192'}
-    if(-not $config.DFlash -or -not $config.UseLMCache -or $config.Mtp){throw 'Default profile must use DFlash2 and LMCache'}
+    if($config.Profile -ne 'qwen38fn-best' -or -not $config.DFlash -or -not $config.UseLMCache -or $config.Mtp){throw 'Selected default must use the promoted LMCache DFlash2 best profile'}
+    if($config.Backend -ne 'wslc-myllmbox' -or $config.Context -ne 262144 -or $config.RequiredPartitionMiB -ne 90112 -or $config.KvCacheBytes -ne '11811160064'){throw 'Selected default differs from the near-full qualified configuration'}
+    $reference=Get-N1xConfig -Root $temporary -Profile qwen38fn-cache-dflash
+    if(-not $reference.DFlash -or -not $reference.UseLMCache -or $reference.Mtp){throw 'Original cache-DFlash reference must remain selectable'}
     foreach($oldName in @('baseline','mtp','cache','cache-mtp','cache-dflash','qwen38fn-devjeonghwan')){
         try {Get-N1xConfig -Root $root -Profile $oldName;throw "Old name accepted: $oldName"}
         catch {if($_.Exception.Message -ne "Unknown profile: $oldName"){throw}}

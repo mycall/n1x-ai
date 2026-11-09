@@ -3,6 +3,7 @@ import argparse
 import base64
 from concurrent.futures import ThreadPoolExecutor
 import json
+import math
 from pathlib import Path
 import re
 import threading
@@ -10,6 +11,10 @@ import time
 import urllib.error
 import urllib.request
 import uuid
+try:
+    from benchmarks.timing import phase_timing
+except ModuleNotFoundError:
+    from timing import phase_timing
 
 
 def request(url, body=None):
@@ -20,7 +25,52 @@ def request(url, body=None):
 
 
 def save(path, value):
-    path.write_text(json.dumps(value, indent=2) + '\n')
+    path.write_text(json.dumps(value, indent=2) + '\n', encoding='utf-8')
+
+
+RESTORE_COUNTERS = (
+    'vllm:prefix_cache_hits_total', 'vllm:external_prefix_cache_hits_total',
+    'vllm:num_preemptions_total', 'lmcache_mp_num_finished_retrieves_total',
+    'lmcache_mp_l2_prefetch_load_completed_chunks_total',
+)
+# The pinned OTel exporter emits these counters only after their first event.
+# A new after-sample can establish that event; an absent after-sample cannot.
+LAZY_RESTORE_COUNTERS = frozenset(RESTORE_COUNTERS[3:])
+
+
+def required_counter_deltas(before, after, keys, *, allow_initially_absent=()):
+    allowed = frozenset(allow_initially_absent)
+    if not allowed <= LAZY_RESTORE_COUNTERS or not allowed <= set(keys):
+        raise ValueError('Only reviewed lazy restore counters may start absent')
+    missing = [key for key in keys if key not in after or key not in before and key not in allowed]
+    if missing:
+        raise RuntimeError('Required restore counters missing: ' + ', '.join(missing))
+    delta = {}
+    for key in keys:
+        first, last = before.get(key, 0), after[key]
+        if not math.isfinite(first) or not math.isfinite(last) or first < 0 or last < first:
+            raise RuntimeError('Restore counters reset or contain invalid values')
+        delta[key] = last - first
+    return delta
+
+
+def restore_summary(before, after, tokens, results, elapsed):
+    row = dict(prompt_tokens_each=tokens, correct=sum(results), elapsed_s=elapsed,
+               qualified=False, initially_absent_counters=[
+                   key for key in RESTORE_COUNTERS if key not in before])
+    try:
+        delta = required_counter_deltas(before, after, RESTORE_COUNTERS,
+                                       allow_initially_absent=LAZY_RESTORE_COUNTERS)
+    except RuntimeError as error:
+        row.update(error=str(error), delta=None)
+        return row
+    row['delta'] = delta
+    row['qualified'] = bool(all(results) and len(results) == 2
+                            and delta[RESTORE_COUNTERS[0]] == 0
+                            and delta[RESTORE_COUNTERS[1]] > 2 * (tokens - 4096)
+                            and delta[RESTORE_COUNTERS[3]] >= 2
+                            and delta[RESTORE_COUNTERS[4]] > 0)
+    return row
 
 
 class Probe:
@@ -33,7 +83,7 @@ class Probe:
         self.lock = threading.Lock()
 
     def chat(self, messages, salt, **extra):
-        body = dict(model='qwen', messages=messages, temperature=0, max_tokens=128,
+        body = dict(model='qwen/qwen38fn-best', messages=messages, temperature=0, max_tokens=128,
                     cache_salt=salt, chat_template_kwargs={'enable_thinking': False})
         body.update(extra)
         start = time.monotonic()
@@ -49,12 +99,14 @@ class Probe:
                 finally:
                     error.close()
             with self.lock:
-                with (self.out / 'errors.jsonl').open('a') as file:
+                with (self.out / 'errors.jsonl').open('a', encoding='utf-8') as file:
                     file.write(json.dumps(failure)+'\n')
             raise
+        elapsed = time.monotonic()-start
+        timing = phase_timing(response.get('usage'), response.get('metrics'), elapsed)
         with self.lock:
-            with (self.out / 'responses.jsonl').open('a') as file:
-                file.write(json.dumps(dict(salt=salt, started_unix_s=started_unix_s, elapsed_s=time.monotonic()-start, request=body, response=response))+'\n')
+            with (self.out / 'responses.jsonl').open('a', encoding='utf-8') as file:
+                file.write(json.dumps(dict(salt=salt, started_unix_s=started_unix_s, elapsed_s=elapsed, timing=timing, request=body, response=response))+'\n')
         return response['choices'][0]
 
     def snapshot(self, name):
@@ -64,7 +116,7 @@ class Probe:
             services.append(('lmcache', 'http://127.0.0.1:8080/metrics'))
         for service, url in services:
             raw = request(url)
-            (self.out / f'{name}-{service}.prom').write_text(raw)
+            (self.out / f'{name}-{service}.prom').write_text(raw, encoding='utf-8')
             for line in raw.splitlines():
                 match = re.match(r'^([^#\s{]+)(?:\{.*\})?\s+([\d.eE+-]+)$', line)
                 if match:
@@ -80,7 +132,7 @@ class Probe:
                 lines[int(count*position)] = f'SPECIAL RECORD: The {tree} access code is {code}.'
             text = 'Read this archive and answer the question at its end.\n'+'\n'.join(lines)+'\nQuestion: Return the cedar, maple, and birch access codes, in that order, and nothing else.'
             messages = [dict(role='user', content=text)]
-            tokens = json.loads(request(self.args.url+'/tokenize', dict(model='qwen', messages=messages, chat_template_kwargs={'enable_thinking':False})))['count']
+            tokens = json.loads(request(self.args.url+'/tokenize', dict(model='qwen/qwen38fn-best', messages=messages, chat_template_kwargs={'enable_thinking':False})))['count']
             if target*.95 <= tokens <= target:
                 return messages, tokens
             count = max(10, round(count*(target-128)/tokens))
@@ -168,13 +220,10 @@ class Probe:
         with ThreadPoolExecutor(max_workers=2) as pool:
             results=list(pool.map(lambda salt:self.retrieve(messages,salt),salts))
         after=self.snapshot('restore-after')
-        keys=['vllm:prefix_cache_hits_total','vllm:external_prefix_cache_hits_total','vllm:num_preemptions_total','lmcache_mp_num_finished_retrieves_total','lmcache_mp_l2_prefetch_load_completed_chunks_total']
-        delta={key:after.get(key,0)-before.get(key,0) for key in keys}
-        qualified=all(results) and delta[keys[0]]==0 and delta[keys[1]]>2*(tokens-4096) and delta[keys[3]]>=2 and delta[keys[4]]>0
-        row=dict(prompt_tokens_each=tokens,correct=len(results),elapsed_s=time.monotonic()-start,qualified=qualified,delta=delta)
+        row=restore_summary(before, after, tokens, results, time.monotonic()-start)
         save(self.out/'summary.json',row)
         print(json.dumps(row),flush=True)
-        if not qualified:
+        if not row['qualified']:
             raise RuntimeError('Simultaneous external restores not established; inspect counters')
 
     def soak(self):

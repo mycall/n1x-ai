@@ -21,7 +21,7 @@ try {
     $changedDefault=& "$temporary/n1x.ps1" start -Profile qwen38fn-cache-mtp -ModelRoot $modelRoot -PrintOnly
     $changedFingerprint=[regex]::Match($changedDefault,'n1x-ai.config-sha=([0-9a-f]{64})').Groups[1].Value
     if($changedFingerprint -ne $fingerprint){throw 'Changing only the default selection invalidated an explicit profile'}
-    $recoveryState=[pscustomobject]@{exitCode=1; fingerprint=$fingerprint; exists=$true; imageExists=$true; calls=[Collections.Generic.List[string]]::new()}
+    $recoveryState=[pscustomobject]@{exitCode=1; fingerprint=$fingerprint; exists=$true; imageExists=$true; freeCommitGiB=32; calls=[Collections.Generic.List[string]]::new()}
     function wslc {
         param([Parameter(ValueFromRemainingArguments=$true)][string[]]$Arguments)
         $global:LASTEXITCODE=0
@@ -46,7 +46,7 @@ try {
     }
     function Get-CimInstance {
         param($ClassName,$Filter)
-        if($ClassName -eq 'Win32_OperatingSystem'){[pscustomobject]@{FreePhysicalMemory=16*1MB}}
+        if($ClassName -eq 'Win32_OperatingSystem'){[pscustomobject]@{FreePhysicalMemory=16*1MB;FreeVirtualMemory=$recoveryState.freeCommitGiB*1MB}}
     }
     function Start-Process {
         param($FilePath,$WindowStyle,$ArgumentList,[switch]$PassThru)
@@ -73,6 +73,14 @@ try {
     & "$temporary/n1x.ps1" start -Profile qwen38fn-cache-mtp -ModelRoot $modelRoot | Out-Null
     if((Get-Content "$temporary/firewall-mode.txt") -ne 'False'){throw 'Plain start should enable the firewall allowance'}
     if($recoveryState.calls -notcontains 'start n1x-qwen38-cache-mtp' -or @($recoveryState.calls|Where-Object {$_ -like 'rm *'}).Count){throw 'Cleanly stopped container should be reused'}
+    $recoveryState.freeCommitGiB=.5
+    $recoveryState.calls.Clear()
+    try{
+        & "$temporary/n1x.ps1" start -Profile qwen38fn-cache-mtp -ModelRoot $modelRoot | Out-Null
+        throw 'Low commit headroom accepted despite free physical RAM'
+    }catch{if($_.Exception.Message -ne 'Insufficient Windows commit headroom'){throw}}
+    if($recoveryState.calls -contains 'monitor-start' -or $recoveryState.calls -contains 'start n1x-qwen38-cache-mtp'){throw 'Low commit headroom launched serving'}
+    $recoveryState.freeCommitGiB=32
     . "$root/scripts/config.ps1"
     $legacyConfig=Get-N1xConfig -Root $temporary -Profile qwen38fn-cache-mtp -ModelRoot $modelRoot
     $legacyCanonical=[ordered]@{}
@@ -81,11 +89,19 @@ try {
     try {$fingerprint=([BitConverter]::ToString($sha.ComputeHash([Text.Encoding]::UTF8.GetBytes(($legacyCanonical|ConvertTo-Json -Compress))))).Replace('-','').ToLowerInvariant()}
     finally {$sha.Dispose()}
     $recoveryState.fingerprint=$fingerprint
-    & "$temporary/n1x.ps1" start -Profile qwen38fn-cache-mtp -ModelRoot $modelRoot | Out-Null
+    try {
+        & "$temporary/n1x.ps1" start -Profile qwen38fn-cache-mtp -ModelRoot $modelRoot | Out-Null
+        throw 'Container with the retired model alias was reused'
+    } catch {if($_.Exception.Message -notlike 'Container settings differ.*'){throw}}
+    $recoveryState.fingerprint=$changedFingerprint
     Set-Content "$temporary/config.local.psd1" "@{DefaultProfile='qwen38fn-baseline';Port=8005}"
     try {
         & "$temporary/n1x.ps1" start -Profile qwen38fn-cache-mtp -ModelRoot $modelRoot | Out-Null
         throw 'Changed runtime settings accepted'
+    } catch {if($_.Exception.Message -notlike 'Container settings differ.*'){throw}}
+    try {
+        & "$temporary/n1x.ps1" wait -Profile qwen38fn-cache-mtp -ModelRoot $modelRoot -TimeoutSeconds 1
+        throw 'Wait accepted a stale serving configuration before benchmarking'
     } catch {if($_.Exception.Message -notlike 'Container settings differ.*'){throw}}
     $recoveryState.exists=$false
     try {

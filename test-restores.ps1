@@ -5,8 +5,11 @@ Set-StrictMode -Version Latest
 . "$PSScriptRoot/scripts/config.ps1"
 $config=Get-N1xConfig -Root $PSScriptRoot -Profile $Profile
 if(-not $config.UseLMCache){throw 'Select an LMCache profile.'}
+. "$PSScriptRoot/scripts/benchmark-partition.ps1"
+$partition=Confirm-N1xBenchmarkPartition -Group "LMCache restart restores ($Profile)"
 $destination=Join-Path $PSScriptRoot ('results/restores/'+(Get-Date -Format 'yyyyMMdd-HHmmss'))
 New-Item -ItemType Directory -Force $destination | Out-Null
+$partition | ConvertTo-Json | Set-Content (Join-Path $destination 'partition.json') -Encoding UTF8
 function Run-Probe([string]$Stage) {
     & wslc run --rm --network "container:$($config.Container)" --entrypoint python `
         -v "${PSScriptRoot}/benchmarks:/probe:ro" -v "${destination}:/results" `

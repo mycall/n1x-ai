@@ -1,8 +1,10 @@
 # Development
 
-Feature checks accept an explicit serving profile, for example `test.ps1 -Profile qwen38fn-cache-dflash -Suite features`. Each result records `elapsedSeconds` for the check and its follow-up health request, including failed checks. Vision/OCR checks require normal completion (`finish_reason=stop`) as well as the expected answer; truncated responses do not pass. Local `check.ps1` also parses PowerShell scripts below `scripts/` recursively and those in `benchmarks/`.
+This guide covers runtime changes and validation. Use [Configuration](Configuration.md) for daily operation and [Speed and capacity benchmarks](Speed-benchmarks.md) for performance experiments.
 
 ## Builds
+
+For best and its 4K alternate, follow the [MyLLMBox build and upgrade procedure](MyLLMBox.md#rebuild-lmcache-and-the-runtime). The commands below build the **original WSLC reference stack**:
 
 ```powershell
 .\build.ps1 -PrintOnly
@@ -27,15 +29,16 @@ With Python on PATH:
 .\check.ps1
 ```
 
-This parses PowerShell, checks configuration/launch behavior, and runs CPU unit tests. GitHub Actions runs these checks on Windows. They require neither model weights nor a GPU.
+This parses PowerShell entrypoints and helpers, checks configuration/launch behavior, and runs CPU unit tests. GitHub Actions runs these checks on Windows. They require neither model weights nor a GPU.
 
 Client tests use temporary configurations to check registration, removal, and preservation of user edits. Firewall tests mock elevation and inspect the generated rule scope; they do not change Windows Firewall. Live client conversations and access from a second LAN computer require separate integration checks described in [Configuration](Configuration.md#lan-access).
 
-After building the cache image, test its real filesystem adapter without a GPU or persistent cache volume:
+After building a cache image, set `$testImage` to that candidate's tag. Test its real filesystem adapter without a GPU or persistent cache volume:
 
 ```powershell
+$testImage = 'n1x-ai:mbx-cache-candidate' # Or the reference image being validated.
 wslc run --rm --volume "${PWD}/tests:/tests:ro" `
-    --entrypoint python n1x-ai:lmcache /tests/disk_adapter_integration.py
+    --entrypoint python $testImage /tests/disk_adapter_integration.py
 ```
 
 This checks concurrent stores, bounded eviction, loaded bytes, and restart accounting in a disposable container.
@@ -44,20 +47,20 @@ Check Linux broker restart handling without a GPU:
 
 ```powershell
 wslc run --rm --volume "${PWD}:/project:ro" `
-    --entrypoint python n1x-ai:lmcache /project/tests/test_vmm_socket.py
+    --entrypoint python $testImage /project/tests/test_vmm_socket.py
 ```
 
 These tests cover stale socket recovery and preservation of live sockets and ordinary files. Windows local checks skip these Linux-specific cases.
 
 ## GPU integration
 
-Stop model services first; these tests allocate GPU memory. Build the cache image, then run:
+Stop model services first; these tests allocate GPU memory. Use the candidate `$testImage` selected above, then run:
 
 ```powershell
 wslc run --rm --gpus all --volume "${PWD}/tests:/tests:ro" `
-    --entrypoint python n1x-ai:lmcache /tests/gpu_segmented.py
+    --entrypoint python $testImage /tests/gpu_segmented.py
 wslc run --rm --gpus all --volume "${PWD}/tests:/tests:ro" `
-    --entrypoint python n1x-ai:lmcache /tests/gpu_cache_roundtrip.py
+    --entrypoint python $testImage /tests/gpu_cache_roundtrip.py
 ```
 
 The segmented test checks shared aliases, physical segment boundaries, and byte integrity. The cache roundtrip test checks concurrent restore admission and exact restored bytes.
@@ -72,7 +75,9 @@ With the [service running](Configuration.md#lifecycle):
 .\n1x.ps1 test -Suite context
 ```
 
-Context checks use bounded default lengths. Validate larger contexts, simultaneous restores, and combined vision workloads against application requirements. Test output stays in ignored `.state/checks`; see [Benchmarks](Benchmarks.md#run) for performance and accuracy suites.
+Use `-Profile <name>` when testing a non-default profile. Each check records elapsed time and the follow-up health request, including failures. Vision/OCR checks require both the expected answer and `finish_reason=stop`; truncation fails.
+
+Context checks use bounded default lengths. Use the [capacity suite](Speed-benchmarks.md#nearly-full-262k-quality-workload) for nearly full context and validate combined vision/tool workloads separately. Test output stays in ignored `.state/checks`; see [Benchmarks](Benchmarks.md#run) for the reference suites.
 
 ## Repository layout
 
@@ -80,9 +85,14 @@ Context checks use bounded default lengths. Validate larger contexts, simultaneo
 | --- | --- |
 | `setup.ps1`, `build.ps1` | Download and build entry points |
 | `n1x.ps1`, `scripts/` | Service lifecycle, configuration, memory monitor |
-| `profiles/` | Serving profiles and MTP configuration |
+| `profiles/` | Serving profiles and runtime recipes |
 | `runtime/lmcache/` | Cache supervisor, compatibility modules, patch scripts, constraints |
+| `runtime/myllmbox/`, `runtime/native/` | Selected runtime installation and DFlash integration |
 | `tests/`, `test.ps1`, `check.ps1` | Focused validation |
 | `benchmarks/`, `benchmark.ps1` | Separate API benchmark client; [usage and results](Benchmarks.md) |
 | `wiki/` | User and maintenance documentation |
 | `licenses/`, `NOTICE.md` | Third-party notices |
+
+## Documentation maintenance
+
+Keep the README focused on purpose and first use. Put operational settings in Configuration, runtime builds in MyLLMBox, exact assets in Model assets, and cache behavior in LMCache. Link to those pages instead of copying their procedures. Keep measured workload settings with their results so comparisons remain interpretable; label local cleanup history separately from general instructions.

@@ -1,0 +1,1347 @@
+{
+  "observedUtc": "2026-11-08T01:14:43.911034+00:00",
+  "rankingBasis": "Provisional deployment suitability for the recorded agent/mixed workloads: correctness first, then throughput, cache reuse, memory margin and operational cost. Rank is a judgment across these requirements, not a descending token-speed sort.",
+  "commonComponents": "Existing W4A16 hybrid target, pinned local runtimes, FP32 recurrent state; DFlash2 K3 or existing MTP tensors. All rows use 88 GiB except the explicitly marked historical four-slot row.",
+  "rates": "Weighted direct recovery request-phase (read, write) tk/s; full prompt tokens include cached tokens. These are not whole-run throughput rates.",
+  "conversationBasis": "Two batches of 24 tasks with eight clients; warmup excluded from batch times. Missing means not run, not zero.",
+  "status": "Historical November 5 screening ranks; not the final deployment order.",
+  "sourceSha256": "0a58dfdfbd48578bffaaf1dd4b6ebabac9857194cc03f86819cf304044383891",
+  "archivePath": "wiki/data/profile-review-20261105.json",
+  "rows": [
+    {
+      "rank": 1,
+      "case": "mbx-recover-kv12-q1",
+      "metricsCase": "mbx-recover-kv12-s1",
+      "components": "DFlash2 + RecoverSSM; 12 GiB KV; BF16 indexer; 8 slots",
+      "decision": "Leading screen; full q1 interrupted by user freeze, not qualified",
+      "conversationBatches": [
+        {
+          "repeat": 0,
+          "concurrency": 8,
+          "sessions": 8,
+          "turns": 3,
+          "planned_tasks": 24,
+          "correct_tasks": 24,
+          "elapsed_s": 86.12805930000104,
+          "correct_tasks_s": 0.27865483322227497,
+          "preemptions": 0.0,
+          "thinking": true,
+          "max_output_tokens": 1024
+        },
+        {
+          "repeat": 1,
+          "concurrency": 8,
+          "sessions": 8,
+          "turns": 3,
+          "planned_tasks": 24,
+          "correct_tasks": 24,
+          "elapsed_s": 86.23562460000176,
+          "correct_tasks_s": 0.27830725539847845,
+          "preemptions": 0.0,
+          "thinking": true,
+          "max_output_tokens": 1024
+        }
+      ],
+      "recoveryReadWriteTks": [
+        1045.0718250194307,
+        18.931850682736965
+      ],
+      "contextLimitTokens": 262144,
+      "partitionGiB": 88,
+      "recoveryWorkload": {
+        "requests": 64,
+        "measuredTimings": 64,
+        "promptTokens": {
+          "min": 442,
+          "median": 906.0,
+          "max": 1393
+        },
+        "completionTokens": {
+          "min": 22,
+          "median": 41.5,
+          "max": 85
+        },
+        "cachedTokens": {
+          "min": 0,
+          "median": 0.0,
+          "max": 0
+        },
+        "cachedTokensHistogram": {
+          "0": 64
+        },
+        "cachedPromptFraction": 0.0,
+        "outputBudgets": [
+          1024
+        ],
+        "read_write_tks": [
+          1045.0718250194307,
+          18.931850682736965
+        ],
+        "pp_sources": {
+          "server-scheduled-to-first-token": 64
+        },
+        "decode_sources": {
+          "server-first-to-last-token": 64
+        },
+        "measured_requests": [
+          64,
+          64
+        ],
+        "total_requests": 64,
+        "basis": "sum of phase token counts / sum of request phase durations; not wall-time throughput",
+        "source": "results/benchmarks/20261102-linux-search/mbx-recover-kv12-s1/probe/recovery/responses.jsonl",
+        "sha256": "6250b4636642fc0cfe10ed90819042bd3be6a94cbbdab38239b6d6112fb465c9"
+      },
+      "conversationWorkload": {
+        "requests": 96,
+        "measuredTimings": 96,
+        "promptTokens": {
+          "min": 11196,
+          "median": 11389.5,
+          "max": 11548
+        },
+        "completionTokens": {
+          "min": 27,
+          "median": 60.5,
+          "max": 142
+        },
+        "cachedTokens": {
+          "min": 8192,
+          "median": 8192.0,
+          "max": 8192
+        },
+        "cachedTokensHistogram": {
+          "8192": 96
+        },
+        "cachedPromptFraction": 0.7208934167985898,
+        "outputBudgets": [
+          1024
+        ],
+        "read_write_tks": [
+          2573.5658708623696,
+          7.065061631677734
+        ],
+        "pp_sources": {
+          "server-scheduled-to-first-token": 96
+        },
+        "decode_sources": {
+          "server-first-to-last-token": 96
+        },
+        "measured_requests": [
+          96,
+          96
+        ],
+        "total_requests": 96,
+        "basis": "sum of phase token counts / sum of request phase durations; not wall-time throughput",
+        "source": "results/benchmarks/20261102-linux-search/mbx-recover-kv12-s1/eight-conversations/responses.jsonl",
+        "sha256": "79039bc825befc92ba9651c0dc87be8e1f16a2ddb133835fecb70191d7f18892"
+      },
+      "artifactReferences": [
+        "results\\benchmarks\\20261102-linux-search\\mbx-recover-kv12-s1\\eight-conversations\\summary.json",
+        "results\\benchmarks\\20261102-linux-search\\mbx-recover-kv12-s1\\probe\\recovery\\responses.jsonl"
+      ],
+      "modelAssets": "w4-dflash-ple"
+    },
+    {
+      "rank": 2,
+      "case": "mbx-b4096-88g-c1",
+      "metricsCase": "mbx-b4096-88g-c1",
+      "components": "DFlash2 + RecoverSSM; 8 GiB KV; BF16 indexer; 8 slots",
+      "decision": "Qualified 88 GiB foundation plus fresh 48-task control; strongest fallback",
+      "conversationBatches": [
+        {
+          "repeat": 0,
+          "concurrency": 8,
+          "sessions": 8,
+          "turns": 3,
+          "planned_tasks": 24,
+          "correct_tasks": 24,
+          "elapsed_s": 91.9562102000018,
+          "correct_tasks_s": 0.2609937920212324,
+          "preemptions": 0.0,
+          "thinking": true,
+          "max_output_tokens": 1024
+        },
+        {
+          "repeat": 1,
+          "concurrency": 8,
+          "sessions": 8,
+          "turns": 3,
+          "planned_tasks": 24,
+          "correct_tasks": 24,
+          "elapsed_s": 90.58270900000207,
+          "correct_tasks_s": 0.26495122816430067,
+          "preemptions": 0.0,
+          "thinking": true,
+          "max_output_tokens": 1024
+        }
+      ],
+      "recoveryReadWriteTks": [
+        1020.3960850066537,
+        20.539841220809603
+      ],
+      "contextLimitTokens": 262144,
+      "partitionGiB": 88,
+      "recoveryWorkload": {
+        "requests": 64,
+        "measuredTimings": 64,
+        "promptTokens": {
+          "min": 442,
+          "median": 906.0,
+          "max": 1393
+        },
+        "completionTokens": {
+          "min": 21,
+          "median": 43.0,
+          "max": 101
+        },
+        "cachedTokens": {
+          "min": 0,
+          "median": 0.0,
+          "max": 0
+        },
+        "cachedTokensHistogram": {
+          "0": 64
+        },
+        "cachedPromptFraction": 0.0,
+        "outputBudgets": [
+          1024
+        ],
+        "read_write_tks": [
+          1020.3960850066537,
+          20.539841220809603
+        ],
+        "pp_sources": {
+          "server-scheduled-to-first-token": 64
+        },
+        "decode_sources": {
+          "server-first-to-last-token": 64
+        },
+        "measured_requests": [
+          64,
+          64
+        ],
+        "total_requests": 64,
+        "basis": "sum of phase token counts / sum of request phase durations; not wall-time throughput",
+        "source": "results/benchmarks/20261102-linux-search/mbx-b4096-88g-c1/probe/recovery/responses.jsonl",
+        "sha256": "bfe1f2677b310c98dcd0d3198a0eecc513dd295bf1a4b6370af24be8600611b8"
+      },
+      "conversationWorkload": {
+        "requests": 96,
+        "measuredTimings": 96,
+        "promptTokens": {
+          "min": 11196,
+          "median": 11377.0,
+          "max": 11523
+        },
+        "completionTokens": {
+          "min": 22,
+          "median": 64.5,
+          "max": 117
+        },
+        "cachedTokens": {
+          "min": 8192,
+          "median": 8192.0,
+          "max": 8192
+        },
+        "cachedTokensHistogram": {
+          "8192": 96
+        },
+        "cachedPromptFraction": 0.720923815643887,
+        "outputBudgets": [
+          1024
+        ],
+        "read_write_tks": [
+          2747.6920915477544,
+          6.1754704011247785
+        ],
+        "pp_sources": {
+          "server-scheduled-to-first-token": 96
+        },
+        "decode_sources": {
+          "server-first-to-last-token": 96
+        },
+        "measured_requests": [
+          96,
+          96
+        ],
+        "total_requests": 96,
+        "basis": "sum of phase token counts / sum of request phase durations; not wall-time throughput",
+        "source": "results/benchmarks/20261102-linux-search/mbx-b4096-88g-c1/eight-conversations/responses.jsonl",
+        "sha256": "42e57f8a82ffa4fd6090c57779d17e6d7b59d077357e27d4b9192fd55d8f60b3"
+      },
+      "artifactReferences": [
+        "results\\benchmarks\\20261102-linux-search\\mbx-b4096-88g-c1\\eight-conversations\\summary.json",
+        "results\\benchmarks\\20261102-linux-search\\mbx-b4096-88g-c1\\probe\\recovery\\responses.jsonl"
+      ],
+      "modelAssets": "w4-dflash-ple"
+    },
+    {
+      "rank": 3,
+      "case": "mbx-ssmoff-kv12-s1",
+      "metricsCase": "mbx-ssmoff-kv12-s1",
+      "components": "DFlash2 + standard SSM; 12 GiB KV; BF16 indexer; 8 slots",
+      "decision": "48-task screen passed; its full suite was not run",
+      "conversationBatches": [
+        {
+          "repeat": 0,
+          "concurrency": 8,
+          "sessions": 8,
+          "turns": 3,
+          "planned_tasks": 24,
+          "correct_tasks": 24,
+          "elapsed_s": 89.17286869999953,
+          "correct_tasks_s": 0.2691401583226191,
+          "preemptions": 0.0,
+          "thinking": true,
+          "max_output_tokens": 1024
+        },
+        {
+          "repeat": 1,
+          "concurrency": 8,
+          "sessions": 8,
+          "turns": 3,
+          "planned_tasks": 24,
+          "correct_tasks": 24,
+          "elapsed_s": 88.93452650000108,
+          "correct_tasks_s": 0.2698614468926161,
+          "preemptions": 0.0,
+          "thinking": true,
+          "max_output_tokens": 1024
+        }
+      ],
+      "recoveryReadWriteTks": [
+        916.2251563565193,
+        21.489668687902505
+      ],
+      "contextLimitTokens": 262144,
+      "partitionGiB": 88,
+      "recoveryWorkload": {
+        "requests": 64,
+        "measuredTimings": 64,
+        "promptTokens": {
+          "min": 442,
+          "median": 906.0,
+          "max": 1391
+        },
+        "completionTokens": {
+          "min": 20,
+          "median": 41.0,
+          "max": 87
+        },
+        "cachedTokens": {
+          "min": 0,
+          "median": 0.0,
+          "max": 0
+        },
+        "cachedTokensHistogram": {
+          "0": 64
+        },
+        "cachedPromptFraction": 0.0,
+        "outputBudgets": [
+          1024
+        ],
+        "read_write_tks": [
+          916.2251563565193,
+          21.489668687902505
+        ],
+        "pp_sources": {
+          "server-scheduled-to-first-token": 64
+        },
+        "decode_sources": {
+          "server-first-to-last-token": 64
+        },
+        "measured_requests": [
+          64,
+          64
+        ],
+        "total_requests": 64,
+        "basis": "sum of phase token counts / sum of request phase durations; not wall-time throughput",
+        "source": "results/benchmarks/20261102-linux-search/mbx-ssmoff-kv12-s1/probe/recovery/responses.jsonl",
+        "sha256": "6c9b4f288e03da3e1b6a993f888283e263f7780518bb60ae5e1d041d062bcacc"
+      },
+      "conversationWorkload": {
+        "requests": 96,
+        "measuredTimings": 96,
+        "promptTokens": {
+          "min": 11196,
+          "median": 11389.0,
+          "max": 11528
+        },
+        "completionTokens": {
+          "min": 27,
+          "median": 57.0,
+          "max": 141
+        },
+        "cachedTokens": {
+          "min": 0,
+          "median": 8192.0,
+          "max": 8192
+        },
+        "cachedTokensHistogram": {
+          "8192": 94,
+          "0": 2
+        },
+        "cachedPromptFraction": 0.7059142761804534,
+        "outputBudgets": [
+          1024
+        ],
+        "read_write_tks": [
+          2630.506993762311,
+          6.340164963741663
+        ],
+        "pp_sources": {
+          "server-scheduled-to-first-token": 96
+        },
+        "decode_sources": {
+          "server-first-to-last-token": 96
+        },
+        "measured_requests": [
+          96,
+          96
+        ],
+        "total_requests": 96,
+        "basis": "sum of phase token counts / sum of request phase durations; not wall-time throughput",
+        "source": "results/benchmarks/20261102-linux-search/mbx-ssmoff-kv12-s1/eight-conversations/responses.jsonl",
+        "sha256": "8c088c6c0397c2b27ffbfb255ecc5b55c5f319aae91929443397b14bb6aea4e8"
+      },
+      "artifactReferences": [
+        "results\\benchmarks\\20261102-linux-search\\mbx-ssmoff-kv12-s1\\eight-conversations\\summary.json",
+        "results\\benchmarks\\20261102-linux-search\\mbx-ssmoff-kv12-s1\\probe\\recovery\\responses.jsonl"
+      ],
+      "modelAssets": "w4-dflash-ple"
+    },
+    {
+      "rank": 4,
+      "case": "mbx-idx8-88g-s1",
+      "metricsCase": "mbx-idx8-88g-s1",
+      "components": "DFlash2 + RecoverSSM; 8 GiB KV; FP8 indexer; 8 slots",
+      "decision": "48-task screen passed; no consistent gain justifying reduced indexer precision",
+      "conversationBatches": [
+        {
+          "repeat": 0,
+          "concurrency": 8,
+          "sessions": 8,
+          "turns": 3,
+          "planned_tasks": 24,
+          "correct_tasks": 24,
+          "elapsed_s": 89.15486460000102,
+          "correct_tasks_s": 0.2691945089892462,
+          "preemptions": 0.0,
+          "thinking": true,
+          "max_output_tokens": 1024
+        },
+        {
+          "repeat": 1,
+          "concurrency": 8,
+          "sessions": 8,
+          "turns": 3,
+          "planned_tasks": 24,
+          "correct_tasks": 24,
+          "elapsed_s": 88.77721839999867,
+          "correct_tasks_s": 0.27033962577949344,
+          "preemptions": 0.0,
+          "thinking": true,
+          "max_output_tokens": 1024
+        }
+      ],
+      "recoveryReadWriteTks": [
+        1027.7369528742956,
+        19.77396557310269
+      ],
+      "contextLimitTokens": 262144,
+      "partitionGiB": 88,
+      "recoveryWorkload": {
+        "requests": 64,
+        "measuredTimings": 64,
+        "promptTokens": {
+          "min": 442,
+          "median": 906.0,
+          "max": 1399
+        },
+        "completionTokens": {
+          "min": 17,
+          "median": 40.5,
+          "max": 96
+        },
+        "cachedTokens": {
+          "min": 0,
+          "median": 0.0,
+          "max": 0
+        },
+        "cachedTokensHistogram": {
+          "0": 64
+        },
+        "cachedPromptFraction": 0.0,
+        "outputBudgets": [
+          1024
+        ],
+        "read_write_tks": [
+          1027.7369528742956,
+          19.77396557310269
+        ],
+        "pp_sources": {
+          "server-scheduled-to-first-token": 64
+        },
+        "decode_sources": {
+          "server-first-to-last-token": 64
+        },
+        "measured_requests": [
+          64,
+          64
+        ],
+        "total_requests": 64,
+        "basis": "sum of phase token counts / sum of request phase durations; not wall-time throughput",
+        "source": "results/benchmarks/20261102-linux-search/mbx-idx8-88g-s1/probe/recovery/responses.jsonl",
+        "sha256": "de5a0c15831423bc954efb6119910ae4b98d6c55fb8c66d90d44d4af43121ce6"
+      },
+      "conversationWorkload": {
+        "requests": 96,
+        "measuredTimings": 96,
+        "promptTokens": {
+          "min": 11196,
+          "median": 11390.5,
+          "max": 11536
+        },
+        "completionTokens": {
+          "min": 27,
+          "median": 61.0,
+          "max": 144
+        },
+        "cachedTokens": {
+          "min": 8192,
+          "median": 8192.0,
+          "max": 8192
+        },
+        "cachedTokensHistogram": {
+          "8192": 96
+        },
+        "cachedPromptFraction": 0.7208650028048794,
+        "outputBudgets": [
+          1024
+        ],
+        "read_write_tks": [
+          2783.092127104831,
+          6.26916854875113
+        ],
+        "pp_sources": {
+          "server-scheduled-to-first-token": 96
+        },
+        "decode_sources": {
+          "server-first-to-last-token": 96
+        },
+        "measured_requests": [
+          96,
+          96
+        ],
+        "total_requests": 96,
+        "basis": "sum of phase token counts / sum of request phase durations; not wall-time throughput",
+        "source": "results/benchmarks/20261102-linux-search/mbx-idx8-88g-s1/eight-conversations/responses.jsonl",
+        "sha256": "41ef4300e2cc07f165a209adb67c71082cd28d47c58a20b614d63c9d3756b389"
+      },
+      "artifactReferences": [
+        "results\\benchmarks\\20261102-linux-search\\mbx-idx8-88g-s1\\eight-conversations\\summary.json",
+        "results\\benchmarks\\20261102-linux-search\\mbx-idx8-88g-s1\\probe\\recovery\\responses.jsonl"
+      ],
+      "modelAssets": "w4-dflash-ple"
+    },
+    {
+      "rank": 5,
+      "case": "public-slots4-control-first1",
+      "metricsCase": "public-slots4-control-first1",
+      "components": "DFlash2 + RecoverSSM; 8 GiB KV; BF16 indexer; 4 slots",
+      "decision": "Historical 96 GiB configuration; full suite and 48 tasks passed; partition change needed",
+      "conversationBatches": [
+        {
+          "repeat": 0,
+          "concurrency": 8,
+          "sessions": 8,
+          "turns": 3,
+          "planned_tasks": 24,
+          "correct_tasks": 24,
+          "elapsed_s": 102.67372520000208,
+          "correct_tasks_s": 0.2337501629871662,
+          "preemptions": 0.0,
+          "thinking": true,
+          "max_output_tokens": 1024
+        },
+        {
+          "repeat": 1,
+          "concurrency": 8,
+          "sessions": 8,
+          "turns": 3,
+          "planned_tasks": 24,
+          "correct_tasks": 24,
+          "elapsed_s": 101.2213241999998,
+          "correct_tasks_s": 0.2371041891585928,
+          "preemptions": 0.0,
+          "thinking": true,
+          "max_output_tokens": 1024
+        }
+      ],
+      "recoveryReadWriteTks": [
+        947.2156266174464,
+        19.08486753638579
+      ],
+      "contextLimitTokens": 262144,
+      "partitionGiB": 96,
+      "recoveryWorkload": {
+        "requests": 64,
+        "measuredTimings": 64,
+        "promptTokens": {
+          "min": 442,
+          "median": 906.0,
+          "max": 1401
+        },
+        "completionTokens": {
+          "min": 22,
+          "median": 43.0,
+          "max": 88
+        },
+        "cachedTokens": {
+          "min": 0,
+          "median": 0.0,
+          "max": 0
+        },
+        "cachedTokensHistogram": {
+          "0": 64
+        },
+        "cachedPromptFraction": 0.0,
+        "outputBudgets": [
+          1024
+        ],
+        "read_write_tks": [
+          947.2156266174464,
+          19.08486753638579
+        ],
+        "pp_sources": {
+          "server-scheduled-to-first-token": 64
+        },
+        "decode_sources": {
+          "server-first-to-last-token": 64
+        },
+        "measured_requests": [
+          64,
+          64
+        ],
+        "total_requests": 64,
+        "basis": "sum of phase token counts / sum of request phase durations; not wall-time throughput",
+        "source": "results/benchmarks/20261102-linux-search/public-slots4-control-first1/probe/recovery/responses.jsonl",
+        "sha256": "ba0672e473acdbe8be29ac60e9ab4775f2c72e349da3f5a52c1fe4978dc3848d"
+      },
+      "conversationWorkload": {
+        "requests": 96,
+        "measuredTimings": 96,
+        "promptTokens": {
+          "min": 11196,
+          "median": 11389.0,
+          "max": 11529
+        },
+        "completionTokens": {
+          "min": 20,
+          "median": 56.5,
+          "max": 141
+        },
+        "cachedTokens": {
+          "min": 8192,
+          "median": 8192.0,
+          "max": 8192
+        },
+        "cachedTokensHistogram": {
+          "8192": 96
+        },
+        "cachedPromptFraction": 0.7208887911120889,
+        "outputBudgets": [
+          1024
+        ],
+        "read_write_tks": [
+          3935.4247831105286,
+          10.931656697081863
+        ],
+        "pp_sources": {
+          "server-scheduled-to-first-token": 96
+        },
+        "decode_sources": {
+          "server-first-to-last-token": 96
+        },
+        "measured_requests": [
+          96,
+          96
+        ],
+        "total_requests": 96,
+        "basis": "sum of phase token counts / sum of request phase durations; not wall-time throughput",
+        "source": "results/benchmarks/20261102-linux-search/public-slots4-control-first1/agents8/responses.jsonl",
+        "sha256": "dc9565f7e9ae7a3abd93990be2ae85a2c4e999cae53610f1c967b68b8ba1fc90"
+      },
+      "artifactReferences": [
+        "results\\benchmarks\\20261102-linux-search\\public-slots4-control-first1\\agents8\\summary.json",
+        "results\\benchmarks\\20261102-linux-search\\public-slots4-control-first1\\probe\\recovery\\responses.jsonl"
+      ],
+      "modelAssets": "w4-dflash-ple"
+    },
+    {
+      "rank": 6,
+      "case": "mbx-ssmoff-88g-q1",
+      "metricsCase": "mbx-ssmoff-88g-q1",
+      "components": "DFlash2 + standard SSM; 8 GiB KV; BF16 indexer; 8 slots",
+      "decision": "Full suite and 48 tasks passed; poor conversation reuse and preemptions",
+      "conversationBatches": [
+        {
+          "repeat": 0,
+          "concurrency": 8,
+          "sessions": 8,
+          "turns": 3,
+          "planned_tasks": 24,
+          "correct_tasks": 24,
+          "elapsed_s": 410.63788799999975,
+          "correct_tasks_s": 0.058445654191558706,
+          "preemptions": 1.0,
+          "thinking": true,
+          "max_output_tokens": 1024
+        },
+        {
+          "repeat": 1,
+          "concurrency": 8,
+          "sessions": 8,
+          "turns": 3,
+          "planned_tasks": 24,
+          "correct_tasks": 24,
+          "elapsed_s": 228.83613349999996,
+          "correct_tasks_s": 0.10487854183220591,
+          "preemptions": 1.0,
+          "thinking": true,
+          "max_output_tokens": 1024
+        }
+      ],
+      "recoveryReadWriteTks": [
+        901.3938222468204,
+        20.293082125900913
+      ],
+      "contextLimitTokens": 262144,
+      "partitionGiB": 88,
+      "recoveryWorkload": {
+        "requests": 64,
+        "measuredTimings": 64,
+        "promptTokens": {
+          "min": 442,
+          "median": 906.0,
+          "max": 1393
+        },
+        "completionTokens": {
+          "min": 22,
+          "median": 43.5,
+          "max": 85
+        },
+        "cachedTokens": {
+          "min": 0,
+          "median": 0.0,
+          "max": 0
+        },
+        "cachedTokensHistogram": {
+          "0": 64
+        },
+        "cachedPromptFraction": 0.0,
+        "outputBudgets": [
+          1024
+        ],
+        "read_write_tks": [
+          901.3938222468204,
+          20.293082125900913
+        ],
+        "pp_sources": {
+          "server-scheduled-to-first-token": 64
+        },
+        "decode_sources": {
+          "server-first-to-last-token": 64
+        },
+        "measured_requests": [
+          64,
+          64
+        ],
+        "total_requests": 64,
+        "basis": "sum of phase token counts / sum of request phase durations; not wall-time throughput",
+        "source": "results/benchmarks/20261102-linux-search/mbx-ssmoff-88g-q1/probe/recovery/responses.jsonl",
+        "sha256": "d2e96d25f5b3422604ba496a772d2bd1aec92984d080d1519e9c24d6f1c92e6d"
+      },
+      "conversationWorkload": {
+        "requests": 96,
+        "measuredTimings": 96,
+        "promptTokens": {
+          "min": 11196,
+          "median": 11390.5,
+          "max": 11520
+        },
+        "completionTokens": {
+          "min": 20,
+          "median": 64.5,
+          "max": 144
+        },
+        "cachedTokens": {
+          "min": 0,
+          "median": 0.0,
+          "max": 8192
+        },
+        "cachedTokensHistogram": {
+          "8192": 13,
+          "0": 83
+        },
+        "cachedPromptFraction": 0.09762680043415764,
+        "outputBudgets": [
+          1024
+        ],
+        "read_write_tks": [
+          1107.7282437886302,
+          2.1771964520581695
+        ],
+        "pp_sources": {
+          "server-scheduled-to-first-token": 96
+        },
+        "decode_sources": {
+          "server-first-to-last-token": 96
+        },
+        "measured_requests": [
+          96,
+          96
+        ],
+        "total_requests": 96,
+        "basis": "sum of phase token counts / sum of request phase durations; not wall-time throughput",
+        "source": "results/benchmarks/20261102-linux-search/mbx-ssmoff-88g-q1/eight-conversations/responses.jsonl",
+        "sha256": "3b302bbc35460ffdae814b9fff07870c1398125f30f555bc1b4ba3ae76cee6f8"
+      },
+      "artifactReferences": [
+        "results\\benchmarks\\20261102-linux-search\\mbx-ssmoff-88g-q1\\eight-conversations\\summary.json",
+        "results\\benchmarks\\20261102-linux-search\\mbx-ssmoff-88g-q1\\probe\\recovery\\responses.jsonl"
+      ],
+      "modelAssets": "w4-dflash-ple"
+    },
+    {
+      "rank": 7,
+      "case": "mbx-lmc4-ssd64-q1",
+      "metricsCase": "mbx-lmc4-ssd64-q1",
+      "components": "DFlash2 + standard SSM + LMCache; GPU KV 8 GiB, RAM 4 GiB, SSD 64 GiB",
+      "decision": "Full correctness and 48 tasks passed; strict near-full restore failed; not eligible",
+      "conversationBatches": [
+        {
+          "repeat": 0,
+          "concurrency": 8,
+          "sessions": 8,
+          "turns": 3,
+          "planned_tasks": 24,
+          "correct_tasks": 24,
+          "elapsed_s": 96.59144199999992,
+          "correct_tasks_s": 0.2484692173867745,
+          "preemptions": 0.0,
+          "thinking": true,
+          "max_output_tokens": 1024
+        },
+        {
+          "repeat": 1,
+          "concurrency": 8,
+          "sessions": 8,
+          "turns": 3,
+          "planned_tasks": 24,
+          "correct_tasks": 24,
+          "elapsed_s": 95.36516850000135,
+          "correct_tasks_s": 0.2516642121803587,
+          "preemptions": 0.0,
+          "thinking": true,
+          "max_output_tokens": 1024
+        }
+      ],
+      "recoveryReadWriteTks": [
+        979.3268081053178,
+        22.42168835738925
+      ],
+      "contextLimitTokens": 262144,
+      "partitionGiB": 88,
+      "recoveryWorkload": {
+        "requests": 64,
+        "measuredTimings": 64,
+        "promptTokens": {
+          "min": 442,
+          "median": 906.0,
+          "max": 1388
+        },
+        "completionTokens": {
+          "min": 22,
+          "median": 42.0,
+          "max": 87
+        },
+        "cachedTokens": {
+          "min": 0,
+          "median": 0.0,
+          "max": 0
+        },
+        "cachedTokensHistogram": {
+          "0": 64
+        },
+        "cachedPromptFraction": 0.0,
+        "outputBudgets": [
+          1024
+        ],
+        "read_write_tks": [
+          979.3268081053178,
+          22.42168835738925
+        ],
+        "pp_sources": {
+          "server-scheduled-to-first-token": 64
+        },
+        "decode_sources": {
+          "server-first-to-last-token": 64
+        },
+        "measured_requests": [
+          64,
+          64
+        ],
+        "total_requests": 64,
+        "basis": "sum of phase token counts / sum of request phase durations; not wall-time throughput",
+        "source": "results/benchmarks/20261102-linux-search/mbx-lmc4-ssd64-q1/probe/recovery/responses.jsonl",
+        "sha256": "b05645a71a62064187c54d4e15ab236158f60591b090cf6c3a666f36d6fea133"
+      },
+      "conversationWorkload": {
+        "requests": 96,
+        "measuredTimings": 96,
+        "promptTokens": {
+          "min": 11196,
+          "median": 11394.5,
+          "max": 11523
+        },
+        "completionTokens": {
+          "min": 22,
+          "median": 62.0,
+          "max": 152
+        },
+        "cachedTokens": {
+          "min": 8192,
+          "median": 8192.0,
+          "max": 8192
+        },
+        "cachedTokensHistogram": {
+          "8192": 96
+        },
+        "cachedPromptFraction": 0.7208676458725957,
+        "outputBudgets": [
+          1024
+        ],
+        "read_write_tks": [
+          4319.356761817984,
+          8.853364965621864
+        ],
+        "pp_sources": {
+          "server-scheduled-to-first-token": 96
+        },
+        "decode_sources": {
+          "server-first-to-last-token": 96
+        },
+        "measured_requests": [
+          96,
+          96
+        ],
+        "total_requests": 96,
+        "basis": "sum of phase token counts / sum of request phase durations; not wall-time throughput",
+        "source": "results/benchmarks/20261102-linux-search/mbx-lmc4-ssd64-q1/eight-conversations/responses.jsonl",
+        "sha256": "6fbceb09127fdce409189404f7bef732f3e01384b6331d388ea3d2da091d48ad"
+      },
+      "artifactReferences": [
+        "results\\benchmarks\\20261102-linux-search\\mbx-lmc4-ssd64-q1\\eight-conversations\\summary.json",
+        "results\\benchmarks\\20261102-linux-search\\mbx-lmc4-ssd64-q1\\probe\\recovery\\responses.jsonl"
+      ],
+      "modelAssets": "w4-dflash-ple"
+    },
+    {
+      "rank": 8,
+      "case": "mbx-mtp3-kv6-s4-s1",
+      "metricsCase": "mbx-mtp3-kv6-s4-s1",
+      "components": "MTP K3 + RecoverSSM; 6 GiB KV; 4 slots / 8 clients",
+      "decision": "48-task screen passed; 1,930 MiB sampled GPU margin is below the reserve; not eligible",
+      "conversationBatches": [
+        {
+          "repeat": 0,
+          "concurrency": 8,
+          "sessions": 8,
+          "turns": 3,
+          "planned_tasks": 24,
+          "correct_tasks": 24,
+          "elapsed_s": 177.58987070000148,
+          "correct_tasks_s": 0.1351428429189109,
+          "preemptions": 0.0,
+          "thinking": true,
+          "max_output_tokens": 1024
+        },
+        {
+          "repeat": 1,
+          "concurrency": 8,
+          "sessions": 8,
+          "turns": 3,
+          "planned_tasks": 24,
+          "correct_tasks": 24,
+          "elapsed_s": 176.50092919999952,
+          "correct_tasks_s": 0.1359766212494255,
+          "preemptions": 0.0,
+          "thinking": true,
+          "max_output_tokens": 1024
+        }
+      ],
+      "recoveryReadWriteTks": [
+        1385.2747700615294,
+        27.147337266569025
+      ],
+      "contextLimitTokens": 262144,
+      "partitionGiB": 88,
+      "recoveryWorkload": {
+        "requests": 64,
+        "measuredTimings": 64,
+        "promptTokens": {
+          "min": 442,
+          "median": 906.0,
+          "max": 1394
+        },
+        "completionTokens": {
+          "min": 21,
+          "median": 43.0,
+          "max": 86
+        },
+        "cachedTokens": {
+          "min": 0,
+          "median": 736.0,
+          "max": 1280
+        },
+        "cachedTokensHistogram": {
+          "0": 4,
+          "384": 8,
+          "512": 8,
+          "640": 4,
+          "704": 8,
+          "768": 4,
+          "896": 8,
+          "960": 8,
+          "1088": 4,
+          "1152": 4,
+          "1280": 4
+        },
+        "cachedPromptFraction": 0.8202002008936303,
+        "outputBudgets": [
+          1024
+        ],
+        "read_write_tks": [
+          1385.2747700615294,
+          27.147337266569025
+        ],
+        "pp_sources": {
+          "server-scheduled-to-first-token": 64
+        },
+        "decode_sources": {
+          "server-first-to-last-token": 64
+        },
+        "measured_requests": [
+          64,
+          64
+        ],
+        "total_requests": 64,
+        "basis": "sum of phase token counts / sum of request phase durations; not wall-time throughput",
+        "source": "results/benchmarks/20261102-linux-search/mbx-mtp3-kv6-s4-s1/probe/recovery/responses.jsonl",
+        "sha256": "2439d2601a5b0e83b675342028a1a801e3a5f6591fc3e610bd78b35e590ce5da"
+      },
+      "conversationWorkload": {
+        "requests": 96,
+        "measuredTimings": 96,
+        "promptTokens": {
+          "min": 11196,
+          "median": 11375.0,
+          "max": 11521
+        },
+        "completionTokens": {
+          "min": 27,
+          "median": 62.0,
+          "max": 113
+        },
+        "cachedTokens": {
+          "min": 0,
+          "median": 0.0,
+          "max": 11392
+        },
+        "cachedTokensHistogram": {
+          "11136": 28,
+          "0": 55,
+          "8192": 11,
+          "11264": 1,
+          "11392": 1
+        },
+        "cachedPromptFraction": 0.38922074445654525,
+        "outputBudgets": [
+          1024
+        ],
+        "read_write_tks": [
+          1980.9702686269825,
+          6.633501551975545
+        ],
+        "pp_sources": {
+          "server-scheduled-to-first-token": 96
+        },
+        "decode_sources": {
+          "server-first-to-last-token": 96
+        },
+        "measured_requests": [
+          96,
+          96
+        ],
+        "total_requests": 96,
+        "basis": "sum of phase token counts / sum of request phase durations; not wall-time throughput",
+        "source": "results/benchmarks/20261102-linux-search/mbx-mtp3-kv6-s4-s1/eight-conversations/responses.jsonl",
+        "sha256": "45f8e5c071e3345367462af5ca06fdc6b22cdd21f4bc2ce483618aaaf9bc41b0"
+      },
+      "artifactReferences": [
+        "results\\benchmarks\\20261102-linux-search\\mbx-mtp3-kv6-s4-s1\\eight-conversations\\summary.json",
+        "results\\benchmarks\\20261102-linux-search\\mbx-mtp3-kv6-s4-s1\\probe\\recovery\\responses.jsonl"
+      ],
+      "modelAssets": "w4-mtp-ple"
+    },
+    {
+      "rank": 9,
+      "case": "mbx-mtp3-sched-88g-q1",
+      "metricsCase": "mbx-mtp3-sched-88g-q1",
+      "components": "MTP K3 + RecoverSSM; 8 GiB KV; 8 slots",
+      "decision": "Full correctness passed; 8-client conversation test absent; 789 MiB GPU margin; not eligible",
+      "conversationBatches": [],
+      "recoveryReadWriteTks": [
+        1198.2849027019638,
+        27.415536922605256
+      ],
+      "contextLimitTokens": 262144,
+      "partitionGiB": 88,
+      "recoveryWorkload": {
+        "requests": 64,
+        "measuredTimings": 64,
+        "promptTokens": {
+          "min": 442,
+          "median": 906.0,
+          "max": 1402
+        },
+        "completionTokens": {
+          "min": 22,
+          "median": 43.0,
+          "max": 89
+        },
+        "cachedTokens": {
+          "min": 0,
+          "median": 736.0,
+          "max": 1280
+        },
+        "cachedTokensHistogram": {
+          "0": 4,
+          "384": 8,
+          "512": 8,
+          "640": 4,
+          "704": 8,
+          "768": 4,
+          "896": 8,
+          "960": 8,
+          "1088": 4,
+          "1152": 4,
+          "1216": 1,
+          "1280": 3
+        },
+        "cachedPromptFraction": 0.8185956349412395,
+        "outputBudgets": [
+          1024
+        ],
+        "read_write_tks": [
+          1198.2849027019638,
+          27.415536922605256
+        ],
+        "pp_sources": {
+          "server-scheduled-to-first-token": 64
+        },
+        "decode_sources": {
+          "server-first-to-last-token": 64
+        },
+        "measured_requests": [
+          64,
+          64
+        ],
+        "total_requests": 64,
+        "basis": "sum of phase token counts / sum of request phase durations; not wall-time throughput",
+        "source": "results/benchmarks/20261102-linux-search/mbx-mtp3-sched-88g-q1/probe/recovery/responses.jsonl",
+        "sha256": "bfa919056a4b09027bd6078ce317c71635487e815a8b2674f21c3c7808b2284b"
+      },
+      "conversationWorkload": {
+        "requests": 0,
+        "measuredTimings": 0,
+        "promptTokens": null,
+        "completionTokens": null,
+        "cachedTokens": null,
+        "cachedTokensHistogram": {},
+        "cachedPromptFraction": null,
+        "outputBudgets": [],
+        "read_write_tks": [
+          null,
+          null
+        ],
+        "pp_sources": {},
+        "decode_sources": {},
+        "measured_requests": [
+          0,
+          0
+        ],
+        "total_requests": 0,
+        "basis": "sum of phase token counts / sum of request phase durations; not wall-time throughput",
+        "source": "results/benchmarks/20261102-linux-search/mbx-mtp3-sched-88g-q1/eight-conversations/responses.jsonl",
+        "sha256": null
+      },
+      "artifactReferences": [
+        "results\\benchmarks\\20261102-linux-search\\mbx-mtp3-sched-88g-q1\\eight-conversations\\summary.json",
+        "results\\benchmarks\\20261102-linux-search\\mbx-mtp3-sched-88g-q1\\probe\\recovery\\responses.jsonl"
+      ],
+      "modelAssets": "w4-mtp-ple"
+    },
+    {
+      "rank": 10,
+      "case": "mbx-mtp3-kv6-s1",
+      "metricsCase": "mbx-mtp3-kv6-s1",
+      "components": "MTP K3 + RecoverSSM; 6 GiB KV; 8 slots",
+      "decision": "48-task screen passed; weak reuse and 284 MiB GPU margin; not eligible",
+      "conversationBatches": [
+        {
+          "repeat": 0,
+          "concurrency": 8,
+          "sessions": 8,
+          "turns": 3,
+          "planned_tasks": 24,
+          "correct_tasks": 24,
+          "elapsed_s": 201.1001127999989,
+          "correct_tasks_s": 0.11934354320262784,
+          "preemptions": 0.0,
+          "thinking": true,
+          "max_output_tokens": 1024
+        },
+        {
+          "repeat": 1,
+          "concurrency": 8,
+          "sessions": 8,
+          "turns": 3,
+          "planned_tasks": 24,
+          "correct_tasks": 24,
+          "elapsed_s": 201.92155710000043,
+          "correct_tasks_s": 0.11885803747102716,
+          "preemptions": 0.0,
+          "thinking": true,
+          "max_output_tokens": 1024
+        }
+      ],
+      "recoveryReadWriteTks": [
+        1434.2511672297903,
+        27.194429434478963
+      ],
+      "contextLimitTokens": 262144,
+      "partitionGiB": 88,
+      "recoveryWorkload": {
+        "requests": 64,
+        "measuredTimings": 64,
+        "promptTokens": {
+          "min": 442,
+          "median": 905.0,
+          "max": 1401
+        },
+        "completionTokens": {
+          "min": 20,
+          "median": 41.0,
+          "max": 90
+        },
+        "cachedTokens": {
+          "min": 0,
+          "median": 736.0,
+          "max": 1280
+        },
+        "cachedTokensHistogram": {
+          "0": 4,
+          "384": 8,
+          "512": 8,
+          "640": 4,
+          "704": 8,
+          "768": 4,
+          "896": 8,
+          "960": 8,
+          "1088": 4,
+          "1152": 4,
+          "1280": 4
+        },
+        "cachedPromptFraction": 0.8201717927403713,
+        "outputBudgets": [
+          1024
+        ],
+        "read_write_tks": [
+          1434.2511672297903,
+          27.194429434478963
+        ],
+        "pp_sources": {
+          "server-scheduled-to-first-token": 64
+        },
+        "decode_sources": {
+          "server-first-to-last-token": 64
+        },
+        "measured_requests": [
+          64,
+          64
+        ],
+        "total_requests": 64,
+        "basis": "sum of phase token counts / sum of request phase durations; not wall-time throughput",
+        "source": "results/benchmarks/20261102-linux-search/mbx-mtp3-kv6-s1/probe/recovery/responses.jsonl",
+        "sha256": "4e0117b3e9db5935cbb205d11e7f215647da9d2f850287074d3d8f8bb780accf"
+      },
+      "conversationWorkload": {
+        "requests": 96,
+        "measuredTimings": 96,
+        "promptTokens": {
+          "min": 11196,
+          "median": 11389.5,
+          "max": 11520
+        },
+        "completionTokens": {
+          "min": 27,
+          "median": 57.0,
+          "max": 142
+        },
+        "cachedTokens": {
+          "min": 0,
+          "median": 0.0,
+          "max": 11136
+        },
+        "cachedTokensHistogram": {
+          "11136": 19,
+          "8192": 3,
+          "0": 74
+        },
+        "cachedPromptFraction": 0.2164903374136115,
+        "outputBudgets": [
+          1024
+        ],
+        "read_write_tks": [
+          1278.0047702508016,
+          2.8646144106400735
+        ],
+        "pp_sources": {
+          "server-scheduled-to-first-token": 96
+        },
+        "decode_sources": {
+          "server-first-to-last-token": 96
+        },
+        "measured_requests": [
+          96,
+          96
+        ],
+        "total_requests": 96,
+        "basis": "sum of phase token counts / sum of request phase durations; not wall-time throughput",
+        "source": "results/benchmarks/20261102-linux-search/mbx-mtp3-kv6-s1/eight-conversations/responses.jsonl",
+        "sha256": "35b371d17b975598c74b279bb268f245f48b9aacf481c3655a3d1588b2ffb0da"
+      },
+      "artifactReferences": [
+        "results\\benchmarks\\20261102-linux-search\\mbx-mtp3-kv6-s1\\eight-conversations\\summary.json",
+        "results\\benchmarks\\20261102-linux-search\\mbx-mtp3-kv6-s1\\probe\\recovery\\responses.jsonl"
+      ],
+      "modelAssets": "w4-mtp-ple"
+    }
+  ],
+  "priorNearFullTop10Markdown": " Component combination | Actual input / output allowance | Client concurrency / cache state | Near-full first-attempt evidence | Disposition |\n| ---: | --- | --- | --- | --- | --- |\n| 1 | DFlash2 K3; standard SSM; BF16 indexer; KV12; batch 8,192; LMCache off; 8 slots | Capacity 253,936–253,947 / 8,192; tool continuations up to 254,202 / remaining window | C1/C6 cold; C8 diagnostic; continuation reuse measured separately | Capacity 24/24 at each C1/C6/C8; tools 8/8 at each C1/C6 | Selected default; full near-full capacity/tool and public lifecycle passed |\n| 2 | Same standard-SSM/KV12 foundation; batch 4,096; LMCache off; 8 slots | Tool screen 253,943–254,202 / remaining window; serial archive 253,940–253,947 / 8,192 | C1/C6 tool screen; C1 archive seed/pressure/replay | Tools 1/1 C1 + 6/6 C6; serial 15/15 | Promising C1 continuation-reuse pilot: 1.684× C1 and 1.069× C6 correct-work throughput; misses 1.10× C6 screen gate; no full qualification |\n| 3 | DFlash2 K3; standard SSM; BF16 indexer; KV11; batch 4,096; LMCache RAM4 + SSD128; prefix64; 8 slots | 253,940–253,947 / 8,192 | Serial C1; external replay and actual SSD restart | Initial 15/15 + restart 6/6; all 12 restores passed strict and partial coverage | Proven serial archive/restart specialist: 12.37× replay, 18.90× post-restart correct-work throughput versus matched cache-off; C6/tools unqualified; no default promotion |\n| 4 | DFlash2; standard SSM; BF16 indexer; KV8; LMCache off; 8 slots | Historical recovery 442–1,393 and conversations 11,196–11,520 / 1,024 | Historical C4 recovery, C8 conversations; weak reuse | — | Historical full correctness passed; no matched near-full qualification |\n| 5 | DFlash2; RecoverSSM; BF16 indexer; KV8; 4 slots; **96 GiB partition** | Historical recovery 442–1,401 and conversations 11,196–11,529 / 1,024 | Historical C4/C8; measured reuse | — | Historical full pass; partition change and near-full qualification needed |\n| 6 | DFlash2; RecoverSSM; FP8 indexer; KV8; 8 slots | Historical recovery 442–1,399 and conversations 11,196–11,536 / 1,024 | Historical C4/C8; measured reuse | — | 48/48 conversation screen; no consistent precision/performance benefit or near-full qualification |\n| 7 | DFlash2; standard SSM; BF16 indexer; KV11; batch 8,192; LMCache RAM4 + SSD128; prefix64 | 253,940–253,947 / 8,192 | C6 seed, C1/C6 restores, pressure histories | 24/24 correct; strict restore failed | Original failure retained: C6 reused only 2/6 prompts and was slower than cold seeds; no SSD restart proof |\n| 8 | DFlash2; standard SSM; BF16 indexer; KV8; LMCache RAM4 + SSD64 | Restore 130,877 / 128; historical conversations around 11K / 1,024 | C1 external restores; historical C8 conversations | No matched near-full cohort; shorter restores correct but below strict coverage | Historical full correctness passed; strict restore failed; not eligible |\n| 9 | DFlash2; RecoverSSM; BF16 indexer; KV12; LMCache off; 8 slots | Failed historical agent request: short history / 1,024 | Historical agent qualification | — | Rejected: 71/72 first attempts; mandatory lookup skipped; no budget exhaustion |\n| 10 | DFlash2; RecoverSSM; BF16 indexer; KV8; LMCache off; 8 slots | Failed historical agent request: short history / 1,024 | Historical agent qualification | — | Rejected: 71/72 first attempts; empty final after valid tool result; no budget exhaustion |",
+  "priorNearFullTop10ModelAssets": "w4-dflash-ple (all ten rows)",
+  "supersededPolicy": "Old resource/strict-restore vetoes are historical. Final selection uses measured speed and 100% first-attempt accuracy."
+}

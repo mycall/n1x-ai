@@ -1,0 +1,30 @@
+# Experimental FP4 + LMCache integration. GPU qualification requires the
+# user-confirmed 88 GiB test group; this does not replace n1x-ai:lmcache.
+FROM myllmbox/qwen38-flash-next-vllm@sha256:bc42593a5bbfd1a07e295b503d7685d951e587ed7ac50fa0c26adb57614f005f
+ARG N1X_LMCACHE_FROM_SOURCE=0
+ENV LMCACHE_TRACK_USAGE=false DO_NOT_TRACK=1 VLLM_NO_USAGE_STATS=1 HF_HUB_DISABLE_TELEMETRY=1 \
+    HF_HUB_OFFLINE=1 N1X_LMCACHE_STAGED_TRANSFER=1 N1X_RESTORE_WAIT_MS=0
+COPY runtime/lmcache/constraints.txt /opt/n1x/lmcache-constraints.txt
+COPY runtime/myllmbox/install_cache.py /opt/n1x/install_cache.py
+# Keep the image's MBX loader, compressed-scale kernels and RecoverSSM overlay.
+# The installer rejects a dependency transaction that replaces its vLLM code.
+RUN --mount=type=secret,id=https_proxy --mount=type=secret,id=http_proxy \
+    HTTPS_PROXY="$(cat /run/secrets/https_proxy 2>/dev/null)" \
+    HTTP_PROXY="$(cat /run/secrets/http_proxy 2>/dev/null)" \
+    TORCH_CUDA_ARCH_LIST=12.1a MAX_JOBS=1 \
+    N1X_LMCACHE_FROM_SOURCE="$N1X_LMCACHE_FROM_SOURCE" python3 /opt/n1x/install_cache.py
+COPY runtime/lmcache/n1x_*.py /usr/local/lib/python3.12/dist-packages/
+COPY runtime/lmcache/patch_*.py /tmp/n1x-patches/
+RUN python3 /tmp/n1x-patches/patch_vmm.py && \
+    python3 /tmp/n1x-patches/patch_admission.py && \
+    python3 /tmp/n1x-patches/patch_segmented.py && \
+    python3 /tmp/n1x-patches/patch_restore_queue_v2.py && \
+    python3 /tmp/n1x-patches/patch_disk_cache.py
+COPY runtime/lmcache/verify_patches.py /tmp/n1x-patches/
+RUN python3 /tmp/n1x-patches/verify_patches.py
+COPY runtime/native/n1x_dflash_capture.py runtime/myllmbox/patch_dflash.py /opt/n1x/
+RUN python3 /opt/n1x/patch_dflash.py /usr/local/lib/python3.12/dist-packages \
+    /opt/n1x/mbx-vllm-before-cache-patches.json
+COPY runtime/lmcache/serve.py /opt/n1x/serve.py
+COPY LICENSE NOTICE.md licenses/Apache-2.0.txt /opt/n1x/licenses/
+ENTRYPOINT ["python3", "-u", "/opt/n1x/serve.py"]

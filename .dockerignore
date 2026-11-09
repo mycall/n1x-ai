@@ -9,3 +9,7 @@
 !runtime/lmcache/
 !runtime/lmcache/*.py
 !runtime/lmcache/constraints.txt
+!runtime/myllmbox/
+!runtime/myllmbox/*.py
+!runtime/native/
+!runtime/native/n1x_dflash_capture.py

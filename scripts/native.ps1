@@ -21,7 +21,7 @@ function Get-N1xNativePaths([string]$Root, $Config) {
 function Get-N1xNativeArguments($Config, $Paths) {
     @('-m','vllm.entrypoints.cli.main','serve',$Paths.Model,'--config',$Paths.Recipe,
         '--host',$(if($Config.LanAccess){'0.0.0.0'}else{'127.0.0.1'}),'--port',[string]$Config.Port,
-        '--served-model-name','qwen','Qwen/Qwen3.8-Flash-Next',
+        '--served-model-name','qwen/qwen38fn-best','Qwen/Qwen3.8-Flash-Next',
         '--max-model-len',[string]$Config.Context,'--max-num-seqs',[string]$Config.MaxSequences,
         '--override-generation-config',(@{max_new_tokens=$Config.MaxOutputTokens}|ConvertTo-Json -Compress),
         '--max-num-batched-tokens',[string]$Config.BatchedTokens,

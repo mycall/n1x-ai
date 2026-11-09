@@ -10,12 +10,17 @@ import time
 
 from PIL import Image, ImageDraw
 from agent_cache_probe import Probe, request, save
+from empty_final import required_content_result
 
 
 def run(args):
+    output_tokens=getattr(args,'output_tokens',1024)
+    if output_tokens < 1:
+        raise ValueError('Output allowance must be positive')
     p=Probe(args)
+    request(args.url+'/health')
     archives={n:p.archive(n)[0] for n in (65000,131000)}
-    lengths={n:json.loads(request(args.url+'/tokenize',dict(model='qwen',messages=m,
+    lengths={n:json.loads(request(args.url+'/tokenize',dict(model='qwen/qwen38fn-best',messages=m,
              chat_template_kwargs={'enable_thinking':True})))['count'] for n,m in archives.items()}
     picture=Image.new('RGB',(320,160),'white')
     draw=ImageDraw.Draw(picture)
@@ -29,29 +34,28 @@ def run(args):
                            required=['sku'],additionalProperties=False)))]
 
     def chat(messages,salt,**extra):
-        return p.chat(messages,salt,max_tokens=1024,chat_template_kwargs={'enable_thinking':True},**extra)
+        return p.chat(messages,salt,max_tokens=output_tokens,chat_template_kwargs={'enable_thinking':True},**extra)
 
     def archive(cycle):
         length=65000 if cycle%2==0 else 131000
-        choice=chat(archives[length],f'{p.salt}-archive-{cycle}')
-        answer=choice['message'].get('content') or ''
-        return dict(kind='archive',correct=choice['finish_reason']=='stop' and
-                    bool(re.search(r'CEDAR-5831.*MAPLE-9264.*BIRCH-1748',answer,re.S)),
-                    prompt_tokens=lengths[length])
+        result=required_content_result(chat,archives[length],f'{p.salt}-archive-{cycle}',
+            lambda choice: choice['finish_reason']=='stop' and bool(re.search(
+                r'CEDAR-5831.*MAPLE-9264.*BIRCH-1748',choice['message'].get('content') or '',re.S)))
+        return dict(kind='archive',prompt_tokens=lengths[length],**result)
 
     def vision(cycle):
-        choice=chat([dict(role='user',content=[dict(type='text',text=
+        result=required_content_result(chat,[dict(role='user',content=[dict(type='text',text=
             'Name the color and shape on the left, then on the right. Be brief.'),
-            dict(type='image_url',image_url=dict(url=uri))])],f'{p.salt}-vision-{cycle}')
-        answer=(choice['message'].get('content') or '').lower()
-        return dict(kind='vision',correct=choice['finish_reason']=='stop' and
-                    bool(re.search(r'red\s+circle.*blue\s+square',answer,re.S)))
+            dict(type='image_url',image_url=dict(url=uri))])],f'{p.salt}-vision-{cycle}',
+            lambda choice: choice['finish_reason']=='stop' and bool(re.search(
+                r'red\s+circle.*blue\s+square',(choice['message'].get('content') or '').lower(),re.S)))
+        return dict(kind='vision',**result)
 
     def arithmetic(cycle):
-        choice=chat([dict(role='user',content=f'Return only the integer result of {9+cycle} times 7.')],
-                    f'{p.salt}-short-{cycle}')
-        return dict(kind='arithmetic',correct=choice['finish_reason']=='stop' and
-                    (choice['message'].get('content') or '').strip()==str((9+cycle)*7))
+        result=required_content_result(chat,[dict(role='user',content=f'Return only the integer result of {9+cycle} times 7.')],
+            f'{p.salt}-short-{cycle}',lambda choice: choice['finish_reason']=='stop' and
+                (choice['message'].get('content') or '').strip()==str((9+cycle)*7))
+        return dict(kind='arithmetic',**result)
 
     def tool(cycle):
         sku=f'MIX-{cycle}'
@@ -74,9 +78,11 @@ def run(args):
                 assistant[field_name]=choice['message'][field_name]
         messages.extend([assistant,dict(role='tool',tool_call_id=calls[0]['id'],
                          content=json.dumps(dict(sku=sku,count=23+cycle)))])
-        answer=chat(messages,salt,tools=tools,tool_choice='none')
-        return dict(kind='tool',correct=answer['finish_reason']=='stop' and
-                    (answer['message'].get('content') or '').strip()==str(23+cycle))
+        result=required_content_result(chat,messages,salt,
+            lambda answer: answer['finish_reason']=='stop' and
+                (answer['message'].get('content') or '').strip()==str(23+cycle),
+            tools=tools,tool_choice='none')
+        return dict(kind='tool',**result)
 
     before=p.snapshot('before')
     rows=[]
@@ -105,8 +111,11 @@ def run(args):
         checks=[check for row in rows for check in row['checks']]
         save(args.out/'summary.json',dict(completed_cycles=len(rows),planned_cycles=12,
              correct=sum(check['correct'] for check in checks),checks=len(checks),
-             elapsed_s=time.monotonic()-start,thinking=True,max_output_tokens=1024,
-             concurrency=4,prompt_tokens=lengths,counters=counters))
+             elapsed_s=time.monotonic()-start,thinking=True,max_output_tokens=output_tokens,
+             concurrency=4,prompt_tokens=lengths,counters=counters,
+             retried_empty_finals=sum(bool(check.get('retried_empty_final')) for check in checks),
+             retry_correct_checks=sum(bool(check.get('retry_correct')) for check in checks),
+             retry_policy='One unchanged-history retry for an empty required final; original scores retained; elapsed time includes retries'))
 
 
 if __name__=='__main__':
@@ -114,4 +123,6 @@ if __name__=='__main__':
     parser.add_argument('--url',default='http://127.0.0.1:8000')
     parser.add_argument('--out',type=Path,required=True)
     parser.add_argument('--no-lmcache-metrics', action='store_true')
+    parser.add_argument('--output-tokens',type=int,default=1024,
+                        help='Explicit output allowance; historical comparison default is 1024')
     run(parser.parse_args())

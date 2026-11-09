@@ -1,5 +1,5 @@
 param(
-    [ValidateSet('help', 'setup', 'clean', 'uninstall', 'start', 'stop', 'restart', 'recreate', 'status', 'wait', 'logs', 'test', 'doctor')]
+    [ValidateSet('help', 'list', 'setup', 'build', 'clean', 'uninstall', 'start', 'stop', 'restart', 'recreate', 'status', 'wait', 'logs', 'test', 'doctor')]
     [string]$Action = 'status',
     [string]$Profile = '',
     [string]$ModelRoot = '',
@@ -14,6 +14,8 @@ param(
     [switch]$SkipBuild,
     [switch]$SkipPleCopy,
     [switch]$Rebuild,
+    [switch]$LmcacheFromSource,
+    [string]$ImageTag = '',
     [string]$VhdPath = ''
 )
 $ErrorActionPreference = 'Stop'
@@ -37,7 +39,9 @@ n1x.ps1 - manage the n1x-ai local model server
 
 Actions:
   help        Show this help
+  list profiles  List available profiles and the configured default
   setup       Install prerequisites, download models, build image (with LMCache)
+  build       Build the selected container runtime (MyLLMBox creates a candidate)
   start       Start the selected container or native Windows profile
   stop        Stop the container and remove client/firewall registrations
   restart     Restart the running container with its existing configuration
@@ -51,13 +55,17 @@ Actions:
   uninstall   Clean up everything this project created
 
 Common options:
-  -Profile <name>      Profile from profiles/*.psd1 (default: configured DefaultProfile)
+  -Profile <name>      Serving profile (see list profiles; default: configured DefaultProfile)
   -Port <n>            Override the configured API port
   -ModelRoot <path>    Override the configured model root
   -PrintOnly           Preview what would run without changing anything
   -TimeoutSeconds <n>  For wait
+  -Rebuild             For MyLLMBox build: bypass image layer cache
+  -LmcacheFromSource   For MyLLMBox build: compile LMCache against the guest stack
+  -ImageTag <tag>      Candidate output tag for MyLLMBox build
 
 Examples:
+  .\n1x.ps1 list profiles
   .\n1x.ps1 start
   .\n1x.ps1 status -Profile qwen38fn-mtp
   .\n1x.ps1 wait -TimeoutSeconds 600
@@ -65,7 +73,32 @@ Examples:
 "@
     return
 }
+if($Action -eq 'list'){
+    # For list, the second positional argument selects the resource to list.
+    if($Profile -ne 'profiles'){throw 'Usage: .\n1x.ps1 list profiles'}
+    Get-N1xProfileList -Root $PSScriptRoot | Format-Table -AutoSize
+    return
+}
+if($Action -ne 'build' -and ($LmcacheFromSource -or $ImageTag)){
+    throw '-LmcacheFromSource and -ImageTag are build options'
+}
+if($Action -eq 'build'){
+    $buildConfig=Get-N1xConfig -Root $PSScriptRoot -Profile $Profile -ModelRoot $ModelRoot -Port $Port
+    if($buildConfig.ContainsKey('Backend') -and $buildConfig.Backend -eq 'native'){
+        throw 'Native runtime builds belong to the separate RTX Spark installation; see wiki/Native-vLLM.md'
+    }
+    if($buildConfig.ContainsKey('Backend') -and $buildConfig.Backend -eq 'wslc-myllmbox'){
+        $options=@{Myllmbox=$true;Rebuild=$Rebuild;LmcacheFromSource=$LmcacheFromSource;PrintOnly=$PrintOnly}
+        if($ImageTag){$options.ImageTag=$ImageTag}
+        & "$PSScriptRoot/build.ps1" @options
+    }else{
+        if($Rebuild -or $LmcacheFromSource -or $ImageTag){throw 'These candidate rebuild options require a MyLLMBox profile'}
+        & "$PSScriptRoot/build.ps1" -WithLMCache:$buildConfig.UseLMCache -PrintOnly:$PrintOnly
+    }
+    return
+}
 if($Action -eq 'setup'){
+    $config=@{}
     if(Test-Path -LiteralPath "$PSScriptRoot/config.psd1"){
         $config=Get-N1xConfig -Root $PSScriptRoot -Profile $Profile -ModelRoot $ModelRoot -Port $Port
         if($config.ContainsKey('Backend') -and $config.Backend -eq 'native'){
@@ -76,12 +109,27 @@ if($Action -eq 'setup'){
             return
         }
     }
+    if($config.ContainsKey('Backend') -and $config.Backend -eq 'wslc-myllmbox'){
+        . "$PSScriptRoot/scripts/myllmbox.ps1"
+        if($PrintOnly){Write-Output 'Validate the pinned MyLLMBox image, weights, prepared PLE and partition; create the configured LMCache volume if missing. See wiki/MyLLMBox.md';return}
+        Assert-N1xMyllmboxInstallation $PSScriptRoot $config -PrepareCache
+        return
+    }
     if($PrintOnly){Write-Output '.\setup.ps1 -WithLMCache -ModelRoot <configured ModelRoot or ~/Models>'; return}
     & "$PSScriptRoot/setup.ps1" -WithLMCache -ModelRoot $ModelRoot -SkipDownload:$SkipDownload -SkipBuild:$SkipBuild -SkipPleCopy:$SkipPleCopy -Rebuild:$Rebuild
     return
 }
 $config = Get-N1xConfig -Root $PSScriptRoot -Profile $Profile -ModelRoot $ModelRoot -Port $Port
 $native=$config.ContainsKey('Backend') -and $config.Backend -eq 'native'
+$myllmbox=$config.ContainsKey('Backend') -and $config.Backend -eq 'wslc-myllmbox'
+$requiresHostMonitor=$config.UseLMCache -or $myllmbox
+if($myllmbox){
+    . "$PSScriptRoot/scripts/myllmbox.ps1"
+    $myllmboxPaths=Get-N1xMyllmboxPaths $PSScriptRoot $config
+    $config['MyllmboxRecipeHash']=(Get-FileHash -LiteralPath $myllmboxPaths.Recipe).Hash
+    $config['MyllmboxEnvironmentHash']=(Get-FileHash -LiteralPath $myllmboxPaths.Environment).Hash
+}
+
 if(Test-Path -LiteralPath "$PSScriptRoot/scripts/native.ps1"){
     . "$PSScriptRoot/scripts/native.ps1"
     # Cleanup must not delete the identity of a running native process.
@@ -103,10 +151,17 @@ if($Action -in @('clean','uninstall')){
 $Profile=$config.Profile
 function Get-ConfigFingerprint([string]$LegacyDefault='') {
     $canonical=[ordered]@{}
+    $canonical['__ServedModelName']='qwen/qwen38fn-best'
     foreach($key in ($config.Keys|Sort-Object)){
         if($key -eq 'DefaultProfile'){
             if($LegacyDefault){$canonical[$key]=$LegacyDefault}
         } else {$canonical[$key]=$config[$key]}
+    }
+    if($myllmbox){
+        foreach($setting in @('MyllmboxConfig','MyllmboxEnvironment')){
+            $file=Join-Path $PSScriptRoot $config[$setting]
+            $canonical['__'+$setting+'Sha256']=if(Test-Path -LiteralPath $file -PathType Leaf){(Get-FileHash -LiteralPath $file -Algorithm SHA256).Hash.ToLowerInvariant()}else{'missing'}
+        }
     }
     $sha=[Security.Cryptography.SHA256]::Create()
     try {return ([BitConverter]::ToString($sha.ComputeHash([Text.Encoding]::UTF8.GetBytes(($canonical|ConvertTo-Json -Compress))))).Replace('-','').ToLowerInvariant()}
@@ -174,8 +229,17 @@ if($native){
             return
         }
         'doctor' {Assert-N1xNativeInstallation $paths; & nvidia-smi;return}
-        # The shared test action below uses the qwen alias on both backends.
+        # The shared test action below uses the qwen/qwen38fn-best alias on both backends.
     }} finally {if($null -ne $nativeLock){$nativeLock.Dispose()}}
+}
+
+$containerLock=$null
+try {
+if($myllmbox -and -not $PrintOnly -and $Action -in @('start','stop','restart','recreate')){
+    New-Item -ItemType Directory -Force "$PSScriptRoot/.state"|Out-Null
+    try {$containerLock=[IO.File]::Open("$PSScriptRoot/.state/native-lifecycle.lock",[IO.FileMode]::OpenOrCreate,[IO.FileAccess]::ReadWrite,[IO.FileShare]::None)}
+    catch {throw 'Another serving lifecycle or qualification command is in progress; retry after it finishes.'}
+    if($Action -in @('start','restart','recreate')){Assert-N1xMyllmboxInstallation $PSScriptRoot $config}
 }
 
 function Invoke-Wslc([string[]]$Arguments) {
@@ -218,6 +282,7 @@ function Assert-ProfileRunning {
     if (-not $container -or -not $container.State.Running) {
         throw "Selected profile '$Profile' is not running. Start it or select the active profile."
     }
+    if($myllmbox){Assert-Configuration $container}
 }
 
 function Assert-Configuration($Container) {
@@ -238,12 +303,14 @@ function Write-Headroom {
     $directory=Join-Path $PSScriptRoot ".state/$name"
     New-Item -ItemType Directory -Force $directory|Out-Null
     $os=Get-CimInstance Win32_OperatingSystem
-    $data=@{availableGiB=$os.FreePhysicalMemory/1MB;updatedUnixSeconds=[DateTimeOffset]::UtcNow.ToUnixTimeSeconds()}
+    $data=@{availableGiB=$os.FreePhysicalMemory/1MB;availableCommitGiB=$os.FreeVirtualMemory/1MB;updatedUnixSeconds=[DateTimeOffset]::UtcNow.ToUnixTimeSeconds()}
     if($data.availableGiB -lt $config.WindowsMinimumGiB){throw 'Insufficient Windows memory headroom'}
+    if($data.availableCommitGiB -lt $config.WindowsMinimumGiB){throw 'Insufficient Windows commit headroom'}
     [IO.File]::WriteAllText((Join-Path $directory 'host.json'),($data|ConvertTo-Json),[Text.UTF8Encoding]::new($false))
 }
 
 function Start-MemoryMonitor {
+    if($myllmbox){Start-N1xMyllmboxMonitor $PSScriptRoot $config;return}
     $directory=Join-Path $PSScriptRoot ".state/$name"
     $pidPath=Join-Path $directory 'monitor.json'
     if(Test-Path -LiteralPath $pidPath){
@@ -275,15 +342,27 @@ switch ($Action) {
                     Write-Host "Recreating $name after an unsuccessful exit; named volumes are preserved."
                     Invoke-Wslc @('rm', $name)
                 } else {
-                    if($config.UseLMCache){Write-Headroom; Start-MemoryMonitor}
+                    if($requiresHostMonitor){Write-Headroom; Start-MemoryMonitor}
                     if ($existing.State.Running) { Write-Host "$name is already running. Check status for API readiness." }
                     else { Invoke-Wslc @('start', $name); Write-Host "Starting $name with its existing configuration." }
-                    if($config.UseLMCache){Start-MemoryMonitor}
+                    if($requiresHostMonitor){Start-MemoryMonitor}
                     Update-ClientRegistrations
                     Update-LanAccess
                     return
                 }
             }
+        }
+        if($myllmbox){
+            $run=Get-N1xMyllmboxArguments $PSScriptRoot $config $fingerprint
+            if($PrintOnly){Write-Output ('wslc '+(($run|ForEach-Object {"'"+$_.Replace("'","''")+"'"}) -join ' '));return}
+            Write-Headroom
+            Start-MemoryMonitor
+            Invoke-Wslc $run
+            Start-MemoryMonitor
+            Update-ClientRegistrations
+            Update-LanAccess
+            Write-Host "Loading MyLLMBox. Check .\n1x.ps1 status -Profile $Profile. API: $endpoint/v1"
+            return
         }
         $model = Join-Path $config.ModelRoot 'Qwen3.8-Flash-Next-W4A16-AutoRound-hybrid'
         $table = Join-Path $config.ModelRoot 'ple-table-fp8'
@@ -351,7 +430,7 @@ switch ($Action) {
                 '--env',"N1X_RESTORE_WAIT_MS=$($config.RestoreWaitMs)",'--env',"N1X_WINDOWS_MINIMUM_GIB=$($config.WindowsMinimumGiB)")
         }
         $run+=@($config.Image,
-            '--model', '/model', '--served-model-name', 'qwen', '--host', '0.0.0.0', '--port', '8000',
+            '--model', '/model', '--served-model-name', 'qwen/qwen38fn-best', '--host', '0.0.0.0', '--port', '8000',
             '--max-model-len', [string]$config.Context, '--max-num-seqs', [string]$config.MaxSequences,
             '--override-generation-config', (@{max_new_tokens=$config.MaxOutputTokens}|ConvertTo-Json -Compress),
             '--gpu-memory-utilization', '0.01', '--kv-cache-memory-bytes', $config.KvCacheBytes,
@@ -368,9 +447,9 @@ switch ($Action) {
         if ($config.DFlash) { $run += @('--config', '/profiles/qwen38fn-dflash.yaml', '--kv-cache-dtype-skip-layers', 'sliding_window') }
         if ($PrintOnly) { Write-Output ('wslc ' + (($run | ForEach-Object { '"' + $_ + '"' }) -join ' ')); return }
         # WSLC refuses a name collision if another process created it meanwhile.
-        if($config.UseLMCache){Start-MemoryMonitor}
+        if($requiresHostMonitor){Start-MemoryMonitor}
         Invoke-Wslc $run
-        if($config.UseLMCache){Start-MemoryMonitor}
+        if($requiresHostMonitor){Start-MemoryMonitor}
         Update-ClientRegistrations
         Update-LanAccess
         Write-Host "Loading model. Check .\n1x.ps1 status -Profile $Profile and .\n1x.ps1 logs -Profile $Profile. API: $endpoint/v1"
@@ -387,16 +466,18 @@ switch ($Action) {
         if($config.UseLMCache -and -not $old.State.Running -and $old.State.ExitCode -ne 0){
             & $PSCommandPath start -Profile $Profile -ModelRoot $config.ModelRoot -Port $config.Port -DenyFirewall:$DenyFirewall
         } else {
-            if($config.UseLMCache){Write-Headroom; Start-MemoryMonitor}
+            if($requiresHostMonitor){Write-Headroom; Start-MemoryMonitor}
             Invoke-Wslc @('restart', $name)
-            if($config.UseLMCache){Start-MemoryMonitor}
+            if($requiresHostMonitor){Start-MemoryMonitor}
             Update-ClientRegistrations
             Update-LanAccess
         }
     }
     'logs' { Invoke-Wslc @('logs', '--tail', '100', $name) }
     'wait' {
-        if(-not(Get-ManagedContainer)){throw "Container '$name' does not exist in this WSLC session. Run .\n1x.ps1 start successfully before wait; use the same non-elevated terminal."}
+        $selected=Get-ManagedContainer
+        if(-not $selected){throw "Container '$name' does not exist in this WSLC session. Run .\n1x.ps1 start successfully before wait; use the same non-elevated terminal."}
+        Assert-Configuration $selected
         $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
         $lastNotice = [datetime]::MinValue
         Write-Host "Waiting up to $TimeoutSeconds seconds for $Profile at $endpoint ..."
@@ -454,7 +535,7 @@ switch ($Action) {
         $results = @()
         foreach ($test in $tests) {
             $body = @{
-                model='qwen'; messages=@(@{role='user'; content=$test.Prompt})
+                model='qwen/qwen38fn-best'; messages=@(@{role='user'; content=$test.Prompt})
                 max_tokens=128; temperature=0; chat_template_kwargs=@{enable_thinking=$false}
             } | ConvertTo-Json -Depth 8
             $reply = Invoke-RestMethod "$endpoint/v1/chat/completions" -Method Post -ContentType 'application/json' -Body $body -TimeoutSec 600
@@ -469,3 +550,5 @@ switch ($Action) {
         if (@($results | Where-Object { -not $_.passed }).Count) { throw "Model correctness check failed; see .state/checks/smoke-$Profile.json" }
     }
 }
+
+} finally {if($containerLock){$containerLock.Dispose()}}

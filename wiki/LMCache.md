@@ -1,6 +1,6 @@
 # LMCache
 
-The cache profiles run vLLM and LMCache together in one container. LMCache uses an 8 GiB host L1 pool with LRU eviction and a bounded SSD L2 cache. vLLM also retains its GPU prefix cache. The native PLE table serves model embeddings and is independent of KV caching.
+LMCache stores reusable prompt KV state in RAM and on SSD. Cache profiles run it alongside vLLM in one container; vLLM also maintains its GPU prefix cache. Prepared PLE serves model embeddings and is separate from prompt caching. See [profiles](Configuration.md#profiles) for serving settings and [model assets](Model-assets.md) for exact storage dependencies.
 
 ## Compatibility
 
@@ -12,13 +12,14 @@ The local descriptor broker recovers abandoned socket paths when container resta
 
 Use the [recommended hardware partition](Installation.md#requirements) with the supplied cache settings. Leave at least 4 GiB Windows memory available; aim for 6 GiB for browsing and a harness.
 
-A hidden PowerShell monitor updates the latest Windows headroom every five seconds while the cache container runs. The supervisor stops both services if available memory drops below `WindowsMinimumGiB` (default 4), or the snapshot becomes unavailable/stale. This guard cannot reserve memory or prevent every transient allocation failure.
+A hidden PowerShell monitor updates Windows physical and commit headroom every five seconds while the cache container runs. The supervisor stops both services if either reserve drops below `WindowsMinimumGiB` (default 4), or the snapshot becomes unavailable/stale. This guard cannot reserve memory or prevent every transient allocation failure.
 
-For less host-cache pressure, edit `config.local.psd1`:
+Both `benchmark.ps1` and `test-restores.ps1` verify the documented 88 GiB partition before cache tests. A mismatch prompts for a manual change and rechecks the hardware; cancellation prevents testing. Restart-restore results include a `partition.json` receipt. Neither command changes the partition or reboots the machine.
+
+To change the host pool or restore wait, edit the corresponding keys in `config.local.psd1`:
 
 ```powershell
 @{
-    DefaultProfile = 'qwen38fn-cache-dflash'
     LmcacheL1GiB = 4
     RestoreWaitMs = 2000
 }
@@ -30,20 +31,24 @@ The restore queue can wait briefly for space released by another restore. It doe
 
 ### SSD budget
 
-`LmcacheL2GiB` defaults to 16 GiB across this project's namespaces in the configured cache volume, rather than 16 GiB per profile. A local filesystem-adapter patch serializes store reservations and evicts the oldest-accessed files before writes. It also leaves 20 GiB available on the Linux filesystem; this floor does not reserve Windows disk space. Run only one project serving profile at a time.
+Best sets `LmcacheL1GiB = 4` and `LmcacheL2GiB = 160`: a 4 GiB RAM cache pool and a 160 GiB SSD KV-data budget. The original reference default is 16 GiB on SSD. The SSD budget covers this project's namespaces **within the configured volume**, not every volume on the machine. Separate trial volumes each have their own budget and remain on disk after the experiment unless removed.
+
+A local filesystem-adapter patch serializes store reservations and evicts the least recently used files before writes. Reads refresh their recency. It also leaves 20 GiB available on the Linux filesystem; this floor does not reserve Windows disk space. Run only one project serving profile at a time. These are cache-data budgets, not limits on total process memory, filesystem metadata, model weights, images or the WSLC virtual disk.
+
+There is no configured age-based expiry (TTL). Cold entries are removed when capacity is needed; an idle cache can retain entries indefinitely without exceeding its data budget. Reuse the selected volume for routine operation and retire disposable trial volumes after saving results. Reducing the SSD budget evicts excess entries at the next cache initialization. Reclaiming Windows space may also require TRIM and offline VHDX compaction; see [cleanup](Configuration.md#cleanup-and-disk-reclamation).
 
 Set `LmcacheL2GiB = 8` for a smaller cache, or `0` to disable new SSD caching while retaining RAM caching. Disabling SSD caching does not remove existing files. Rebuild the cache image after patch changes, and recreate the service after configuration changes.
 
-The budget is a working-set choice, not a fixed context-length guarantee. DFlash2 and MTP produce different entry sizes; see [measured sizing](Benchmarks.md#ssd-budget-validation) and [restore qualification](Benchmarks.md#feature-and-cache-validation). Additional entries compete for space, and eviction can reduce prefix hits or require recomputation. The budget excludes model weights, native PLE data, runtime compilation caches, and container images.
-
-Deleting cache files frees Linux filesystem space. WSLC's backing VHDX may still require offline compaction to return physical space to Windows.
+The budget is a working-set choice, not a fixed context-length guarantee. DFlash2 and MTP produce different entry sizes; see [historical sizing](Benchmarks.md#ssd-budget-validation) and [restore qualification](Benchmarks.md#feature-and-cache-validation). Additional entries compete for space, and eviction can reduce prefix hits or require recomputation.
 
 ### Prompt reuse
 
-Chunk size is 1,664 tokens for the default DFlash2 profile and 2,048 for the other cache profiles. Partial chunks and changed prefixes affect reuse. See [API guidance](../AGENTS.md) for prompt construction and cache salts, and [benchmark results](Benchmarks.md#feature-and-cache-validation) for verified restores.
+Cache geometry is profile-specific: best uses 4,096-token blocks/chunks, the reference DFlash2 profile uses 1,664, and the other reference cache profiles use 2,048. Partial chunks and changed prefixes affect reuse. Keep compatible geometry together as described in [Scheduling](Configuration.md#scheduling).
+
+Named volumes surviving a restart does not prove a successful restore. Check cache-hit and transfer evidence; a correct response may have been recomputed. See [API guidance](../AGENTS.md) for prompt construction and cache salts and [measured results](Benchmarks.md) for verified behavior.
 
 ## Ports and privacy
 
-Only the model API is published, on Windows loopback port 8000 by default. LMCache TCP 5555 and its HTTP/metrics port 8080 bind to container loopback. They do not need separate Windows ports.
+Only the model API is published, according to [LAN access settings](Configuration.md#lan-access). LMCache TCP 5555 and its HTTP/metrics port 8080 bind to container loopback and need no separate Windows ports.
 
 Outbound usage telemetry is disabled with `LMCACHE_TRACK_USAGE=false`, `DO_NOT_TRACK=1`, `VLLM_NO_USAGE_STATS=1`, and `HF_HUB_DISABLE_TELEMETRY=1`. Internal cache counters remain available for verification. The filesystem cache contains application data; protect its storage accordingly.
