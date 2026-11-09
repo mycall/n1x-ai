@@ -1,0 +1,2596 @@
+{
+  "date": "2026-11-08",
+  "timezone": "America/Los_Angeles",
+  "local_evidence_directory": "results/benchmarks/parameter-review-20261108",
+  "condition_sequence": "50% -> 20% -> 50% -> 20%",
+  "condition_source": "User-reported NVIDIA App changes, not independent driver readback.",
+  "comparison": {
+    "complete": true,
+    "sequence": "50% -> 20% -> 50% -> 20%",
+    "runs": [
+      {
+        "label": "First 50%",
+        "folder": "background50",
+        "background_gpu_percent": 50,
+        "rows": [
+          {
+            "client_concurrency": 2,
+            "correct": 16,
+            "planned": 16,
+            "elapsed_s": 80.1091582000372,
+            "correct_tasks_s": 0.19972747635229265,
+            "mean_session_s": 9.850341337503778,
+            "preemptions": 0.0,
+            "peak_scheduled": 2.0,
+            "peak_waiting": 1.0,
+            "gpu_samples": 15,
+            "gpu_utilization_max": 96.0,
+            "clock_mhz_median": 1709.0,
+            "samples_above_98_percent": 0,
+            "clock_mhz_range_above_98_percent": null,
+            "repeats": [
+              {
+                "repeat": 0,
+                "concurrency": 2,
+                "sessions": 8,
+                "turns": 1,
+                "planned_tasks": 8,
+                "correct_tasks": 8,
+                "elapsed_s": 40.18966070000897,
+                "correct_tasks_s": 0.19905617167845893,
+                "preemptions": 0.0,
+                "thinking": true,
+                "max_output_tokens": 8192,
+                "session_results": [
+                  {
+                    "session": 0,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 12.010885800002143
+                  },
+                  {
+                    "session": 1,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 9.72782980001648
+                  },
+                  {
+                    "session": 2,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 10.385289099998772
+                  },
+                  {
+                    "session": 3,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 8.269737599999644
+                  },
+                  {
+                    "session": 4,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 10.144942999992054
+                  },
+                  {
+                    "session": 5,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 9.768982200010214
+                  },
+                  {
+                    "session": 6,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 10.139025900018169
+                  },
+                  {
+                    "session": 7,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 9.711808399995789
+                  }
+                ]
+              },
+              {
+                "repeat": 1,
+                "concurrency": 2,
+                "sessions": 8,
+                "turns": 1,
+                "planned_tasks": 8,
+                "correct_tasks": 8,
+                "elapsed_s": 39.91949750002823,
+                "correct_tasks_s": 0.2004033242150491,
+                "preemptions": 0.0,
+                "thinking": true,
+                "max_output_tokens": 8192,
+                "session_results": [
+                  {
+                    "session": 0,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 11.92590490001021
+                  },
+                  {
+                    "session": 1,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 9.816855899989605
+                  },
+                  {
+                    "session": 2,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 8.684438299998874
+                  },
+                  {
+                    "session": 3,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 10.383077500009676
+                  },
+                  {
+                    "session": 4,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 11.388593300012872
+                  },
+                  {
+                    "session": 5,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 9.566409199993359
+                  },
+                  {
+                    "session": 6,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 7.638976500020362
+                  },
+                  {
+                    "session": 7,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 8.042703999992227
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "client_concurrency": 8,
+            "correct": 16,
+            "planned": 16,
+            "elapsed_s": 59.72175719999359,
+            "correct_tasks_s": 0.2679090627963257,
+            "mean_session_s": 28.37876141875131,
+            "preemptions": 0.0,
+            "peak_scheduled": 8.0,
+            "peak_waiting": 4.0,
+            "gpu_samples": 11,
+            "gpu_utilization_max": 96.0,
+            "clock_mhz_median": 1443.0,
+            "samples_above_98_percent": 0,
+            "clock_mhz_range_above_98_percent": null,
+            "repeats": [
+              {
+                "repeat": 0,
+                "concurrency": 8,
+                "sessions": 8,
+                "turns": 1,
+                "planned_tasks": 8,
+                "correct_tasks": 8,
+                "elapsed_s": 29.054593400011072,
+                "correct_tasks_s": 0.27534372585633743,
+                "preemptions": 0.0,
+                "thinking": true,
+                "max_output_tokens": 8192,
+                "session_results": [
+                  {
+                    "session": 0,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 25.9836709999945
+                  },
+                  {
+                    "session": 1,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 18.388253300014185
+                  },
+                  {
+                    "session": 2,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 28.526756399980513
+                  },
+                  {
+                    "session": 3,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 28.887849399994593
+                  },
+                  {
+                    "session": 4,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 28.798449099995196
+                  },
+                  {
+                    "session": 5,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 28.955182400008198
+                  },
+                  {
+                    "session": 6,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 29.024146900017513
+                  },
+                  {
+                    "session": 7,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 27.884375000023283
+                  }
+                ]
+              },
+              {
+                "repeat": 1,
+                "concurrency": 8,
+                "sessions": 8,
+                "turns": 1,
+                "planned_tasks": 8,
+                "correct_tasks": 8,
+                "elapsed_s": 30.667163799982518,
+                "correct_tasks_s": 0.26086533636359815,
+                "preemptions": 0.0,
+                "thinking": true,
+                "max_output_tokens": 8192,
+                "session_results": [
+                  {
+                    "session": 0,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 30.378592900000513
+                  },
+                  {
+                    "session": 1,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 30.379675800009863
+                  },
+                  {
+                    "session": 2,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 30.36558710000827
+                  },
+                  {
+                    "session": 3,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 29.790245199983474
+                  },
+                  {
+                    "session": 4,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 30.095672399998875
+                  },
+                  {
+                    "session": 5,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 30.632420199981425
+                  },
+                  {
+                    "session": 6,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 29.772415599989472
+                  },
+                  {
+                    "session": 7,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 26.196890000021085
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "label": "First 20%",
+        "folder": "background20",
+        "background_gpu_percent": 20,
+        "rows": [
+          {
+            "client_concurrency": 2,
+            "correct": 15,
+            "planned": 16,
+            "elapsed_s": 89.33444090001285,
+            "correct_tasks_s": 0.16790836601069323,
+            "mean_session_s": 10.813112812504187,
+            "preemptions": 0.0,
+            "peak_scheduled": 2.0,
+            "peak_waiting": 1.0,
+            "gpu_samples": 17,
+            "gpu_utilization_max": 96.0,
+            "clock_mhz_median": 1547.0,
+            "samples_above_98_percent": 0,
+            "clock_mhz_range_above_98_percent": null,
+            "repeats": [
+              {
+                "repeat": 0,
+                "concurrency": 2,
+                "sessions": 8,
+                "turns": 1,
+                "planned_tasks": 8,
+                "correct_tasks": 7,
+                "elapsed_s": 44.545057999988785,
+                "correct_tasks_s": 0.1571442560474781,
+                "preemptions": 0.0,
+                "thinking": true,
+                "max_output_tokens": 8192,
+                "session_results": [
+                  {
+                    "session": 0,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 13.52739850000944
+                  },
+                  {
+                    "session": 1,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 10.945732199994382
+                  },
+                  {
+                    "session": 2,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 10.971486399997957
+                  },
+                  {
+                    "session": 3,
+                    "correct_tasks": 0,
+                    "planned_tasks": 1,
+                    "elapsed_s": 8.662756100005936
+                  },
+                  {
+                    "session": 4,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 8.719549600005848
+                  },
+                  {
+                    "session": 5,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 12.732929000019794
+                  },
+                  {
+                    "session": 6,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 11.115417799999705
+                  },
+                  {
+                    "session": 7,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 9.61953860000358
+                  }
+                ]
+              },
+              {
+                "repeat": 1,
+                "concurrency": 2,
+                "sessions": 8,
+                "turns": 1,
+                "planned_tasks": 8,
+                "correct_tasks": 8,
+                "elapsed_s": 44.789382900024066,
+                "correct_tasks_s": 0.17861375803853063,
+                "preemptions": 0.0,
+                "thinking": true,
+                "max_output_tokens": 8192,
+                "session_results": [
+                  {
+                    "session": 0,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 10.831998499983456
+                  },
+                  {
+                    "session": 1,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 13.429940000001807
+                  },
+                  {
+                    "session": 2,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 11.430254900013097
+                  },
+                  {
+                    "session": 3,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 10.883873200014932
+                  },
+                  {
+                    "session": 4,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 8.901836400007596
+                  },
+                  {
+                    "session": 5,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 11.480845899990527
+                  },
+                  {
+                    "session": 6,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 10.763571500021499
+                  },
+                  {
+                    "session": 7,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 8.992676399997436
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "client_concurrency": 8,
+            "correct": 16,
+            "planned": 16,
+            "elapsed_s": 64.34244820001186,
+            "correct_tasks_s": 0.2486694312635286,
+            "mean_session_s": 31.436445268749594,
+            "preemptions": 0.0,
+            "peak_scheduled": 8.0,
+            "peak_waiting": 5.0,
+            "gpu_samples": 14,
+            "gpu_utilization_max": 96.0,
+            "clock_mhz_median": 1585.5,
+            "samples_above_98_percent": 0,
+            "clock_mhz_range_above_98_percent": null,
+            "repeats": [
+              {
+                "repeat": 0,
+                "concurrency": 8,
+                "sessions": 8,
+                "turns": 1,
+                "planned_tasks": 8,
+                "correct_tasks": 8,
+                "elapsed_s": 32.46049110000604,
+                "correct_tasks_s": 0.24645344937490832,
+                "preemptions": 0.0,
+                "thinking": true,
+                "max_output_tokens": 8192,
+                "session_results": [
+                  {
+                    "session": 0,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 32.45736410000245
+                  },
+                  {
+                    "session": 1,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 31.739940599974943
+                  },
+                  {
+                    "session": 2,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 32.22580479999306
+                  },
+                  {
+                    "session": 3,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 31.98219790001167
+                  },
+                  {
+                    "session": 4,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 32.217744499997934
+                  },
+                  {
+                    "session": 5,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 31.45919120000326
+                  },
+                  {
+                    "session": 6,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 32.0948245000036
+                  },
+                  {
+                    "session": 7,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 31.575629600003595
+                  }
+                ]
+              },
+              {
+                "repeat": 1,
+                "concurrency": 8,
+                "sessions": 8,
+                "turns": 1,
+                "planned_tasks": 8,
+                "correct_tasks": 8,
+                "elapsed_s": 31.88195710000582,
+                "correct_tasks_s": 0.2509256246379724,
+                "preemptions": 0.0,
+                "thinking": true,
+                "max_output_tokens": 8192,
+                "session_results": [
+                  {
+                    "session": 0,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 30.52027109998744
+                  },
+                  {
+                    "session": 1,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 30.186787100014044
+                  },
+                  {
+                    "session": 2,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 30.81950800001505
+                  },
+                  {
+                    "session": 3,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 31.267200600006618
+                  },
+                  {
+                    "session": 4,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 31.857088899996597
+                  },
+                  {
+                    "session": 5,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 31.25890580000123
+                  },
+                  {
+                    "session": 6,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 31.16857459998573
+                  },
+                  {
+                    "session": 7,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 30.15209099999629
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "label": "Second 50%",
+        "folder": "background50-verify",
+        "background_gpu_percent": 50,
+        "rows": [
+          {
+            "client_concurrency": 2,
+            "correct": 16,
+            "planned": 16,
+            "elapsed_s": 87.36382979998598,
+            "correct_tasks_s": 0.1831421543289826,
+            "mean_session_s": 10.699718406249303,
+            "preemptions": 0.0,
+            "peak_scheduled": 2.0,
+            "peak_waiting": 1.0,
+            "gpu_samples": 18,
+            "gpu_utilization_max": 96.0,
+            "clock_mhz_median": 1605.0,
+            "samples_above_98_percent": 0,
+            "clock_mhz_range_above_98_percent": null,
+            "repeats": [
+              {
+                "repeat": 0,
+                "concurrency": 2,
+                "sessions": 8,
+                "turns": 1,
+                "planned_tasks": 8,
+                "correct_tasks": 8,
+                "elapsed_s": 42.39442450000206,
+                "correct_tasks_s": 0.1887040594217669,
+                "preemptions": 0.0,
+                "thinking": true,
+                "max_output_tokens": 8192,
+                "session_results": [
+                  {
+                    "session": 0,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 10.539438999985578
+                  },
+                  {
+                    "session": 1,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 10.595969799993327
+                  },
+                  {
+                    "session": 2,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 8.401424100011354
+                  },
+                  {
+                    "session": 3,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 12.495993899996392
+                  },
+                  {
+                    "session": 4,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 10.569608200021321
+                  },
+                  {
+                    "session": 5,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 12.120576699991943
+                  },
+                  {
+                    "session": 6,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 9.737394299998414
+                  },
+                  {
+                    "session": 7,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 7.173902999988059
+                  }
+                ]
+              },
+              {
+                "repeat": 1,
+                "concurrency": 2,
+                "sessions": 8,
+                "turns": 1,
+                "planned_tasks": 8,
+                "correct_tasks": 8,
+                "elapsed_s": 44.96940529998392,
+                "correct_tasks_s": 0.17789872796033754,
+                "preemptions": 0.0,
+                "thinking": true,
+                "max_output_tokens": 8192,
+                "session_results": [
+                  {
+                    "session": 0,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 10.691690099978587
+                  },
+                  {
+                    "session": 1,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 13.194137300015427
+                  },
+                  {
+                    "session": 2,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 11.246387399995001
+                  },
+                  {
+                    "session": 3,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 10.992797800019616
+                  },
+                  {
+                    "session": 4,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 11.441101899981732
+                  },
+                  {
+                    "session": 5,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 9.071043600008124
+                  },
+                  {
+                    "session": 6,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 11.709604500007117
+                  },
+                  {
+                    "session": 7,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 11.214422899996862
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "client_concurrency": 8,
+            "correct": 16,
+            "planned": 16,
+            "elapsed_s": 65.91071809999994,
+            "correct_tasks_s": 0.242752627512338,
+            "mean_session_s": 30.808209712498865,
+            "preemptions": 0.0,
+            "peak_scheduled": 8.0,
+            "peak_waiting": 3.0,
+            "gpu_samples": 13,
+            "gpu_utilization_max": 96.0,
+            "clock_mhz_median": 1566.0,
+            "samples_above_98_percent": 0,
+            "clock_mhz_range_above_98_percent": null,
+            "repeats": [
+              {
+                "repeat": 0,
+                "concurrency": 8,
+                "sessions": 8,
+                "turns": 1,
+                "planned_tasks": 8,
+                "correct_tasks": 8,
+                "elapsed_s": 32.5512141000072,
+                "correct_tasks_s": 0.24576656266711203,
+                "preemptions": 0.0,
+                "thinking": true,
+                "max_output_tokens": 8192,
+                "session_results": [
+                  {
+                    "session": 0,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 32.54814279999118
+                  },
+                  {
+                    "session": 1,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 31.503505000000587
+                  },
+                  {
+                    "session": 2,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 32.054592200001935
+                  },
+                  {
+                    "session": 3,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 32.042922399996314
+                  },
+                  {
+                    "session": 4,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 31.635501700016903
+                  },
+                  {
+                    "session": 5,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 29.08370630000718
+                  },
+                  {
+                    "session": 6,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 31.834057400003076
+                  },
+                  {
+                    "session": 7,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 32.24942409998039
+                  }
+                ]
+              },
+              {
+                "repeat": 1,
+                "concurrency": 8,
+                "sessions": 8,
+                "turns": 1,
+                "planned_tasks": 8,
+                "correct_tasks": 8,
+                "elapsed_s": 33.35950399999274,
+                "correct_tasks_s": 0.23981171902321274,
+                "preemptions": 0.0,
+                "thinking": true,
+                "max_output_tokens": 8192,
+                "session_results": [
+                  {
+                    "session": 0,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 29.321162100008223
+                  },
+                  {
+                    "session": 1,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 31.42941179999616
+                  },
+                  {
+                    "session": 2,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 33.35140089999186
+                  },
+                  {
+                    "session": 3,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 31.962015500001144
+                  },
+                  {
+                    "session": 4,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 24.206900999997742
+                  },
+                  {
+                    "session": 5,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 32.30146719998447
+                  },
+                  {
+                    "session": 6,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 24.205687199981185
+                  },
+                  {
+                    "session": 7,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 33.20145780002349
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "label": "Second 20%",
+        "folder": "background20-retest",
+        "background_gpu_percent": 20,
+        "rows": [
+          {
+            "client_concurrency": 2,
+            "correct": 16,
+            "planned": 16,
+            "elapsed_s": 89.83940879997681,
+            "correct_tasks_s": 0.1780955620002269,
+            "mean_session_s": 10.962314250000418,
+            "preemptions": 0.0,
+            "peak_scheduled": 2.0,
+            "peak_waiting": 1.0,
+            "gpu_samples": 17,
+            "gpu_utilization_max": 96.0,
+            "clock_mhz_median": 1709.0,
+            "samples_above_98_percent": 0,
+            "clock_mhz_range_above_98_percent": null,
+            "repeats": [
+              {
+                "repeat": 0,
+                "concurrency": 2,
+                "sessions": 8,
+                "turns": 1,
+                "planned_tasks": 8,
+                "correct_tasks": 8,
+                "elapsed_s": 42.79033739998704,
+                "correct_tasks_s": 0.18695809582474626,
+                "preemptions": 0.0,
+                "thinking": true,
+                "max_output_tokens": 8192,
+                "session_results": [
+                  {
+                    "session": 0,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 10.387010200007353
+                  },
+                  {
+                    "session": 1,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 12.318332800001372
+                  },
+                  {
+                    "session": 2,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 10.156619400018826
+                  },
+                  {
+                    "session": 3,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 10.983885900001042
+                  },
+                  {
+                    "session": 4,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 8.258661600004416
+                  },
+                  {
+                    "session": 5,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 10.797706399986055
+                  },
+                  {
+                    "session": 6,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 10.627355100004934
+                  },
+                  {
+                    "session": 7,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 8.683431100012967
+                  }
+                ]
+              },
+              {
+                "repeat": 1,
+                "concurrency": 2,
+                "sessions": 8,
+                "turns": 1,
+                "planned_tasks": 8,
+                "correct_tasks": 8,
+                "elapsed_s": 47.04907139998977,
+                "correct_tasks_s": 0.17003523686977037,
+                "preemptions": 0.0,
+                "thinking": true,
+                "max_output_tokens": 8192,
+                "session_results": [
+                  {
+                    "session": 0,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 13.449376400007168
+                  },
+                  {
+                    "session": 1,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 10.79199100000551
+                  },
+                  {
+                    "session": 2,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 9.79585529997712
+                  },
+                  {
+                    "session": 3,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 11.648881100001745
+                  },
+                  {
+                    "session": 4,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 11.830429699999513
+                  },
+                  {
+                    "session": 5,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 11.89594919999945
+                  },
+                  {
+                    "session": 6,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 14.629032800003188
+                  },
+                  {
+                    "session": 7,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 9.142509999976028
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "client_concurrency": 8,
+            "correct": 16,
+            "planned": 16,
+            "elapsed_s": 65.21828269999241,
+            "correct_tasks_s": 0.24532998014683788,
+            "mean_session_s": 32.00477996875088,
+            "preemptions": 0.0,
+            "peak_scheduled": 8.0,
+            "peak_waiting": 3.0,
+            "gpu_samples": 14,
+            "gpu_utilization_max": 96.0,
+            "clock_mhz_median": 1592.5,
+            "samples_above_98_percent": 0,
+            "clock_mhz_range_above_98_percent": null,
+            "repeats": [
+              {
+                "repeat": 0,
+                "concurrency": 8,
+                "sessions": 8,
+                "turns": 1,
+                "planned_tasks": 8,
+                "correct_tasks": 8,
+                "elapsed_s": 32.324314700003015,
+                "correct_tasks_s": 0.24749171248475854,
+                "preemptions": 0.0,
+                "thinking": true,
+                "max_output_tokens": 8192,
+                "session_results": [
+                  {
+                    "session": 0,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 31.577452500001527
+                  },
+                  {
+                    "session": 1,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 32.033690300013404
+                  },
+                  {
+                    "session": 2,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 32.250022599997465
+                  },
+                  {
+                    "session": 3,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 31.67520239998703
+                  },
+                  {
+                    "session": 4,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 32.30415079998784
+                  },
+                  {
+                    "session": 5,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 31.43116929999087
+                  },
+                  {
+                    "session": 6,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 31.426540199987357
+                  },
+                  {
+                    "session": 7,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 31.836879000009503
+                  }
+                ]
+              },
+              {
+                "repeat": 1,
+                "concurrency": 8,
+                "sessions": 8,
+                "turns": 1,
+                "planned_tasks": 8,
+                "correct_tasks": 8,
+                "elapsed_s": 32.8939679999894,
+                "correct_tasks_s": 0.24320568439789866,
+                "preemptions": 0.0,
+                "thinking": true,
+                "max_output_tokens": 8192,
+                "session_results": [
+                  {
+                    "session": 0,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 32.43532240000786
+                  },
+                  {
+                    "session": 1,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 32.78723159999936
+                  },
+                  {
+                    "session": 2,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 29.61442339999485
+                  },
+                  {
+                    "session": 3,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 32.87440790000255
+                  },
+                  {
+                    "session": 4,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 32.04816520001623
+                  },
+                  {
+                    "session": 5,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 32.87027220000164
+                  },
+                  {
+                    "session": 6,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 32.15208650002023
+                  },
+                  {
+                    "session": 7,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 32.75946319999639
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "groups": [
+      {
+        "client_concurrency": 2,
+        "latest_time_change_50_to_20_percent": 2.8336429454369316,
+        "latest_correct_throughput_change_50_to_20_percent": -2.7555602079957997,
+        "second20_time_change_vs_first20_percent": 0.5652555664720005,
+        "cohorts": [
+          {
+            "client_concurrency": 2,
+            "correct": 16,
+            "planned": 16,
+            "elapsed_s": 80.1091582000372,
+            "correct_tasks_s": 0.19972747635229265,
+            "mean_session_s": 9.850341337503778,
+            "preemptions": 0.0,
+            "peak_scheduled": 2.0,
+            "peak_waiting": 1.0,
+            "gpu_samples": 15,
+            "gpu_utilization_max": 96.0,
+            "clock_mhz_median": 1709.0,
+            "samples_above_98_percent": 0,
+            "clock_mhz_range_above_98_percent": null,
+            "repeats": [
+              {
+                "repeat": 0,
+                "concurrency": 2,
+                "sessions": 8,
+                "turns": 1,
+                "planned_tasks": 8,
+                "correct_tasks": 8,
+                "elapsed_s": 40.18966070000897,
+                "correct_tasks_s": 0.19905617167845893,
+                "preemptions": 0.0,
+                "thinking": true,
+                "max_output_tokens": 8192,
+                "session_results": [
+                  {
+                    "session": 0,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 12.010885800002143
+                  },
+                  {
+                    "session": 1,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 9.72782980001648
+                  },
+                  {
+                    "session": 2,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 10.385289099998772
+                  },
+                  {
+                    "session": 3,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 8.269737599999644
+                  },
+                  {
+                    "session": 4,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 10.144942999992054
+                  },
+                  {
+                    "session": 5,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 9.768982200010214
+                  },
+                  {
+                    "session": 6,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 10.139025900018169
+                  },
+                  {
+                    "session": 7,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 9.711808399995789
+                  }
+                ]
+              },
+              {
+                "repeat": 1,
+                "concurrency": 2,
+                "sessions": 8,
+                "turns": 1,
+                "planned_tasks": 8,
+                "correct_tasks": 8,
+                "elapsed_s": 39.91949750002823,
+                "correct_tasks_s": 0.2004033242150491,
+                "preemptions": 0.0,
+                "thinking": true,
+                "max_output_tokens": 8192,
+                "session_results": [
+                  {
+                    "session": 0,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 11.92590490001021
+                  },
+                  {
+                    "session": 1,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 9.816855899989605
+                  },
+                  {
+                    "session": 2,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 8.684438299998874
+                  },
+                  {
+                    "session": 3,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 10.383077500009676
+                  },
+                  {
+                    "session": 4,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 11.388593300012872
+                  },
+                  {
+                    "session": 5,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 9.566409199993359
+                  },
+                  {
+                    "session": 6,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 7.638976500020362
+                  },
+                  {
+                    "session": 7,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 8.042703999992227
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "client_concurrency": 2,
+            "correct": 15,
+            "planned": 16,
+            "elapsed_s": 89.33444090001285,
+            "correct_tasks_s": 0.16790836601069323,
+            "mean_session_s": 10.813112812504187,
+            "preemptions": 0.0,
+            "peak_scheduled": 2.0,
+            "peak_waiting": 1.0,
+            "gpu_samples": 17,
+            "gpu_utilization_max": 96.0,
+            "clock_mhz_median": 1547.0,
+            "samples_above_98_percent": 0,
+            "clock_mhz_range_above_98_percent": null,
+            "repeats": [
+              {
+                "repeat": 0,
+                "concurrency": 2,
+                "sessions": 8,
+                "turns": 1,
+                "planned_tasks": 8,
+                "correct_tasks": 7,
+                "elapsed_s": 44.545057999988785,
+                "correct_tasks_s": 0.1571442560474781,
+                "preemptions": 0.0,
+                "thinking": true,
+                "max_output_tokens": 8192,
+                "session_results": [
+                  {
+                    "session": 0,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 13.52739850000944
+                  },
+                  {
+                    "session": 1,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 10.945732199994382
+                  },
+                  {
+                    "session": 2,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 10.971486399997957
+                  },
+                  {
+                    "session": 3,
+                    "correct_tasks": 0,
+                    "planned_tasks": 1,
+                    "elapsed_s": 8.662756100005936
+                  },
+                  {
+                    "session": 4,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 8.719549600005848
+                  },
+                  {
+                    "session": 5,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 12.732929000019794
+                  },
+                  {
+                    "session": 6,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 11.115417799999705
+                  },
+                  {
+                    "session": 7,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 9.61953860000358
+                  }
+                ]
+              },
+              {
+                "repeat": 1,
+                "concurrency": 2,
+                "sessions": 8,
+                "turns": 1,
+                "planned_tasks": 8,
+                "correct_tasks": 8,
+                "elapsed_s": 44.789382900024066,
+                "correct_tasks_s": 0.17861375803853063,
+                "preemptions": 0.0,
+                "thinking": true,
+                "max_output_tokens": 8192,
+                "session_results": [
+                  {
+                    "session": 0,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 10.831998499983456
+                  },
+                  {
+                    "session": 1,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 13.429940000001807
+                  },
+                  {
+                    "session": 2,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 11.430254900013097
+                  },
+                  {
+                    "session": 3,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 10.883873200014932
+                  },
+                  {
+                    "session": 4,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 8.901836400007596
+                  },
+                  {
+                    "session": 5,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 11.480845899990527
+                  },
+                  {
+                    "session": 6,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 10.763571500021499
+                  },
+                  {
+                    "session": 7,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 8.992676399997436
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "client_concurrency": 2,
+            "correct": 16,
+            "planned": 16,
+            "elapsed_s": 87.36382979998598,
+            "correct_tasks_s": 0.1831421543289826,
+            "mean_session_s": 10.699718406249303,
+            "preemptions": 0.0,
+            "peak_scheduled": 2.0,
+            "peak_waiting": 1.0,
+            "gpu_samples": 18,
+            "gpu_utilization_max": 96.0,
+            "clock_mhz_median": 1605.0,
+            "samples_above_98_percent": 0,
+            "clock_mhz_range_above_98_percent": null,
+            "repeats": [
+              {
+                "repeat": 0,
+                "concurrency": 2,
+                "sessions": 8,
+                "turns": 1,
+                "planned_tasks": 8,
+                "correct_tasks": 8,
+                "elapsed_s": 42.39442450000206,
+                "correct_tasks_s": 0.1887040594217669,
+                "preemptions": 0.0,
+                "thinking": true,
+                "max_output_tokens": 8192,
+                "session_results": [
+                  {
+                    "session": 0,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 10.539438999985578
+                  },
+                  {
+                    "session": 1,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 10.595969799993327
+                  },
+                  {
+                    "session": 2,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 8.401424100011354
+                  },
+                  {
+                    "session": 3,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 12.495993899996392
+                  },
+                  {
+                    "session": 4,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 10.569608200021321
+                  },
+                  {
+                    "session": 5,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 12.120576699991943
+                  },
+                  {
+                    "session": 6,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 9.737394299998414
+                  },
+                  {
+                    "session": 7,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 7.173902999988059
+                  }
+                ]
+              },
+              {
+                "repeat": 1,
+                "concurrency": 2,
+                "sessions": 8,
+                "turns": 1,
+                "planned_tasks": 8,
+                "correct_tasks": 8,
+                "elapsed_s": 44.96940529998392,
+                "correct_tasks_s": 0.17789872796033754,
+                "preemptions": 0.0,
+                "thinking": true,
+                "max_output_tokens": 8192,
+                "session_results": [
+                  {
+                    "session": 0,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 10.691690099978587
+                  },
+                  {
+                    "session": 1,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 13.194137300015427
+                  },
+                  {
+                    "session": 2,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 11.246387399995001
+                  },
+                  {
+                    "session": 3,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 10.992797800019616
+                  },
+                  {
+                    "session": 4,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 11.441101899981732
+                  },
+                  {
+                    "session": 5,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 9.071043600008124
+                  },
+                  {
+                    "session": 6,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 11.709604500007117
+                  },
+                  {
+                    "session": 7,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 11.214422899996862
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "client_concurrency": 2,
+            "correct": 16,
+            "planned": 16,
+            "elapsed_s": 89.83940879997681,
+            "correct_tasks_s": 0.1780955620002269,
+            "mean_session_s": 10.962314250000418,
+            "preemptions": 0.0,
+            "peak_scheduled": 2.0,
+            "peak_waiting": 1.0,
+            "gpu_samples": 17,
+            "gpu_utilization_max": 96.0,
+            "clock_mhz_median": 1709.0,
+            "samples_above_98_percent": 0,
+            "clock_mhz_range_above_98_percent": null,
+            "repeats": [
+              {
+                "repeat": 0,
+                "concurrency": 2,
+                "sessions": 8,
+                "turns": 1,
+                "planned_tasks": 8,
+                "correct_tasks": 8,
+                "elapsed_s": 42.79033739998704,
+                "correct_tasks_s": 0.18695809582474626,
+                "preemptions": 0.0,
+                "thinking": true,
+                "max_output_tokens": 8192,
+                "session_results": [
+                  {
+                    "session": 0,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 10.387010200007353
+                  },
+                  {
+                    "session": 1,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 12.318332800001372
+                  },
+                  {
+                    "session": 2,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 10.156619400018826
+                  },
+                  {
+                    "session": 3,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 10.983885900001042
+                  },
+                  {
+                    "session": 4,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 8.258661600004416
+                  },
+                  {
+                    "session": 5,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 10.797706399986055
+                  },
+                  {
+                    "session": 6,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 10.627355100004934
+                  },
+                  {
+                    "session": 7,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 8.683431100012967
+                  }
+                ]
+              },
+              {
+                "repeat": 1,
+                "concurrency": 2,
+                "sessions": 8,
+                "turns": 1,
+                "planned_tasks": 8,
+                "correct_tasks": 8,
+                "elapsed_s": 47.04907139998977,
+                "correct_tasks_s": 0.17003523686977037,
+                "preemptions": 0.0,
+                "thinking": true,
+                "max_output_tokens": 8192,
+                "session_results": [
+                  {
+                    "session": 0,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 13.449376400007168
+                  },
+                  {
+                    "session": 1,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 10.79199100000551
+                  },
+                  {
+                    "session": 2,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 9.79585529997712
+                  },
+                  {
+                    "session": 3,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 11.648881100001745
+                  },
+                  {
+                    "session": 4,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 11.830429699999513
+                  },
+                  {
+                    "session": 5,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 11.89594919999945
+                  },
+                  {
+                    "session": 6,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 14.629032800003188
+                  },
+                  {
+                    "session": 7,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 9.142509999976028
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "client_concurrency": 8,
+        "latest_time_change_50_to_20_percent": -1.0505657045899008,
+        "latest_correct_throughput_change_50_to_20_percent": 1.0617197683550739,
+        "second20_time_change_vs_first20_percent": 1.361207918694629,
+        "cohorts": [
+          {
+            "client_concurrency": 8,
+            "correct": 16,
+            "planned": 16,
+            "elapsed_s": 59.72175719999359,
+            "correct_tasks_s": 0.2679090627963257,
+            "mean_session_s": 28.37876141875131,
+            "preemptions": 0.0,
+            "peak_scheduled": 8.0,
+            "peak_waiting": 4.0,
+            "gpu_samples": 11,
+            "gpu_utilization_max": 96.0,
+            "clock_mhz_median": 1443.0,
+            "samples_above_98_percent": 0,
+            "clock_mhz_range_above_98_percent": null,
+            "repeats": [
+              {
+                "repeat": 0,
+                "concurrency": 8,
+                "sessions": 8,
+                "turns": 1,
+                "planned_tasks": 8,
+                "correct_tasks": 8,
+                "elapsed_s": 29.054593400011072,
+                "correct_tasks_s": 0.27534372585633743,
+                "preemptions": 0.0,
+                "thinking": true,
+                "max_output_tokens": 8192,
+                "session_results": [
+                  {
+                    "session": 0,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 25.9836709999945
+                  },
+                  {
+                    "session": 1,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 18.388253300014185
+                  },
+                  {
+                    "session": 2,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 28.526756399980513
+                  },
+                  {
+                    "session": 3,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 28.887849399994593
+                  },
+                  {
+                    "session": 4,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 28.798449099995196
+                  },
+                  {
+                    "session": 5,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 28.955182400008198
+                  },
+                  {
+                    "session": 6,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 29.024146900017513
+                  },
+                  {
+                    "session": 7,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 27.884375000023283
+                  }
+                ]
+              },
+              {
+                "repeat": 1,
+                "concurrency": 8,
+                "sessions": 8,
+                "turns": 1,
+                "planned_tasks": 8,
+                "correct_tasks": 8,
+                "elapsed_s": 30.667163799982518,
+                "correct_tasks_s": 0.26086533636359815,
+                "preemptions": 0.0,
+                "thinking": true,
+                "max_output_tokens": 8192,
+                "session_results": [
+                  {
+                    "session": 0,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 30.378592900000513
+                  },
+                  {
+                    "session": 1,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 30.379675800009863
+                  },
+                  {
+                    "session": 2,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 30.36558710000827
+                  },
+                  {
+                    "session": 3,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 29.790245199983474
+                  },
+                  {
+                    "session": 4,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 30.095672399998875
+                  },
+                  {
+                    "session": 5,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 30.632420199981425
+                  },
+                  {
+                    "session": 6,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 29.772415599989472
+                  },
+                  {
+                    "session": 7,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 26.196890000021085
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "client_concurrency": 8,
+            "correct": 16,
+            "planned": 16,
+            "elapsed_s": 64.34244820001186,
+            "correct_tasks_s": 0.2486694312635286,
+            "mean_session_s": 31.436445268749594,
+            "preemptions": 0.0,
+            "peak_scheduled": 8.0,
+            "peak_waiting": 5.0,
+            "gpu_samples": 14,
+            "gpu_utilization_max": 96.0,
+            "clock_mhz_median": 1585.5,
+            "samples_above_98_percent": 0,
+            "clock_mhz_range_above_98_percent": null,
+            "repeats": [
+              {
+                "repeat": 0,
+                "concurrency": 8,
+                "sessions": 8,
+                "turns": 1,
+                "planned_tasks": 8,
+                "correct_tasks": 8,
+                "elapsed_s": 32.46049110000604,
+                "correct_tasks_s": 0.24645344937490832,
+                "preemptions": 0.0,
+                "thinking": true,
+                "max_output_tokens": 8192,
+                "session_results": [
+                  {
+                    "session": 0,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 32.45736410000245
+                  },
+                  {
+                    "session": 1,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 31.739940599974943
+                  },
+                  {
+                    "session": 2,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 32.22580479999306
+                  },
+                  {
+                    "session": 3,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 31.98219790001167
+                  },
+                  {
+                    "session": 4,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 32.217744499997934
+                  },
+                  {
+                    "session": 5,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 31.45919120000326
+                  },
+                  {
+                    "session": 6,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 32.0948245000036
+                  },
+                  {
+                    "session": 7,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 31.575629600003595
+                  }
+                ]
+              },
+              {
+                "repeat": 1,
+                "concurrency": 8,
+                "sessions": 8,
+                "turns": 1,
+                "planned_tasks": 8,
+                "correct_tasks": 8,
+                "elapsed_s": 31.88195710000582,
+                "correct_tasks_s": 0.2509256246379724,
+                "preemptions": 0.0,
+                "thinking": true,
+                "max_output_tokens": 8192,
+                "session_results": [
+                  {
+                    "session": 0,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 30.52027109998744
+                  },
+                  {
+                    "session": 1,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 30.186787100014044
+                  },
+                  {
+                    "session": 2,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 30.81950800001505
+                  },
+                  {
+                    "session": 3,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 31.267200600006618
+                  },
+                  {
+                    "session": 4,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 31.857088899996597
+                  },
+                  {
+                    "session": 5,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 31.25890580000123
+                  },
+                  {
+                    "session": 6,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 31.16857459998573
+                  },
+                  {
+                    "session": 7,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 30.15209099999629
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "client_concurrency": 8,
+            "correct": 16,
+            "planned": 16,
+            "elapsed_s": 65.91071809999994,
+            "correct_tasks_s": 0.242752627512338,
+            "mean_session_s": 30.808209712498865,
+            "preemptions": 0.0,
+            "peak_scheduled": 8.0,
+            "peak_waiting": 3.0,
+            "gpu_samples": 13,
+            "gpu_utilization_max": 96.0,
+            "clock_mhz_median": 1566.0,
+            "samples_above_98_percent": 0,
+            "clock_mhz_range_above_98_percent": null,
+            "repeats": [
+              {
+                "repeat": 0,
+                "concurrency": 8,
+                "sessions": 8,
+                "turns": 1,
+                "planned_tasks": 8,
+                "correct_tasks": 8,
+                "elapsed_s": 32.5512141000072,
+                "correct_tasks_s": 0.24576656266711203,
+                "preemptions": 0.0,
+                "thinking": true,
+                "max_output_tokens": 8192,
+                "session_results": [
+                  {
+                    "session": 0,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 32.54814279999118
+                  },
+                  {
+                    "session": 1,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 31.503505000000587
+                  },
+                  {
+                    "session": 2,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 32.054592200001935
+                  },
+                  {
+                    "session": 3,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 32.042922399996314
+                  },
+                  {
+                    "session": 4,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 31.635501700016903
+                  },
+                  {
+                    "session": 5,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 29.08370630000718
+                  },
+                  {
+                    "session": 6,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 31.834057400003076
+                  },
+                  {
+                    "session": 7,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 32.24942409998039
+                  }
+                ]
+              },
+              {
+                "repeat": 1,
+                "concurrency": 8,
+                "sessions": 8,
+                "turns": 1,
+                "planned_tasks": 8,
+                "correct_tasks": 8,
+                "elapsed_s": 33.35950399999274,
+                "correct_tasks_s": 0.23981171902321274,
+                "preemptions": 0.0,
+                "thinking": true,
+                "max_output_tokens": 8192,
+                "session_results": [
+                  {
+                    "session": 0,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 29.321162100008223
+                  },
+                  {
+                    "session": 1,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 31.42941179999616
+                  },
+                  {
+                    "session": 2,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 33.35140089999186
+                  },
+                  {
+                    "session": 3,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 31.962015500001144
+                  },
+                  {
+                    "session": 4,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 24.206900999997742
+                  },
+                  {
+                    "session": 5,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 32.30146719998447
+                  },
+                  {
+                    "session": 6,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 24.205687199981185
+                  },
+                  {
+                    "session": 7,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 33.20145780002349
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "client_concurrency": 8,
+            "correct": 16,
+            "planned": 16,
+            "elapsed_s": 65.21828269999241,
+            "correct_tasks_s": 0.24532998014683788,
+            "mean_session_s": 32.00477996875088,
+            "preemptions": 0.0,
+            "peak_scheduled": 8.0,
+            "peak_waiting": 3.0,
+            "gpu_samples": 14,
+            "gpu_utilization_max": 96.0,
+            "clock_mhz_median": 1592.5,
+            "samples_above_98_percent": 0,
+            "clock_mhz_range_above_98_percent": null,
+            "repeats": [
+              {
+                "repeat": 0,
+                "concurrency": 8,
+                "sessions": 8,
+                "turns": 1,
+                "planned_tasks": 8,
+                "correct_tasks": 8,
+                "elapsed_s": 32.324314700003015,
+                "correct_tasks_s": 0.24749171248475854,
+                "preemptions": 0.0,
+                "thinking": true,
+                "max_output_tokens": 8192,
+                "session_results": [
+                  {
+                    "session": 0,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 31.577452500001527
+                  },
+                  {
+                    "session": 1,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 32.033690300013404
+                  },
+                  {
+                    "session": 2,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 32.250022599997465
+                  },
+                  {
+                    "session": 3,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 31.67520239998703
+                  },
+                  {
+                    "session": 4,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 32.30415079998784
+                  },
+                  {
+                    "session": 5,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 31.43116929999087
+                  },
+                  {
+                    "session": 6,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 31.426540199987357
+                  },
+                  {
+                    "session": 7,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 31.836879000009503
+                  }
+                ]
+              },
+              {
+                "repeat": 1,
+                "concurrency": 8,
+                "sessions": 8,
+                "turns": 1,
+                "planned_tasks": 8,
+                "correct_tasks": 8,
+                "elapsed_s": 32.8939679999894,
+                "correct_tasks_s": 0.24320568439789866,
+                "preemptions": 0.0,
+                "thinking": true,
+                "max_output_tokens": 8192,
+                "session_results": [
+                  {
+                    "session": 0,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 32.43532240000786
+                  },
+                  {
+                    "session": 1,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 32.78723159999936
+                  },
+                  {
+                    "session": 2,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 29.61442339999485
+                  },
+                  {
+                    "session": 3,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 32.87440790000255
+                  },
+                  {
+                    "session": 4,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 32.04816520001623
+                  },
+                  {
+                    "session": 5,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 32.87027220000164
+                  },
+                  {
+                    "session": 6,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 32.15208650002023
+                  },
+                  {
+                    "session": 7,
+                    "correct_tasks": 1,
+                    "planned_tasks": 1,
+                    "elapsed_s": 32.75946319999639
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "method": "Unchanged eight-session probe, one turn, forward/reverse C2/C8 sweeps, xhigh, temperature 0.6, seed 42, 8192 output allowance. All first scores and individual cohorts remain visible.",
+    "msi_performance_mode": "Performance Boost, user-confirmed; Windows power-scheme labels are a separate control.",
+    "limits": [
+      "Only two eight-task batches per concurrency in each cohort.",
+      "Run order, generated lengths, clocks, cache state and uncontrolled desktop GPU contention can affect timing.",
+      "No direct foreground/background GPU category measurement; no near-full-context C8 qualification."
+    ]
+  },
+  "request_phase_groups": [
+    {
+      "variant": "xhigh-t06",
+      "phase": "agents",
+      "concurrency": 2,
+      "correct": 16,
+      "planned": 16,
+      "elapsed_s": 89.83940879997681,
+      "correct_tasks_s": 0.1780955620002269,
+      "requests": 32,
+      "completion_tokens": 2332,
+      "reasoning_tokens": 1612,
+      "mean_completion_tokens_per_task": 145.75,
+      "write_tks": 22.72825509546062,
+      "read_tks": 5858.113421516551,
+      "acceptance_rate": 0.6784313725490196,
+      "preemptions": 0.0,
+      "empty_finals": 0,
+      "truncated": 0,
+      "timing_sources": [
+        [
+          "server-scheduled-to-first-token",
+          "server-first-to-last-token"
+        ]
+      ]
+    },
+    {
+      "variant": "xhigh-t06",
+      "phase": "agents",
+      "concurrency": 8,
+      "correct": 16,
+      "planned": 16,
+      "elapsed_s": 65.21828269999241,
+      "correct_tasks_s": 0.24532998014683788,
+      "requests": 32,
+      "completion_tokens": 2342,
+      "reasoning_tokens": 1622,
+      "mean_completion_tokens_per_task": 146.375,
+      "write_tks": 9.307377006829473,
+      "read_tks": 2054.9331794104137,
+      "acceptance_rate": 0.6705526770293609,
+      "preemptions": 0.0,
+      "empty_finals": 0,
+      "truncated": 0,
+      "timing_sources": [
+        [
+          "server-scheduled-to-first-token",
+          "server-first-to-last-token"
+        ]
+      ]
+    }
+  ],
+  "serving_profile": {
+    "CacheVolume": "n1x-mbx-w4-dflash-test-cache",
+    "MaxSequences": 8,
+    "MyllmboxWSLCVersion": "3.0.5.0",
+    "RequiredPartitionMiB": 90112,
+    "ImageId": "sha256:de420cb63cedf084f8838e1e11a7db611e43418c04b3cebc756bc4a5955571aa",
+    "MyllmboxConfig": "profiles/qwen38fn-best.yaml",
+    "Backend": "wslc-myllmbox",
+    "DFlash": true,
+    "Container": "n1x-qwen38fn-best",
+    "MyllmboxModel": "Qwen3.8-Flash-Next-W4A16-AutoRound-hybrid",
+    "RestoreWaitMs": 0,
+    "MyllmboxDrafter": "Qwen3.8-Flash-Next-DFlash2",
+    "BatchedTokens": 8192,
+    "LmcacheNamespace": "qwen-c8-w4-std-fp32-idxbf16-kv11-b4k-v1",
+    "UseLMCache": true,
+    "Mtp": false,
+    "Context": 262144,
+    "MyllmboxEnvironment": "runtime/myllmbox/environment.psd1",
+    "CacheBlockTokens": 4096,
+    "LanAccess": false,
+    "Image": "n1x-ai:mbx-cache-test",
+    "LmcacheVolume": "n1x-c8-lmc4-ssd160-v1",
+    "PleVolume": "n1x-ple-native",
+    "KvCacheDtype": "fp8",
+    "KvCacheBytes": "11811160064",
+    "LmcacheL1GiB": 4,
+    "LmcacheL2GiB": 160,
+    "LmcacheChunkTokens": 4096
+  },
+  "msi_performance_mode": "Performance Boost (user-confirmed)",
+  "conclusion": "The fourth cohort does not establish a repeatable approximately 7% C8 benefit. The recent 20%, 50%, 20% C8 totals are close; foreground/background GPU classification remains unverified.",
+  "audit": {
+    "prior_artifact_hashes_unchanged": true,
+    "source_hashes_match": true,
+    "matching_warmup_payloads_excluding_salts_across_all_four_cohorts": 32,
+    "validated_requests": 96,
+    "independently_scored_workflows": 32,
+    "correct_workflows": 32
+  },
+  "prior_numeric_files": [
+    {
+      "file": "gpu-priority-trial-20261108.json",
+      "sha256": "b316d0a7ece92a9dc6339fd205b4fb95137f4711888aa85a619711717782941e"
+    },
+    {
+      "file": "gpu-priority-c8-baseline-20261108.json",
+      "sha256": "43948f65921b558b962fdcd5661e3a7efae5c61d34b93a9927508a5abfdbbdac"
+    },
+    {
+      "file": "gpu-priority-c8-verification-20261108.json",
+      "sha256": "910c7e3c61c347dc4fb528b2b163220e738046304adaa1b9df8e3d8f907da404"
+    }
+  ],
+  "limits": [
+    "Two batches per concurrency in each cohort; limited replication, not a precise statistical effect estimate.",
+    "Runtime history differs: the first 50% C8 cohort followed the longer parameter comparison; later cohorts followed server restarts with the same priming procedure.",
+    "No controlled competing foreground GPU load, fixed-clock regime, or direct GPU category measurement.",
+    "Generated lengths, cache state, clocks and desktop contention can vary; all prior observations remain visible.",
+    "Windows power-scheme labels do not identify MSI Performance Boost mode."
+  ],
+  "final_state": "Service stopped, matching initial state. User-selected 20% and deployment defaults unchanged.",
+  "evidence": [
+    {
+      "path": "background20-retest/c8-scaling/aggregate.json",
+      "bytes": 1326,
+      "sha256": "626b0615105a5e513eb0655f6f14cd2ec7afe496c7c14d03731e169654a019d2"
+    },
+    {
+      "path": "background20-retest/c8-scaling/completed.json",
+      "bytes": 72,
+      "sha256": "399335c44a7c8dbbbd820df9b21d62479016848d41fdc64bbfefa5fe7d211d5c"
+    },
+    {
+      "path": "background20-retest/c8-scaling/phase-events.jsonl",
+      "bytes": 588,
+      "sha256": "a4bd08840c3950baae2b4a5afbe2610df19a70f9b875cca67c8c56b1a6965463"
+    },
+    {
+      "path": "background20-retest/c8-scaling/request-gauges.jsonl",
+      "bytes": 54080,
+      "sha256": "2e8a1b30e0b52440a8fbf6e089d8e30d9ac1b350626f5a34d2565d25e87fbbf3"
+    },
+    {
+      "path": "background20-retest/c8-scaling/scaling-summary.json",
+      "bytes": 8881,
+      "sha256": "cf1d7406ddcd223b3e5a5e6756277c3c8e6fa096593a937bda259034f6db6aec"
+    },
+    {
+      "path": "background20-retest/c8-scaling/settings.json",
+      "bytes": 3281,
+      "sha256": "04acc4df97bed32142054d10aae3bd6771630f174c5d54e1e07c834b70b59f5e"
+    },
+    {
+      "path": "background20-retest/c8-scaling/telemetry.jsonl",
+      "bytes": 21042,
+      "sha256": "f45887b764089299a37b3608aaf56596de28049edea30ee36480aec5f341de94"
+    },
+    {
+      "path": "background20-retest/c8-scaling/xhigh-t06/agents/agent-0-c2-after-vllm.prom",
+      "bytes": 70562,
+      "sha256": "897d2314ebd4672c8e107c572e5e5dcaecef2b34128b900ce3bb13644d94e1e8"
+    },
+    {
+      "path": "background20-retest/c8-scaling/xhigh-t06/agents/agent-0-c2-before-vllm.prom",
+      "bytes": 70314,
+      "sha256": "be497c767f79f75fb440ba9dbec25c2d2fa65e236370e40da9efa3447230ab5b"
+    },
+    {
+      "path": "background20-retest/c8-scaling/xhigh-t06/agents/agent-0-c8-after-vllm.prom",
+      "bytes": 70600,
+      "sha256": "8776c5fb2a5467177f84b14549028fb08a3659d1cb7c25833b923bee7a1b5d23"
+    },
+    {
+      "path": "background20-retest/c8-scaling/xhigh-t06/agents/agent-0-c8-before-vllm.prom",
+      "bytes": 70565,
+      "sha256": "dfb89e82c2cc44930ef9226e885903ed66e32f580176a6237d28416848aa7b26"
+    },
+    {
+      "path": "background20-retest/c8-scaling/xhigh-t06/agents/agent-1-c2-after-vllm.prom",
+      "bytes": 70635,
+      "sha256": "1d4d4f9e6f0a114a09ad4c39a8138ad076b1a17c5126a7b6a357de64742dbb5d"
+    },
+    {
+      "path": "background20-retest/c8-scaling/xhigh-t06/agents/agent-1-c2-before-vllm.prom",
+      "bytes": 70601,
+      "sha256": "9eee0cd728d86e97ef67dab54668d304cdccf4e1dde61409114a6078c5aeeef9"
+    },
+    {
+      "path": "background20-retest/c8-scaling/xhigh-t06/agents/agent-1-c8-after-vllm.prom",
+      "bytes": 70599,
+      "sha256": "c5e0a3133e3773b2423d2b92e12f305efc8d80d08a79c1438072083f8f282eb2"
+    },
+    {
+      "path": "background20-retest/c8-scaling/xhigh-t06/agents/agent-1-c8-before-vllm.prom",
+      "bytes": 70598,
+      "sha256": "547f618aa3d8b7220b488bd3d3dba44c83a307c669f948c1519d9e31398dc5de"
+    },
+    {
+      "path": "background20-retest/c8-scaling/xhigh-t06/agents/responses.jsonl",
+      "bytes": 3026112,
+      "sha256": "e73df88615d3de46ba0b3edf055adee59476113f896ef76b694be85ad3e5e306"
+    },
+    {
+      "path": "background20-retest/c8-scaling/xhigh-t06/agents/summary.json",
+      "bytes": 5831,
+      "sha256": "eee5045af50fde90585d7000dd5ab263ef799ccb642a04b666620a8e4f51c8e5"
+    },
+    {
+      "path": "background20-retest/four-run-comparison.json",
+      "bytes": 78112,
+      "sha256": "3d7228ae790959721cf52e0f4d43338124cb59ca16c8b6141948d34e3057fea6"
+    },
+    {
+      "path": "background20-retest/host.json",
+      "bytes": 13399,
+      "sha256": "8fe5167afa868c0a2c8fd815f0c752596abcfb4cd90bcd925d1d856712bf4f4a"
+    },
+    {
+      "path": "background20-retest/startup-warmup-observation.txt",
+      "bytes": 4492,
+      "sha256": "e2e7d9882b8846d19e9959cdb73ed99bce2cc128ad38236f49353b1c0c369576"
+    },
+    {
+      "path": "compare_c8_four_runs.py",
+      "bytes": 3241,
+      "sha256": "bd771523dc1e8dc7574842b0c089db5b654ce72b38ede2be2045df74ecd12a22"
+    },
+    {
+      "path": "run_c8_20_retest.py",
+      "bytes": 1751,
+      "sha256": "5ec19a582f9643ec8ca4df320803de700cbed3d4b52cdbd8813973ffeae24274"
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 # Benchmarks
 
-This page retains measured performance and correctness evidence. Near-full comparisons appear first, followed by historical reference results with their original workloads. See [Component review](Profile-review.md) for the selected profile and top ten, [Speed and capacity benchmarks](Speed-benchmarks.md) for reusable tools, and [Test coverage](Test-plan.md) for unmeasured cases.
+This page retains measured performance and correctness evidence. Near-full comparisons appear first, followed by historical reference results with their original workloads. See [Component review](Profile-review.md) for the selected profile and top ten, [Speed and capacity benchmarks](Speed-benchmarks.md) for reusable tools, [request parameter trials](Parameter-trials.md) for the DFlash2 reasoning/temperature comparison, and [Test coverage](Test-plan.md) for unmeasured cases.
 
 ## Matched prefill comparison
 

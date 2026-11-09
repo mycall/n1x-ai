@@ -27,5 +27,7 @@ Use this guide to install, operate, evaluate, and maintain the local model serve
 | --- | --- |
 | Understand the selected profile and ranked alternatives | [Component review and top ten](Profile-review.md) |
 | Inspect measured results and retained evidence | [Benchmarks](Benchmarks.md) |
+| Review DFlash2 reasoning and temperature trials using the existing weights | [Request parameter trials](Parameter-trials.md) |
+| Compare 20%/50% GPU sharing observations and C2/C8 scaling | [GPU priority repeat](GPU-priority-trial.md) |
 | Plan or run speed/depth and near-full quality comparisons | [Speed and capacity benchmarks](Speed-benchmarks.md) |
 | See measured coverage and remaining gaps | [Test coverage](Test-plan.md) |
