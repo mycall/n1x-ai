@@ -24,7 +24,7 @@ Check `ModelRoot` against the [asset inventory](Model-assets.md). The recovery p
 
 | Runtime | Recovery |
 | --- | --- |
-| Best / 4K alternate | Restore missing weights or prepared PLE first. Best's setup validates them; it only creates missing LMCache storage. See [prerequisites](MyLLMBox.md#existing-installation). |
+| Best / 4K alternate | Restore missing target/drafter weights first. `start` or `setup` restores the runtime, downloads/copies missing FP8 PLE, and creates missing cache volumes. See [prerequisites](MyLLMBox.md#existing-installation). |
 | Original WSLC reference | Rerun [reference setup](Installation.md#original-wslc-reference) to resume downloads and prepare missing native PLE. |
 | Native Windows reference | Restore the external FP4 model/runtime using [native installation guidance](Native-vLLM.md#installation-and-configuration). |
 
@@ -34,7 +34,7 @@ To rebuild the original native PLE copy from an available host source:
 .\prepare-native-ple.ps1
 ```
 
-This does not generate the MyLLMBox prepared PLE map. Launch validation does not automatically restore large assets removed during cleanup.
+For MyLLMBox, use `n1x.ps1 setup` or `start` so preparation uses its selected image. The loader generates the PLE map on first startup. Recovery can download/copy about 49 GiB of PLE data and needs additional disk space for the Linux copy and map. Check `wslc images` and `wslc volume list` in the same non-administrator terminal: elevated and regular WSLC sessions can expose different storage.
 
 ## Memory or cache failures
 

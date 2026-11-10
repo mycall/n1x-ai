@@ -142,8 +142,43 @@ function Confirm-N1xMyllmboxImage {
     Write-Host "Selected locally built runtime $tag ($($image.Id)). Run n1x.ps1 wait and n1x.ps1 test after startup to validate serving."
 }
 
+function Confirm-N1xMyllmboxStorage {
+    param([string]$Root,[hashtable]$Config,[switch]$Prepare,[switch]$SkipDownload,[switch]$SkipPleCopy)
+    # Listing first distinguishes an unavailable WSLC session from absent storage.
+    $rows=@(& wslc volume list --format json)
+    if($LASTEXITCODE -ne 0){throw 'Cannot inspect WSLC volumes; check wslc info from the same non-administrator terminal'}
+    $volumes=@($rows | Where-Object {$_.Trim()} | ForEach-Object {($_|ConvertFrom-Json).Name})
+    $ready=$false
+    if($Config.PleVolume -in $volumes){
+        & wslc run --rm --entrypoint python3 --volume "$($Config.PleVolume):/table:ro" --volume "${Root}/scripts:/checks:ro" $Config.ImageId /checks/check-ple.py | Out-Host
+        $ready=$LASTEXITCODE -eq 0
+    }
+    if(-not $ready){
+        if(-not $Prepare -or $SkipPleCopy){throw "Missing or incomplete FP8 PLE volume: $($Config.PleVolume); run .\n1x.ps1 setup -Profile $($Config.Profile) without -SkipPleCopy"}
+        $running=@(& wslc list --filter 'label=n1x-ai.managed=true' --format json)
+        if($LASTEXITCODE -ne 0){throw 'Cannot inspect containers before preparing PLE'}
+        if(@($running | Where-Object {$_.Trim()}).Count){throw 'Stop managed containers before preparing the PLE table'}
+        Write-Host "Preparing FP8 PLE volume $($Config.PleVolume); downloading/copying the table can take a while."
+        if(-not $SkipDownload){
+            . "$Root/scripts/models.ps1"
+            Get-N1xModelDownload 'Saren/Qwen3.8-Flash-Next-ple-table-fp8' '50511b0a41aa1d34b8beb7e5d4bb06a0b650dc14' (Join-Path $Config.ModelRoot 'ple-table-fp8') 'ple'
+        }
+        & "$Root/prepare-native-ple.ps1" -Volume $Config.PleVolume -ModelRoot $Config.ModelRoot -Image $Config.ImageId -PythonExecutable python3
+        & wslc run --rm --entrypoint python3 --volume "$($Config.PleVolume):/table:ro" --volume "${Root}/scripts:/checks:ro" $Config.ImageId /checks/check-ple.py | Out-Host
+        if($LASTEXITCODE -ne 0){throw 'Prepared FP8 PLE volume failed verification; rerun setup to resume'}
+    }
+    if($Config.CacheVolume -notin $volumes){
+        if(-not $Prepare){throw "Missing MyLLMBox runtime cache volume: $($Config.CacheVolume); run .\n1x.ps1 setup -Profile $($Config.Profile)"}
+        & wslc volume create $Config.CacheVolume | Out-Null
+        if($LASTEXITCODE -ne 0){throw 'Cannot create the MyLLMBox runtime cache volume'}
+        & wslc volume inspect $Config.CacheVolume | Out-Null
+        if($LASTEXITCODE -ne 0){throw 'New MyLLMBox runtime cache volume could not be verified'}
+        Write-Host 'Created runtime cache volume. The first model load builds the PLE map and compiles kernels; allow extra startup time.'
+    }
+}
+
 function Assert-N1xMyllmboxInstallation {
-    param([string]$Root,[hashtable]$Config,[switch]$PrepareCache,[switch]$PrepareRuntime)
+    param([string]$Root,[hashtable]$Config,[switch]$PrepareCache,[switch]$PrepareRuntime,[switch]$SkipDownload,[switch]$SkipPleCopy)
     $paths=Get-N1xMyllmboxPaths $Root $Config
     $null=Get-N1xMyllmboxEnvironment $Root $Config
     foreach($path in @($paths.Recipe,"$($paths.Model)/config.json","$($paths.Model)/model.safetensors.index.json","$($paths.Drafter)/config.json","$($paths.Drafter)/model.safetensors")){
@@ -161,15 +196,12 @@ function Assert-N1xMyllmboxInstallation {
     $tool=Get-Command wslc.exe -ErrorAction Stop
     $version=[Diagnostics.FileVersionInfo]::GetVersionInfo($tool.Source).FileVersion
     if($version -ne $Config.MyllmboxWSLCVersion){throw "This MyLLMBox recipe requires WSLC $($Config.MyllmboxWSLCVersion); found $version"}
-    & wslc volume inspect $Config.PleVolume | Out-Null
-    if($LASTEXITCODE -ne 0){throw "Missing existing FP8 PLE volume: $($Config.PleVolume)"}
-    & wslc volume inspect $Config.CacheVolume | Out-Null
-    if($LASTEXITCODE -ne 0){throw "Missing prepared MyLLMBox cache volume: $($Config.CacheVolume); reuse the qualified PLE map"}
     $partition=@(& nvidia-smi --id=0 --query-gpu=memory.total --format=csv,noheader,nounits)
     if($LASTEXITCODE -ne 0 -or $partition.Count -ne 1 -or $partition[0].Trim() -ne [string]$Config.RequiredPartitionMiB){
         throw "This MyLLMBox recipe requires $($Config.RequiredPartitionMiB) MiB of GPU memory; change the partition manually before starting"
     }
     Confirm-N1xMyllmboxImage $Root $Config -PrepareRuntime:$PrepareRuntime
+    Confirm-N1xMyllmboxStorage $Root $Config -Prepare:$PrepareCache -SkipDownload:$SkipDownload -SkipPleCopy:$SkipPleCopy
     Confirm-N1xMyllmboxCacheVolume $Config -CreateIfMissing:$PrepareCache
 }
 

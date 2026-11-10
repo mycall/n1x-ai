@@ -1,6 +1,6 @@
 # Installation
 
-Choose the installation path for the runtime you intend to use. Best prepares its runtime around existing model and PLE assets; the original WSLC reference setup can download and build its own stack.
+Choose the installation path for the runtime you intend to use. Best prepares its runtime and PLE storage around existing model weights; the original WSLC reference setup can download and build its own stack.
 
 ## Requirements
 
@@ -17,7 +17,7 @@ Use a **non-administrator PowerShell** for setup and serving. Regular and elevat
 
 | Installation | Entry point | What it does |
 | --- | --- | --- |
-| Prepared best or 4K alternate | `n1x.ps1 setup -Profile qwen38fn-best` | Validate assets, restore/build a missing runtime, and create an empty LMCache volume if missing |
+| Prepared best or 4K alternate | `n1x.ps1 setup -Profile qwen38fn-best` | Validate weights, restore/build runtime, prepare PLE, and create missing cache volumes |
 | Original WSLC reference | `n1x.ps1 setup -Profile qwen38fn-cache-dflash` | Download assets, build missing images, prepare native PLE, and select this reference as the local default |
 | Native Windows reference | `n1x.ps1 setup -Profile qwen38fn-myllmbox` | Validate the separately installed native runtime and FP4 model |
 
@@ -29,9 +29,9 @@ First satisfy the [MyLLMBox prerequisites](MyLLMBox.md#existing-installation). C
 .\n1x.ps1 setup -Profile qwen38fn-best
 ```
 
-Setup validates target shards, drafter, prepared PLE volumes, WSLC version, and GPU partition before preparing the runtime. If the image tag is missing, it restores it from the configured image ID when available; otherwise it builds the pinned repository recipe under a unique `n1x-ai:mbx-setup-*` tag and saves `Image` and `ImageId` in `config.local.psd1`, preserving other local settings. Existing tags with a different ID are rejected. It also creates the configured LMCache volume if absent. `start` and `recreate` run this same preparation automatically; `restart` only validates the existing installation. Preview commands make no changes. Builds require all containers to be stopped.
+Setup validates target shards, drafter, WSLC version, and GPU partition before preparing the runtime. If the image tag is missing, it restores it from the configured image ID when available; otherwise it builds the pinned repository recipe under a unique `n1x-ai:mbx-setup-*` tag and saves `Image` and `ImageId` in `config.local.psd1`, preserving other local settings. Existing tags with a different ID are rejected. It verifies the FP8 PLE copy manifest and file sizes. Missing or incomplete PLE storage triggers a resumable download of the pinned FP8 source and a SHA256-verified copy into the configured PLE volume, using the selected MyLLMBox image. It creates missing runtime-cache and LMCache volumes; the loader builds its PLE map on the first model load. `start` and `recreate` run this same preparation automatically; `restart` only validates the existing installation. Preview commands make no changes. Builds require all containers to be stopped.
 
-Setup does not download best-profile weights or generate missing PLE data. These assets must already be prepared; this is not a complete fresh-machine bootstrap. A locally built runtime has passed the image build checks but has not inherited the historical GPU qualification: run `n1x.ps1 wait` and `n1x.ps1 test` after starting it. See [runtime builds](MyLLMBox.md#rebuild-lmcache-and-the-runtime) for explicit candidate upgrades.
+Target and drafter weights must already exist; this is not a complete fresh-machine bootstrap. PLE recovery requires space for the host source, Linux copy, and generated map (roughly 49 GiB each), and the first startup takes longer. `-SkipDownload` uses existing host PLE files, `-SkipPleCopy` requires a complete prepared PLE volume, and `-SkipBuild` requires an existing runtime image. A locally built runtime has passed the image build checks but has not inherited the historical GPU qualification: run `n1x.ps1 wait` and `n1x.ps1 test` after starting it. See [runtime builds](MyLLMBox.md#rebuild-lmcache-and-the-runtime) for explicit candidate upgrades.
 
 `-ModelRoot D:\Models` overrides the path for that command. Save the path in `config.local.psd1` to use it for subsequent best-profile commands.
 

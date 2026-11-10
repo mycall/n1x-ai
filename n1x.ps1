@@ -111,11 +111,11 @@ if($Action -eq 'setup'){
     }
     if($config.ContainsKey('Backend') -and $config.Backend -eq 'wslc-myllmbox'){
         . "$PSScriptRoot/scripts/myllmbox.ps1"
-        if($PrintOnly){Write-Output 'Validate MyLLMBox weights, prepared PLE and partition; restore a missing image tag or build and select a missing runtime; create the configured LMCache volume if missing. See wiki/MyLLMBox.md';return}
+        if($PrintOnly){Write-Output 'Validate MyLLMBox weights and partition; restore/build a missing runtime; download and prepare missing FP8 PLE; create missing runtime and LMCache volumes. See wiki/MyLLMBox.md';return}
         New-Item -ItemType Directory -Force "$PSScriptRoot/.state"|Out-Null
         try {$setupLock=[IO.File]::Open("$PSScriptRoot/.state/native-lifecycle.lock",[IO.FileMode]::OpenOrCreate,[IO.FileAccess]::ReadWrite,[IO.FileShare]::None)}
         catch {throw 'Another serving lifecycle or qualification command is in progress; retry after it finishes.'}
-        try {Assert-N1xMyllmboxInstallation $PSScriptRoot $config -PrepareCache -PrepareRuntime}
+        try {Assert-N1xMyllmboxInstallation $PSScriptRoot $config -PrepareCache -PrepareRuntime:(-not $SkipBuild) -SkipDownload:$SkipDownload -SkipPleCopy:$SkipPleCopy}
         finally {$setupLock.Dispose()}
         return
     }
@@ -247,7 +247,7 @@ if($myllmbox -and -not $PrintOnly -and $Action -in @('start','stop','restart','r
     catch {throw 'Another serving lifecycle or qualification command is in progress; retry after it finishes.'}
     if($Action -in @('start','restart','recreate')){
         $prepare=$Action -in @('start','recreate')
-        Assert-N1xMyllmboxInstallation $PSScriptRoot $config -PrepareCache:$prepare -PrepareRuntime:$prepare
+        Assert-N1xMyllmboxInstallation $PSScriptRoot $config -PrepareCache:$prepare -PrepareRuntime:($prepare -and -not $SkipBuild) -SkipDownload:$SkipDownload -SkipPleCopy:$SkipPleCopy
         $fingerprint=Get-ConfigFingerprint
     }
 }
