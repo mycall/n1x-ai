@@ -111,8 +111,12 @@ if($Action -eq 'setup'){
     }
     if($config.ContainsKey('Backend') -and $config.Backend -eq 'wslc-myllmbox'){
         . "$PSScriptRoot/scripts/myllmbox.ps1"
-        if($PrintOnly){Write-Output 'Validate the pinned MyLLMBox image, weights, prepared PLE and partition; create the configured LMCache volume if missing. See wiki/MyLLMBox.md';return}
-        Assert-N1xMyllmboxInstallation $PSScriptRoot $config -PrepareCache
+        if($PrintOnly){Write-Output 'Validate MyLLMBox weights, prepared PLE and partition; restore a missing image tag or build and select a missing runtime; create the configured LMCache volume if missing. See wiki/MyLLMBox.md';return}
+        New-Item -ItemType Directory -Force "$PSScriptRoot/.state"|Out-Null
+        try {$setupLock=[IO.File]::Open("$PSScriptRoot/.state/native-lifecycle.lock",[IO.FileMode]::OpenOrCreate,[IO.FileAccess]::ReadWrite,[IO.FileShare]::None)}
+        catch {throw 'Another serving lifecycle or qualification command is in progress; retry after it finishes.'}
+        try {Assert-N1xMyllmboxInstallation $PSScriptRoot $config -PrepareCache -PrepareRuntime}
+        finally {$setupLock.Dispose()}
         return
     }
     if($PrintOnly){Write-Output '.\setup.ps1 -WithLMCache -ModelRoot <configured ModelRoot or ~/Models>'; return}
@@ -241,7 +245,11 @@ if($myllmbox -and -not $PrintOnly -and $Action -in @('start','stop','restart','r
     New-Item -ItemType Directory -Force "$PSScriptRoot/.state"|Out-Null
     try {$containerLock=[IO.File]::Open("$PSScriptRoot/.state/native-lifecycle.lock",[IO.FileMode]::OpenOrCreate,[IO.FileAccess]::ReadWrite,[IO.FileShare]::None)}
     catch {throw 'Another serving lifecycle or qualification command is in progress; retry after it finishes.'}
-    if($Action -in @('start','restart','recreate')){Assert-N1xMyllmboxInstallation $PSScriptRoot $config}
+    if($Action -in @('start','restart','recreate')){
+        $prepare=$Action -in @('start','recreate')
+        Assert-N1xMyllmboxInstallation $PSScriptRoot $config -PrepareCache:$prepare -PrepareRuntime:$prepare
+        $fingerprint=Get-ConfigFingerprint
+    }
 }
 
 function Invoke-Wslc([string[]]$Arguments) {

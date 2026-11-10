@@ -138,3 +138,65 @@ try{
     if($script:volumeCreates -ne 1){throw 'Cache preparation was not idempotent'}
 }finally{Remove-Item Function:wslc}
 Write-Host 'MyLLMBox rebuild preview and missing-cache preparation checks passed'
+
+$fixture=Join-Path ([IO.Path]::GetTempPath()) ('n1x-image-setup-'+[guid]::NewGuid().ToString('N'))
+New-Item -ItemType Directory $fixture|Out-Null
+@'
+param([switch]$Myllmbox,[string]$ImageTag)
+Invoke-FixtureBuild $ImageTag
+'@ | Set-Content (Join-Path $fixture 'build.ps1')
+function Invoke-FixtureBuild([string]$ImageTag){
+if($global:n1xSetupfailBuild){throw 'fixture build failure'}
+$global:n1xSetupbuildCount++
+$global:n1xSetupimages[$ImageTag]=$global:n1xSetupnewId
+}
+$global:n1xSetupimages=@{}
+$global:n1xSetupbuildCount=0
+$global:n1xSetupfailBuild=$false
+$global:n1xSetupnewId='sha256:'+('b'*64)
+$originalId='sha256:'+('a'*64)
+$imageConfig=@{Image='n1x-ai:fixture';ImageId=$originalId;DFlashTokens=3;Profile='qwen38fn-best'}
+function wslc {
+    param([Parameter(ValueFromRemainingArguments=$true)]$Arguments)
+    $global:LASTEXITCODE=0
+    if($Arguments[0] -ne 'image'){throw 'Unexpected setup command'}
+    if($Arguments[1] -eq 'tag'){$global:n1xSetupimages[$Arguments[3]]=$global:n1xSetupimages[$Arguments[2]];return}
+    if($Arguments[1] -ne 'inspect'){throw 'Unexpected image operation'}
+    if(-not $global:n1xSetupimages.ContainsKey($Arguments[2])){$global:LASTEXITCODE=1;return}
+    @{Id=$global:n1xSetupimages[$Arguments[2]];Config=@{Labels=@{}}}|ConvertTo-Json -Depth 4
+}
+try{
+    $global:n1xSetupimages[$imageConfig.Image]=$originalId
+    Confirm-N1xMyllmboxImage $fixture $imageConfig -PrepareRuntime
+    if($global:n1xSetupbuildCount){throw 'Existing runtime was rebuilt'}
+    $global:n1xSetupimages[$imageConfig.Image]=$global:n1xSetupnewId
+    try{Confirm-N1xMyllmboxImage $fixture $imageConfig -PrepareRuntime;throw 'Changed identity accepted'}
+    catch{if($_.Exception.Message -notlike 'MyLLMBox image identity changed*'){throw}}
+    $global:n1xSetupimages.Clear()
+    $global:n1xSetupimages[$originalId]=$originalId
+    Confirm-N1xMyllmboxImage $fixture $imageConfig -PrepareRuntime
+    if($global:n1xSetupimages[$imageConfig.Image] -ne $originalId -or $global:n1xSetupbuildCount){throw 'Tag recovery rebuilt the runtime'}
+    $global:n1xSetupimages.Clear()
+    try{Confirm-N1xMyllmboxImage $fixture $imageConfig;throw 'Read-only check built an image'}
+    catch{if($_.Exception.Message -notlike 'Prepared MyLLMBox image*'){throw}}
+    $localPath=Join-Path $fixture 'config.local.psd1'
+    "@{ ModelRoot = 'C:\model files'; Port = 8123; LanAccess = `$false }"|Set-Content $localPath
+    $before=Get-Content $localPath -Raw
+    $global:n1xSetupfailBuild=$true
+    try{Confirm-N1xMyllmboxImage $fixture $imageConfig -PrepareRuntime;throw 'Failed build accepted'}
+    catch{if($_.Exception.Message -ne 'fixture build failure'){throw}}
+    if((Get-Content $localPath -Raw) -ne $before -or $imageConfig.ImageId -ne $originalId){throw 'Failed build changed selection'}
+    $global:n1xSetupfailBuild=$false
+    Confirm-N1xMyllmboxImage $fixture $imageConfig -PrepareRuntime
+    $saved=Import-PowerShellDataFile $localPath
+    if($saved.ImageId -ne $global:n1xSetupnewId -or $saved.Image -ne $imageConfig.Image -or $imageConfig.ImageId -ne $global:n1xSetupnewId){throw 'Built identity was not selected consistently'}
+    if($saved.Port -ne 8123 -or $saved.LanAccess -ne $false -or $saved.ModelRoot -ne 'C:\model files'){throw 'Setup lost local settings'}
+    Confirm-N1xMyllmboxImage $fixture $imageConfig -PrepareRuntime
+    if($global:n1xSetupbuildCount -ne 1){throw 'Setup was not idempotent'}
+}finally{
+    Remove-Item Function:wslc
+    Remove-Item Function:Invoke-FixtureBuild
+    Get-ChildItem -LiteralPath $fixture -File | Remove-Item
+    Remove-Item -LiteralPath $fixture
+}
+Write-Host 'MyLLMBox missing-runtime setup checks passed'

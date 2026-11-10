@@ -90,8 +90,60 @@ function Assert-N1xMyllmboxDepthImage {
     }
 }
 
+function Confirm-N1xMyllmboxImage {
+    param([string]$Root,[hashtable]$Config,[switch]$PrepareRuntime)
+    $raw=@(& wslc image inspect $Config.Image 2>$null)
+    if($LASTEXITCODE -eq 0){
+        $image=@(($raw -join "`n")|ConvertFrom-Json)[0]
+        if($image.Id -ne $Config.ImageId){throw 'MyLLMBox image identity changed; qualify the new build before updating ImageId'}
+        Assert-N1xMyllmboxDepthImage $Config $image
+        return
+    }
+    if(-not $PrepareRuntime){throw "Prepared MyLLMBox image '$($Config.Image)' is missing; run .\n1x.ps1 setup -Profile $($Config.Profile)"}
+    # A removed tag need not trigger an expensive rebuild.
+    $raw=@(& wslc image inspect $Config.ImageId 2>$null)
+    if($LASTEXITCODE -eq 0){
+        $image=@(($raw -join "`n")|ConvertFrom-Json)[0]
+        if($image.Id -ne $Config.ImageId){throw 'Restored MyLLMBox image identity does not match'}
+        Assert-N1xMyllmboxDepthImage $Config $image
+        & wslc image tag $Config.ImageId $Config.Image
+        if($LASTEXITCODE -ne 0){throw 'Cannot restore the configured MyLLMBox image tag'}
+        return
+    }
+    # Serialize before building so unsupported local settings fail without work.
+    $localPath=Join-Path $Root 'config.local.psd1'
+    $settings=if(Test-Path -LiteralPath $localPath){Import-PowerShellDataFile $localPath}else{@{}}
+    $lines=@('@{')
+    foreach($key in ($settings.Keys|Sort-Object)){
+        if($key -in @('Image','ImageId')){continue}
+        $value=$settings[$key]
+        if($value -is [bool]){$literal=if($value){'$true'}else{'$false'}}
+        elseif($value -is [string]){$literal="'"+$value.Replace("'","''")+"'"}
+        elseif($value -is [ValueType]){$literal=[string]$value}
+        else{throw "Unsupported local setting type: $key; edit config.local.psd1 manually"}
+        $lines+="    '$($key.Replace("'","''"))' = $literal"
+    }
+    $tag='n1x-ai:mbx-setup-'+[guid]::NewGuid().ToString('N')
+    Write-Host "MyLLMBox runtime is missing. Running setup to build $tag from the pinned recipe..."
+    & "$Root/build.ps1" -Myllmbox -ImageTag $tag | Out-Host
+    $raw=@(& wslc image inspect $tag)
+    if($LASTEXITCODE -ne 0){throw 'Cannot inspect the setup image; local configuration was not changed'}
+    $image=@(($raw -join "`n")|ConvertFrom-Json)[0]
+    if($image.Id -notmatch '^sha256:[a-f0-9]{64}$'){throw 'Invalid setup image identity'}
+    Assert-N1xMyllmboxDepthImage $Config $image
+    $lines+=@("    Image = '$tag'","    ImageId = '$($image.Id)'",'}')
+    $temporary=$localPath+'.'+[guid]::NewGuid().ToString('N')+'.tmp'
+    try{
+        [IO.File]::WriteAllText($temporary,($lines -join "`n"),[Text.UTF8Encoding]::new($false))
+        Move-Item -LiteralPath $temporary -Destination $localPath -Force
+    }finally{if(Test-Path -LiteralPath $temporary){Remove-Item -LiteralPath $temporary}}
+    $Config.Image=$tag
+    $Config.ImageId=$image.Id
+    Write-Host "Selected locally built runtime $tag ($($image.Id)). Run n1x.ps1 wait and n1x.ps1 test after startup to validate serving."
+}
+
 function Assert-N1xMyllmboxInstallation {
-    param([string]$Root,[hashtable]$Config,[switch]$PrepareCache)
+    param([string]$Root,[hashtable]$Config,[switch]$PrepareCache,[switch]$PrepareRuntime)
     $paths=Get-N1xMyllmboxPaths $Root $Config
     $null=Get-N1xMyllmboxEnvironment $Root $Config
     foreach($path in @($paths.Recipe,"$($paths.Model)/config.json","$($paths.Model)/model.safetensors.index.json","$($paths.Drafter)/config.json","$($paths.Drafter)/model.safetensors")){
@@ -109,11 +161,6 @@ function Assert-N1xMyllmboxInstallation {
     $tool=Get-Command wslc.exe -ErrorAction Stop
     $version=[Diagnostics.FileVersionInfo]::GetVersionInfo($tool.Source).FileVersion
     if($version -ne $Config.MyllmboxWSLCVersion){throw "This MyLLMBox recipe requires WSLC $($Config.MyllmboxWSLCVersion); found $version"}
-    $raw=@(& wslc image inspect $Config.Image)
-    if($LASTEXITCODE -ne 0){throw "Prepared MyLLMBox image '$($Config.Image)' is missing; see wiki/MyLLMBox.md"}
-    $image=@(($raw -join "`n")|ConvertFrom-Json)[0]
-    if($image.Id -ne $Config.ImageId){throw 'MyLLMBox image identity changed; qualify the new build before updating ImageId'}
-    Assert-N1xMyllmboxDepthImage $Config $image
     & wslc volume inspect $Config.PleVolume | Out-Null
     if($LASTEXITCODE -ne 0){throw "Missing existing FP8 PLE volume: $($Config.PleVolume)"}
     & wslc volume inspect $Config.CacheVolume | Out-Null
@@ -122,6 +169,7 @@ function Assert-N1xMyllmboxInstallation {
     if($LASTEXITCODE -ne 0 -or $partition.Count -ne 1 -or $partition[0].Trim() -ne [string]$Config.RequiredPartitionMiB){
         throw "This MyLLMBox recipe requires $($Config.RequiredPartitionMiB) MiB of GPU memory; change the partition manually before starting"
     }
+    Confirm-N1xMyllmboxImage $Root $Config -PrepareRuntime:$PrepareRuntime
     Confirm-N1xMyllmboxCacheVolume $Config -CreateIfMissing:$PrepareCache
 }
 

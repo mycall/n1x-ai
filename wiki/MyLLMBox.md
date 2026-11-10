@@ -20,7 +20,7 @@ The selected profiles use a pinned MyLLMBox v5.4 image with the project's LMCach
 
 The host toolkit does not replace the guest toolkit. Rebuilding can produce a different image identity; the launcher rejects a tag whose ID differs from the profile.
 
-Use the [prepared-installation setup](Installation.md#prepared-best-profile) to validate these prerequisites and create an empty LMCache volume. Missing weights, runtime images, or prepared PLE data require restoration or preparation separately. The current scripts do not bootstrap the entire best installation from an empty machine.
+The [prepared-installation setup](Installation.md#prepared-best-profile), also run automatically by `start` and `recreate`, validates these prerequisites and creates an empty LMCache volume. A missing image tag is restored from its immutable ID if available. Otherwise setup builds the pinned repository recipe under a unique tag and records its new ID in local configuration. Existing image identity mismatches still fail. Missing weights and prepared PLE data require separate preparation; the scripts do not bootstrap the entire best installation from an empty machine. Locally built images need serving validation after startup and do not inherit the measured qualification of the image listed above.
 
 ## Rebuild LMCache and the runtime
 
