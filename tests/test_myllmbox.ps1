@@ -15,7 +15,7 @@ foreach($slots in @(4,8)){
     if($arguments -notcontains $config.ImageId){throw 'Immutable image is missing'}
     if((OptionValue $arguments '--served-model-name') -ne 'qwen/qwen38fn-best' -or $arguments -contains 'qwen'){throw 'Client-facing model name changed'}
     if((OptionValue $arguments '--max-num-seqs') -ne [string]$slots){throw 'Slot override lost'}
-    if((OptionValue $arguments '--kv-cache-memory-bytes') -ne '11811160064'){throw 'KV pool changed'}
+    if((OptionValue $arguments '--kv-cache-memory-bytes') -ne '16106127360'){throw 'KV pool changed'}
     $spec=OptionValue $arguments '--speculative-config'|ConvertFrom-Json
     if($spec.method -ne 'dflash' -or $spec.num_speculative_tokens -ne 3 -or -not $spec.disable_eagle_block_drop){throw 'Draft contract changed'}
     $graphs=OptionValue $arguments '--compilation-config'|ConvertFrom-Json

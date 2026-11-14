@@ -1,5 +1,9 @@
 # Benchmarks
 
+The current `qwen38fn-best` was promoted from the [96 GiB campaign](96GiB-comparison-campaign.md): batch8K/KV15 with LMCache RAM4/SSD160 completed 48/48 C2/C4 tool tasks. Its C4 correct-work throughput was about 31% higher than the completed KV11 C4 measurement. No matched 88 GiB control was run. The older speed matrix and prefill results below describe the previous KV11 profile and retain their original runtime identities.
+
+The [November 11 near-full tool trial on 96 GiB](Near-full-tools-96GiB.md) passed 24/24 first-attempt C1/C2 tasks with the locally configured best profile. All 40 warm requests reused 249,856 tokens through native prefix cache; external hits were zero. Its runtime image and protocol differ from the historical comparisons below.
+
 This page retains measured performance and correctness evidence. Near-full comparisons appear first, followed by historical reference results with their original workloads. See [Component review](Profile-review.md) for the selected profile and top ten, [Speed and capacity benchmarks](Speed-benchmarks.md) for reusable tools, [request parameter trials](Parameter-trials.md) for the DFlash2 reasoning/temperature comparison, and [Test coverage](Test-plan.md) for unmeasured cases.
 
 The [completed best-profile speed matrix](Qwen38fn-speed-matrix.md) uses the common `vllm bench serve` benchmark at C1–C8 and 4K/8K/64K/262K, with three cold bursts per cell and fixed 512-token generation. It reports per-request read/write rates, queueing and whole-burst throughput separately. The correctness workloads below retain their original protocols.

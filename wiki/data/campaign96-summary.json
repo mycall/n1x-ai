@@ -1,0 +1,231 @@
+{
+  "recorded_date": "2026-11-13",
+  "protocol": "n1x-campaign96-v1",
+  "partition_gib": 96,
+  "runtime_image_id": "sha256:819970fd46a90c1e70b7cd06aeb15d5ce3c75b02b62892a8322f42de225566bc",
+  "selected": {
+    "profile": "qwen38fn-best",
+    "kv_gib": 15,
+    "batch_tokens": 8192,
+    "lmcache": true,
+    "lmcache_ram_gib": 4,
+    "lmcache_ssd_gib": 160
+  },
+  "results": [
+    {
+      "configuration": "kv11-on-8k-baseline",
+      "qualified": false,
+      "concurrency": 2,
+      "correct_tasks": 21,
+      "planned_tasks": 24,
+      "elapsed_s": 802.7233551999961,
+      "correct_tasks_s": 0.026160943074551395,
+      "appended_task_mean_s": 8.484292314282877,
+      "preemptions": 0.0,
+      "cache_counter_deltas": {
+        "vllm:prefix_cache_hits_total": 8744960.0,
+        "vllm:external_prefix_cache_hits_total": 0.0
+      }
+    },
+    {
+      "configuration": "kv11-on-8k-baseline",
+      "qualified": false,
+      "concurrency": 4,
+      "correct_tasks": 24,
+      "planned_tasks": 24,
+      "elapsed_s": 3249.4080096000107,
+      "correct_tasks_s": 0.007385960743955421,
+      "appended_task_mean_s": 510.76268068124864,
+      "preemptions": 0.0,
+      "cache_counter_deltas": {
+        "vllm:prefix_cache_hits_total": 249856.0,
+        "vllm:external_prefix_cache_hits_total": 4497408.0
+      }
+    },
+    {
+      "configuration": "kv11-off-8k-retained",
+      "qualified": false,
+      "concurrency": 2,
+      "correct_tasks": 12,
+      "planned_tasks": 12,
+      "elapsed_s": 623.0896103999985,
+      "correct_tasks_s": 0.01925886710307444,
+      "appended_task_mean_s": 7.550609762500244,
+      "preemptions": 0.0,
+      "cache_counter_deltas": {
+        "vllm:prefix_cache_hits_total": 4997120.0,
+        "vllm:external_prefix_cache_hits_total": 0.0
+      }
+    },
+    {
+      "configuration": "kv11-off-8k-retained",
+      "qualified": false,
+      "concurrency": 4,
+      "correct_tasks": 12,
+      "planned_tasks": 12,
+      "elapsed_s": 3321.2773809000064,
+      "correct_tasks_s": 0.0036130676916687446,
+      "appended_task_mean_s": 1104.6214119499982,
+      "preemptions": 0.0,
+      "cache_counter_deltas": {
+        "vllm:prefix_cache_hits_total": 0.0,
+        "vllm:external_prefix_cache_hits_total": 0.0
+      }
+    },
+    {
+      "configuration": "kv15-on-8k-retained",
+      "qualified": true,
+      "concurrency": 2,
+      "correct_tasks": 24,
+      "planned_tasks": 24,
+      "elapsed_s": 1046.1964098000026,
+      "correct_tasks_s": 0.022940243127567213,
+      "appended_task_mean_s": 10.110051606249726,
+      "preemptions": 0.0,
+      "cache_counter_deltas": {
+        "vllm:prefix_cache_hits_total": 9994240.0,
+        "vllm:external_prefix_cache_hits_total": 0.0
+      }
+    },
+    {
+      "configuration": "kv15-on-8k-retained",
+      "qualified": true,
+      "concurrency": 4,
+      "correct_tasks": 24,
+      "planned_tasks": 24,
+      "elapsed_s": 2484.557861299996,
+      "correct_tasks_s": 0.009659666363109963,
+      "appended_task_mean_s": 316.4371234000009,
+      "preemptions": 2.0,
+      "cache_counter_deltas": {
+        "vllm:prefix_cache_hits_total": 4747264.0,
+        "vllm:external_prefix_cache_hits_total": 2998272.0
+      }
+    },
+    {
+      "configuration": "kv11-on-4k-attempt1",
+      "qualified": true,
+      "concurrency": 2,
+      "correct_tasks": 24,
+      "planned_tasks": 24,
+      "elapsed_s": 1336.4906646000163,
+      "correct_tasks_s": 0.017957476722953915,
+      "appended_task_mean_s": 28.184578324999165,
+      "preemptions": 0.0,
+      "cache_counter_deltas": {
+        "vllm:prefix_cache_hits_total": 9994240.0,
+        "vllm:external_prefix_cache_hits_total": 0.0
+      }
+    },
+    {
+      "configuration": "kv11-on-4k-attempt1",
+      "qualified": true,
+      "concurrency": 4,
+      "correct_tasks": 24,
+      "planned_tasks": 24,
+      "elapsed_s": 5005.747053599989,
+      "correct_tasks_s": 0.004794489162759411,
+      "appended_task_mean_s": 737.7531772312523,
+      "preemptions": 0.0,
+      "cache_counter_deltas": {
+        "vllm:prefix_cache_hits_total": 0.0,
+        "vllm:external_prefix_cache_hits_total": 4997120.0
+      }
+    }
+  ],
+  "displaced_replay": [
+    {
+      "configuration": "retained-off-replay",
+      "repeat": 0,
+      "correct_tasks": 2,
+      "planned_tasks": 2,
+      "elapsed_s": 208.1915214000037,
+      "selection_cached_tokens": [
+        0,
+        0
+      ],
+      "cache_counter_deltas": {
+        "vllm:prefix_cache_hits_total": 0.0,
+        "vllm:external_prefix_cache_hits_total": 0.0,
+        "vllm:num_preemptions_total": 0.0
+      },
+      "native_displacement_verified": true,
+      "external_restore_verified": false
+    },
+    {
+      "configuration": "retained-off-replay",
+      "repeat": 1,
+      "correct_tasks": 2,
+      "planned_tasks": 2,
+      "elapsed_s": 246.11001869999745,
+      "selection_cached_tokens": [
+        0,
+        0
+      ],
+      "cache_counter_deltas": {
+        "vllm:prefix_cache_hits_total": 0.0,
+        "vllm:external_prefix_cache_hits_total": 0.0,
+        "vllm:num_preemptions_total": 0.0
+      },
+      "native_displacement_verified": true,
+      "external_restore_verified": false
+    },
+    {
+      "configuration": "kv11-on-replay-attempt1",
+      "repeat": 0,
+      "correct_tasks": 2,
+      "planned_tasks": 2,
+      "elapsed_s": 121.47658260000753,
+      "selection_cached_tokens": [
+        0,
+        249856
+      ],
+      "cache_counter_deltas": {
+        "vllm:prefix_cache_hits_total": 0.0,
+        "vllm:external_prefix_cache_hits_total": 249856.0,
+        "vllm:num_preemptions_total": 0.0
+      },
+      "native_displacement_verified": true,
+      "external_restore_verified": false
+    },
+    {
+      "configuration": "kv11-on-replay-attempt1",
+      "repeat": 1,
+      "correct_tasks": 2,
+      "planned_tasks": 2,
+      "elapsed_s": 294.17442680000386,
+      "selection_cached_tokens": [
+        0,
+        249856
+      ],
+      "cache_counter_deltas": {
+        "vllm:prefix_cache_hits_total": 0.0,
+        "vllm:external_prefix_cache_hits_total": 249856.0,
+        "vllm:num_preemptions_total": 0.0
+      },
+      "native_displacement_verified": true,
+      "external_restore_verified": false
+    }
+  ],
+  "limits": [
+    "No matched 88 GiB control; historical runtime differs.",
+    "Configuration order not counterbalanced.",
+    "KV11 batch8K C2 incomplete; cache-off batch8K only partial.",
+    "Replay external coverage partial; SSD restart unmeasured.",
+    "Completed stage correctness does not erase prior runtime and transport failures.",
+    "Synthetic short tool outputs with an 8192-token allowance do not establish general long-output quality."
+  ],
+  "source_sha256": {
+    "results/benchmarks/campaign96-finish-20261113-164038/summary.json": "99c27502add24fcda3b75755f9281d284dfbebbdab0caf02d07c1c530355e2d2",
+    "results/benchmarks/campaign96-20261112-092739/kv11-on-8k-attempt1/summary.json": "39fcc20d5abef9e3b012464a031ed967d50b85b732b4eb2a898c43703798c306",
+    "results/benchmarks/campaign96-20261112-092739/kv11-on-8k-attempt1/tasks.jsonl": "9976423869c01238e3b88ec39f87ea1afa4dabbc716b788c7b7d745097d526fd",
+    "results/benchmarks/campaign96-20261112-092739/kv11-on-8k-attempt1/r0-c2-after.prom": "32fa30925138af828783052836912a5acbd8e91f0e50c3cf5d8a8587ff8d78f6",
+    "results/benchmarks/campaign96-20261112-092739/kv11-on-8k-attempt1/r0-c2-before.prom": "a669959e1d5a2c4d601fb36d490c601ec4b99a2f8fde8e5f21372f6afb77c74b",
+    "results/benchmarks/campaign96-20261112-092739/kv11-on-8k-attempt1/r0-c4-after.prom": "d5f61a7989a7d53a1b7890831af163a6ef884ab1ab1c29516bb64ca48b716f24",
+    "results/benchmarks/campaign96-20261112-092739/kv11-on-8k-attempt1/r0-c4-before.prom": "2153efca59e6640c835743a61378b74a56f58204330f529d464479cd371b309e",
+    "results/benchmarks/campaign96-20261112-092739/kv11-on-8k-attempt1/r1-c2-after.prom": "76068067bc6c4c7711994206106788dc41297be5b5654feafbb10070ae0b85da",
+    "results/benchmarks/campaign96-20261112-092739/kv11-on-8k-attempt1/r1-c2-before.prom": "769b513faa92efbec0889d74d2b2248ca30e44cd6c073e07fd99f1d9774597d9",
+    "results/benchmarks/campaign96-20261112-092739/kv11-on-8k-attempt1/r1-c4-after.prom": "0411bcc2450c942ede6111bff1e8bd3f2d6fb0cf36d2fc1e51bc1d711d30bfcc",
+    "results/benchmarks/campaign96-20261112-092739/kv11-on-8k-attempt1/r1-c4-before.prom": "1380683214caaa0173e325974e8558d19b9f21f9d4bd96a8d286c4a71a65588a"
+  }
+}

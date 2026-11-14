@@ -1,0 +1,268 @@
+{
+  "protocol": "n1x-near-full-tools-v1",
+  "results": [
+    {
+      "concurrency": 1,
+      "correct_tasks": 12,
+      "planned_tasks": 12,
+      "elapsed_s": 527.6634891,
+      "correct_tasks_s": 0.022741766765912854,
+      "preemptions": 0.0,
+      "input_range": [
+        250002,
+        250417
+      ],
+      "phases": {
+        "cold-selection": {
+          "requests": 4,
+          "mean_e2e_s": 116.17302622499994,
+          "mean_client_ttft_s": 113.14635244999997,
+          "mean_pp_s": 112.4750559,
+          "generated_range": [
+            152,
+            201
+          ],
+          "cached_tokens": 0,
+          "cached_fraction": 0.0,
+          "requests_with_cache": 0,
+          "write_tks": 53.10576521316248,
+          "timing_sources": [
+            [
+              "server-scheduled-to-first-token",
+              "server-first-to-last-token"
+            ]
+          ]
+        },
+        "appended-selection": {
+          "requests": 8,
+          "mean_e2e_s": 3.033962574999947,
+          "mean_client_ttft_s": 1.5173218624999265,
+          "mean_pp_s": 0.45389898750002544,
+          "generated_range": [
+            91,
+            111
+          ],
+          "cached_tokens": 1998848,
+          "cached_fraction": 0.9986031482121696,
+          "requests_with_cache": 8,
+          "write_tks": 60.58939527683028,
+          "timing_sources": [
+            [
+              "server-scheduled-to-first-token",
+              "server-first-to-last-token"
+            ]
+          ]
+        },
+        "tool-continuation": {
+          "requests": 12,
+          "mean_e2e_s": 2.2588544166667077,
+          "mean_client_ttft_s": 1.5944992166666718,
+          "mean_pp_s": 0.5085220333333211,
+          "generated_range": [
+            42,
+            75
+          ],
+          "cached_tokens": 2998272,
+          "cached_fraction": 0.9982523844514488,
+          "requests_with_cache": 12,
+          "write_tks": 66.10711117696448,
+          "timing_sources": [
+            [
+              "server-scheduled-to-first-token",
+              "server-first-to-last-token"
+            ]
+          ]
+        }
+      },
+      "appended_task_mean_s": 6.254004237500027,
+      "appended_task_timing_basis": "Selection plus continuation, including harness tokenization; first cold task excluded",
+      "cache_counter_deltas": {
+        "vllm:prefix_cache_hits_total": 4997120.0,
+        "vllm:external_prefix_cache_hits_total": 0.0
+      }
+    },
+    {
+      "concurrency": 2,
+      "correct_tasks": 12,
+      "planned_tasks": 12,
+      "elapsed_s": 516.0312644,
+      "correct_tasks_s": 0.02325440497089385,
+      "preemptions": 0.0,
+      "input_range": [
+        250002,
+        250419
+      ],
+      "phases": {
+        "cold-selection": {
+          "requests": 4,
+          "mean_e2e_s": 234.08852562500002,
+          "mean_client_ttft_s": 172.30947057499998,
+          "mean_pp_s": 118.88335975000001,
+          "generated_range": [
+            154,
+            174
+          ],
+          "cached_tokens": 0,
+          "cached_fraction": 0.0,
+          "requests_with_cache": 0,
+          "write_tks": 2.5769128689894925,
+          "timing_sources": [
+            [
+              "server-scheduled-to-first-token",
+              "server-first-to-last-token"
+            ]
+          ]
+        },
+        "appended-selection": {
+          "requests": 8,
+          "mean_e2e_s": 4.3532702500000084,
+          "mean_client_ttft_s": 2.438880587500023,
+          "mean_pp_s": 0.5371738249999964,
+          "generated_range": [
+            82,
+            113
+          ],
+          "cached_tokens": 1998848,
+          "cached_fraction": 0.9986031482121696,
+          "requests_with_cache": 8,
+          "write_tks": 46.92811382582879,
+          "timing_sources": [
+            [
+              "server-scheduled-to-first-token",
+              "server-first-to-last-token"
+            ]
+          ]
+        },
+        "tool-continuation": {
+          "requests": 12,
+          "mean_e2e_s": 3.212677058333346,
+          "mean_client_ttft_s": 2.3574050166666702,
+          "mean_pp_s": 0.5643158833332981,
+          "generated_range": [
+            46,
+            85
+          ],
+          "cached_tokens": 2998272,
+          "cached_fraction": 0.9982696675078051,
+          "requests_with_cache": 12,
+          "write_tks": 51.47762210382067,
+          "timing_sources": [
+            [
+              "server-scheduled-to-first-token",
+              "server-first-to-last-token"
+            ]
+          ]
+        }
+      },
+      "appended_task_mean_s": 9.343411537499975,
+      "appended_task_timing_basis": "Selection plus continuation, including harness tokenization; first cold task excluded",
+      "cache_counter_deltas": {
+        "vllm:prefix_cache_hits_total": 4997120.0,
+        "vllm:external_prefix_cache_hits_total": 0.0
+      }
+    }
+  ],
+  "limits": "Synthetic tool selection and append-only continuations. Cold selection and warm phases have different generated work; their latency ratio is not a matched cache speedup. No cache-off comparison, displaced replay, or SSD restart qualification.",
+  "date": "2026-11-11",
+  "run_directory": "results\\benchmarks\\near-full-tools-96g-20261111",
+  "runtime": {
+    "config": {
+      "RestoreWaitMs": 0,
+      "RequiredPartitionMiB": 98304,
+      "BatchedTokens": 8192,
+      "MyllmboxEnvironment": "runtime/myllmbox/environment.psd1",
+      "MyllmboxModel": "Qwen3.8-Flash-Next-W4A16-AutoRound-hybrid",
+      "ImageId": "sha256:819970fd46a90c1e70b7cd06aeb15d5ce3c75b02b62892a8322f42de225566bc",
+      "Mtp": false,
+      "LmcacheVolume": "n1x-c8-lmc4-ssd160-v1",
+      "KvCacheDtype": "fp8",
+      "Container": "n1x-qwen38fn-best",
+      "CacheBlockTokens": 4096,
+      "KvCacheBytes": "11811160064",
+      "MaxSequences": 8,
+      "Context": 262144,
+      "LmcacheChunkTokens": 4096,
+      "Backend": "wslc-myllmbox",
+      "MyllmboxDrafter": "Qwen3.8-Flash-Next-DFlash2",
+      "PleVolume": "n1x-ple-native",
+      "DefaultProfile": "qwen38fn-best",
+      "LmcacheL2GiB": 160,
+      "PleWorkers": 8,
+      "MyllmboxConfig": "profiles/qwen38fn-best.yaml",
+      "DFlash": true,
+      "LanAccess": false,
+      "CacheVolume": "n1x-mbx-w4-dflash-test-cache",
+      "ModelRoot": "C:\\Users\\michael\\models",
+      "WindowsMinimumGiB": 4,
+      "DFlashTokens": 3,
+      "Image": "n1x-ai:mbx-setup-1447755d89af469f894bfa8dcb51506d",
+      "Profile": "qwen38fn-best",
+      "MaxOutputTokens": 8192,
+      "LmcacheNamespace": "qwen-c8-w4-std-fp32-idxbf16-kv11-b4k-v1",
+      "LmcacheL1GiB": 4,
+      "MyllmboxWSLCVersion": "3.0.5.0",
+      "UseLMCache": true,
+      "Port": 8000
+    },
+    "git": "4676cd2bc101e29add34b2b2ea8ef2a889d8bf3f",
+    "dirty": true,
+    "windowsScheme": "Power Scheme GUID: 381b4222-f694-41f0-9685-ff5bb260df2e  (Balanced)",
+    "gpu": "NVIDIA RTX Spark N1X (6144-core Blackwell RTX GPU), 621.14, 98304 MiB, 69403 MiB",
+    "recordedUtc": "2026-11-11T20:35:21.0461046Z"
+  },
+  "settings": {
+    "protocol": "n1x-near-full-tools-v1",
+    "started_utc": "2026-11-11T20:41:30.096298+00:00",
+    "run_id": "d446164456794f5fbefae6e817d85d5f",
+    "target": 250000,
+    "context_limit": 262144,
+    "output_allowance": 8192,
+    "concurrency": [
+      1,
+      2
+    ],
+    "sessions": 2,
+    "turns": 3,
+    "repeats": 2,
+    "thinking": true,
+    "reasoning_effort": "xhigh",
+    "temperature": 0,
+    "seed": 42,
+    "source_hashes": {
+      "near_full_tools_probe.py": "84a11d0df455fe2f25b38b28af4b613a1fb6b4b2d58ea60f4e436806c29b4599",
+      "speed_probe.py": "bdcbb5851407a65beb2ad2cef4f822f24b1172a2c63ac7c1ed9cbf15d69ff447",
+      "context_capacity_probe.py": "d69fcf65fa14f5987b5a3c44d3bdda8e2159423a28cfe1ef9e679b914ce7fcc3",
+      "timing.py": "12518e3c3cbc062ab3e929d209df24585fd481645be2db7e02f1fc327f37190e"
+    }
+  },
+  "request_counts": {
+    "cold": 8,
+    "warm": 40,
+    "diagnostic": 0
+  },
+  "server_health_after": 200,
+  "log_observations": {
+    "Failed to batched allocate": 179,
+    "N1X prefetch admission recovered": 6,
+    "Prefetch request completed": 40
+  },
+  "artifact_sha256": {
+    "calibration.json": "10849fabb11e64d9c826c007e7491b945080345cef8b766aff94d1f9f6e0301b",
+    "memory-observations.jsonl": "b641f6f580b0a33fc090d839723789a205e8475882a09a02d61901a33026dad8",
+    "metrics-observations.jsonl": "bdfdbfa1b508e97e84cf42cd5395cdd142b79562c14e8f307c61d3512f0c4c7a",
+    "r0-c1-after.prom": "ab9ffb42d1c24ee50377f491fed35bfd6b3f39753ce5cae08847be88e3b6f3ee",
+    "r0-c1-before.prom": "39fea9568334c1250a30156c571262f7d6c5de88199997cac76226c480f34d63",
+    "r0-c2-after.prom": "b306d4974361a0874ff7f7912d77251c1462198d8a89a2c80b1827b35ec6b12d",
+    "r0-c2-before.prom": "ce3f811d3ef6ad076da5121bd8655d60ae08cd6678b6aa38c9cb4672a0ea0d67",
+    "r1-c1-after.prom": "2ab98458d518a92b75f52f94f90ef2c8dc1fe1e5d505964a4a9bc6abdb121a57",
+    "r1-c1-before.prom": "7432ee554e0996045a2c9e4a2beaf84561bdc67f5fe4a47f2f6848a71b1b7c1c",
+    "r1-c2-after.prom": "17cb8237c90dcdd05a72e4413380b30dfbc7859e1bdc9e0ccafbf0453c160696",
+    "r1-c2-before.prom": "248523a54793fb0bc76336402df641bb6d4159337e8c490cfea0d1658b49572a",
+    "requests.jsonl": "ca136c034231b2bdec371d19cbfee28a60e3f43ad4fb5a4cc9bebf6aabac0edd",
+    "run.json": "80514400f8db771057f0ae3f37a29bff9d6eac0e7d3f0072c4647f0bc897c49c",
+    "server.log": "4ac0bb7923c2379fe4f782722f29d12da2eb714a93f11c36bddfe28b6532f5d1",
+    "summary.json": "ac1b6f25266bfa3f3b59bd68e32be863773d4dc2bfc2d7a0c359f138ee8af4fb",
+    "tasks.jsonl": "9274d82914a2ac012171ac9a98dd1db7aeb2fb2d47fceac20776ad1cea67ce34"
+  },
+  "report_source_sha256": "c339cb2f66a954c74a5dbbfbc863bdb2f086694ff3638dee5d7111b989c25ea2"
+}

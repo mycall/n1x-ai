@@ -1,5 +1,7 @@
 # qwen38fn-best read/write speed matrix
 
+These November 8 results describe the historical 88 GiB/KV11 profile. The [current best](Profile-review.md) uses 96 GiB/KV15 and a different runtime image; this matrix has not been rerun for it.
+
 Completed all **32 cells** with **96 measured bursts / 432 requests**, three independent cold bursts per cell. Every request produced exactly 512 tokens; all streams finished with zero cached tokens. Existing model weights were reused.
 
 [Interactive charts](data/qwen38fn-speed-matrix-20261108.html) · [Full numbers and per-request evidence](data/qwen38fn-speed-matrix-20261108.json).
@@ -107,7 +109,7 @@ The custom corpus is deterministic technical reference prose with varied record 
 
 A local aiohttp forwarding proxy leaves response bytes unchanged while retaining each response's usage, finish reason and server timing metrics. The unmodified common benchmark retains client TTFT, TPOT, latency, throughput and speculative-decode statistics. Read = summed input tokens / summed scheduled-to-first-token seconds; write = summed `(output_tokens - 1)` / summed first-to-last-token seconds. Server queue time is excluded from these phase rates and shown separately. Aggregate throughput = summed tokens / summed common benchmark burst durations. Benchmark CLI startup and dataset construction are excluded from burst durations.
 
-The selected profile stays at DFlash2 **K3**, standard FP32 SSM, BF16 indexer, FP8 target KV, 11 GiB KV, eight server slots, 8K prefill batch, and LMCache RAM4/SSD160. Image and configuration identities, exact commands, request timings, wave ranges, GPU telemetry summaries and source hashes are retained in the JSON. Eight clients do not imply eight resident near-full histories. Results describe this host, corpus, fixed output window and recorded clock/power conditions.
+The measured historical profile used DFlash2 **K3**, standard FP32 SSM, BF16 indexer, FP8 target KV, 11 GiB KV, eight server slots, 8K prefill batch, and LMCache RAM4/SSD160. Image and configuration identities, exact commands, request timings, wave ranges, GPU telemetry summaries and source hashes are retained in the JSON. Eight clients do not imply eight resident near-full histories. Results describe this host, corpus, fixed output window and recorded clock/power conditions.
 
 The missing pandas benchmark-client dependency was installed in a separate `/cache/n1x-bench-deps` directory (about 12 MB plus small date/time dependencies). No serving packages or model weights changed. The service was initially stopped and is stopped again after successful completion.
 

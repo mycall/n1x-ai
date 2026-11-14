@@ -8,7 +8,7 @@ distributed-executor-backend: mp
 max-model-len: 262144
 max-num-seqs: 8
 max-num-batched-tokens: 8192
-kv-cache-memory-bytes: 11811160064
+kv-cache-memory-bytes: 16106127360
 kv-cache-dtype: fp8
 kv-cache-dtype-skip-layers:
 - sliding_window

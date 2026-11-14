@@ -6,7 +6,7 @@ Use explicit depths for nearly full 262K comparisons; the default grid also supp
 
 ## Completed common-benchmark matrix
 
-See the [qwen38fn-best matrix](Qwen38fn-speed-matrix.md) for all 32 C1–C8 × 4K/8K/64K/262K cells, collected with installed `vllm bench serve`. It includes interactive charts, exact request counts and commands, three cold bursts per cell, 512-token outputs, client TTFT, queue times and aggregate throughput. The 262K window reserves 512 output tokens. This protocol remains separate from the reusable `n1x-speed-v1` suite described below.
+See the [historical 88 GiB/KV11 matrix](Qwen38fn-speed-matrix.md) for all 32 C1–C8 × 4K/8K/64K/262K cells, collected with installed `vllm bench serve`. It includes interactive charts, exact request counts and commands, three cold bursts per cell, 512-token outputs, client TTFT, queue times and aggregate throughput. The 262K window reserves 512 output tokens. This protocol remains separate from the reusable `n1x-speed-v1` suite described below and does not measure the current 96 GiB/KV15 profile.
 
 ## Preview the matrix without serving
 
@@ -95,12 +95,31 @@ Old recovery, scheduler, archive, and agent logs are not interchangeable with `n
 
 ## Nearly full 262K quality workload
 
+### Appended-history tool workload
+
+The [96 GiB comparison campaign](96GiB-comparison-campaign.md) adds C2/C4 KV-capacity, cache-on/off, displaced-replay and prefill-batch comparisons. Its controller records each runtime and restores the original settings afterward.
+
+`benchmarks/near_full_tools_probe.py` measures real tool selection and tool-result continuations against an already verified service. Its default initial input is 250,000 rendered tokens (±8), leaving room for three growing tool round trips and an unchanged 8,192-token output allowance within 262,144. Every request is token-counted before generation; an overfull history fails rather than reducing the allowance.
+
+The workload alternates inventory and price lookup, validates exact tool names, SKU arguments and call IDs, and requires a final answer combining the returned value with archive facts at 10% and 90% of the initial history. Returned reasoning and tool calls are preserved. Each session keeps its salt and appends messages. Two sessions run at C1 and C2, repeated in reverse order: 24 planned tasks and 48 generation requests. Initial selections are cold; appended selections and continuations report actual cache coverage. Empty-final diagnostic retries do not replace first scores; a failed session leaves later tasks incomplete.
+
+After checking `/health`, runtime identity and the hardware partition, save a host record containing the effective configuration, container/image identity, GPU, Git state and power setting, then run:
+
+```powershell
+python benchmarks/near_full_tools_probe.py --host <host.json> --out results/benchmarks/<new-run>
+python benchmarks/near_full_tools_report.py results/benchmarks/<new-run>
+```
+
+The output directory must be new. A short harness pilot can use `--target 2048 --sessions 1 --concurrency 1 --repeats 1`; keep it separate from near-full results. Raw requests/responses, exact rendered input counts, first scores, cache usage, direct server phase timings when available, and before/after metrics are retained. Cold selection and warm phases generate different work, so their latency ratio is not a matched cache speedup. This suite does not qualify displaced replay or SSD restart.
+
+### Archive quality workload
+
 ```powershell
 .\benchmark.ps1 -Suite capacity -Profile qwen38fn-best -CapacityConcurrency 1,8
 ```
 
 This opt-in suite is separate from `all`. It calibrates actual rendered input near 253,944 tokens (±8), reserving 8,192 output tokens inside 262,144. Thinking/xhigh is explicit. The launcher retains its historical C1/C6 default; specify the desired concurrency explicitly. Three repeats of eight matched tasks per point cover retrieval, arithmetic/JSON, structured answers and supplied tool-result continuations. These are bounded quality checks, not general coding evaluations.
 
-First-score correctness, actual input/output counts, cache hits, PP/decode sources, batch throughput, scheduling and preemptions are retained. Empty-final diagnostic retries never replace first scores. Cold scaling needs zero-hit evidence. The historical 6.4× C8/C1 target is a diagnostic; it is not a current promotion veto. For C1/C2-focused use, C2 remains an unmeasured gap.
+First-score correctness, actual input/output counts, cache hits, PP/decode sources, batch throughput, scheduling and preemptions are retained. Empty-final diagnostic retries never replace first scores. Cold scaling needs zero-hit evidence. The historical 6.4× C8/C1 target is a diagnostic; it is not a current promotion veto. The historical archive workload's matched C2 prefill comparison remains unmeasured; the separate 96 GiB tool campaign does cover C2.
 
 The maintained entrypoints are `benchmark.ps1 -Suite speed` and `-Suite capacity`, alongside the original [reference suites](Benchmarks.md#run). Restore matching source from the [verified archive](Benchmarks.md#retained-evidence) when auditing old trial probes. See [Development](Development.md#local-checks) for offline checks and GPU validation.

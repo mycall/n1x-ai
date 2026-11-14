@@ -35,7 +35,8 @@ Set local paths and the default profile in `config.local.psd1`; see [Configurati
 - [Install and prepare the runtime](wiki/Installation.md)
 - [Configure profiles, clients, networking, and cleanup](wiki/Configuration.md)
 - [Review benchmark results and the top ten combinations](wiki/Profile-review.md)
-- [Compare best-profile read/write speed across C1–C8 and 4K–262K](wiki/Qwen38fn-speed-matrix.md)
+- [Review the current 96 GiB best-profile selection](wiki/96GiB-comparison-campaign.md)
+- [Compare historical 88 GiB read/write speed across C1–C8 and 4K–262K](wiki/Qwen38fn-speed-matrix.md)
 - [Browse the documentation](wiki/Home.md), including builds, model files, cache limits, and troubleshooting
 
 ## License

@@ -14,7 +14,7 @@ Use the [recommended hardware partition](Installation.md#requirements) with the 
 
 A hidden PowerShell monitor updates Windows physical and commit headroom every five seconds while the cache container runs. The supervisor stops both services if either reserve drops below `WindowsMinimumGiB` (default 4), or the snapshot becomes unavailable/stale. This guard cannot reserve memory or prevent every transient allocation failure.
 
-Both `benchmark.ps1` and `test-restores.ps1` verify the documented 88 GiB partition before cache tests. A mismatch prompts for a manual change and rechecks the hardware; cancellation prevents testing. Restart-restore results include a `partition.json` receipt. Neither command changes the partition or reboots the machine.
+Both `benchmark.ps1` and `test-restores.ps1` verify the selected profile's effective `RequiredPartitionMiB` before cache tests: 96 GiB for best, with an 88 GiB fallback for reference profiles that do not specify a partition. A mismatch prompts for a manual change and rechecks the hardware; cancellation prevents testing. Restart-restore results include a `partition.json` receipt. Neither command changes the partition or reboots the machine.
 
 To change the host pool or restore wait, edit the corresponding keys in `config.local.psd1`:
 

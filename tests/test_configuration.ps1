@@ -13,7 +13,7 @@ try {
     if($config.MaxOutputTokens -ne 8192){throw 'Default output allowance must be 8192'}
     if($config.DFlashTokens -ne 3){throw 'Default DFlash2 depth must remain K3'}
     if($config.Profile -ne 'qwen38fn-best' -or -not $config.DFlash -or -not $config.UseLMCache -or $config.Mtp){throw 'Selected default must use the promoted LMCache DFlash2 best profile'}
-    if($config.Backend -ne 'wslc-myllmbox' -or $config.Context -ne 262144 -or $config.RequiredPartitionMiB -ne 90112 -or $config.KvCacheBytes -ne '11811160064'){throw 'Selected default differs from the near-full qualified configuration'}
+    if($config.Backend -ne 'wslc-myllmbox' -or $config.Context -ne 262144 -or $config.RequiredPartitionMiB -ne 98304 -or $config.KvCacheBytes -ne '16106127360'){throw 'Selected default differs from the promoted 96 GiB configuration'}
     $reference=Get-N1xConfig -Root $temporary -Profile qwen38fn-cache-dflash
     if(-not $reference.DFlash -or -not $reference.UseLMCache -or $reference.Mtp){throw 'Original cache-DFlash reference must remain selectable'}
     foreach($oldName in @('baseline','mtp','cache','cache-mtp','cache-dflash','qwen38fn-devjeonghwan')){

@@ -5,7 +5,7 @@ Choose the installation path for the runtime you intend to use. Best prepares it
 ## Requirements
 
 - Windows 11 ARM64 on an NVIDIA N1X system, with a working NVIDIA driver and GPU-enabled WSLC installation. Check `wslc info` and `nvidia-smi` before setup.
-- 128 GiB unified memory for the supplied long-context cache profiles. The recommended dedicated GPU partition is 88 GiB, configured in the NVIDIA app. This project does not change the partition or power settings.
+- 128 GiB unified memory for the supplied long-context cache profiles. Best requires a 96 GiB dedicated GPU partition; the 4K alternate and original cache references retain 88 GiB. Configure the partition in the NVIDIA app. This project does not change the partition or power settings.
 - Git and the [Hugging Face CLI](https://huggingface.co/docs/huggingface_hub/guides/cli) (`hf`) on PATH. The host Python installation serves tooling; the container has its own pinned Python/runtime environment.
 - SSD space for [model assets](Model-assets.md), runtime/build layers, and the configured [cache budget](LMCache.md#ssd-budget).
 

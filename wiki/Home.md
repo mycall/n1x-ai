@@ -25,9 +25,10 @@ Use this guide to install, operate, evaluate, and maintain the local model serve
 
 | Task | Guide |
 | --- | --- |
-| Understand the selected profile and ranked alternatives | [Component review and top ten](Profile-review.md) |
+| Understand the current recommendation and historical alternatives | [Component review and top ten](Profile-review.md) |
+| Review the completed 96 GiB campaign and current best selection | [96 GiB comparison campaign](96GiB-comparison-campaign.md) |
 | Inspect measured results and retained evidence | [Benchmarks](Benchmarks.md) |
-| Compare best-profile C1–C8 read/write speed at 4K, 8K, 64K and 262K | [Completed speed matrix](Qwen38fn-speed-matrix.md) |
+| Review the historical 88 GiB C1–C8 speed measurements | [Completed speed matrix](Qwen38fn-speed-matrix.md) |
 | Review DFlash2 reasoning and temperature trials using the existing weights | [Request parameter trials](Parameter-trials.md) |
 | Compare 20%/50% GPU sharing observations and C2/C8 scaling | [GPU priority repeat](GPU-priority-trial.md) |
 | Review Spark recipe ideas that can reuse the installed model weights | [Spark recipe review](Spark-recipe-review.md) |

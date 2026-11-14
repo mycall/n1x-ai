@@ -2,7 +2,9 @@
 
 This page distinguishes completed measurements from open questions. [Component review](Profile-review.md) explains the current selection; [Benchmarks](Benchmarks.md) holds the measured values and source evidence.
 
-## Current near-full comparison
+## Measured coverage
+
+The prefill and cold speed-grid rows below describe the historical 88 GiB/KV11 profile. Current 96 GiB evidence is identified separately.
 
 | Item | Status |
 | --- | --- |
@@ -11,15 +13,15 @@ This page distinguishes completed measurements from open questions. [Component r
 | Same comparison, C8 cold | Completed; each 8/8; 4K faster |
 | C2 correctness comparison with the 8K output allowance | Unmeasured; fixed-work 512-token speed is covered separately |
 | 8K C8 displaced replay and SSD restart | Unmeasured in final round |
-| Full-window tool selection / continuations | Earlier cache-off best passed; not transferred to the new LMCache combination |
-| Current best on 96 GiB partition | Unmeasured; not ruled out |
+| Near-full tool selection / continuations | [96 GiB local runtime: 24/24 C1/C2 tasks](Near-full-tools-96GiB.md), 250,002–250,419 inputs, 8K allowance; original 88 GiB runtime transfer remains open |
+| Current best settings on 96 GiB partition | [KV15 campaign: 48/48 C2/C4 tool tasks](96GiB-comparison-campaign.md); promoted November 13; no matched partition-speed comparison |
 | 1,024 / 2,048 / 8,192 quality-budget experiment | No matched accuracy conclusion; 8,192 is the serving default/cap |
 | Fixed-work cold speed grid | [Completed](Qwen38fn-speed-matrix.md): common vLLM benchmark, C1–C8 × 4K/8K/64K/262K, three bursts per cell |
 | Coding-project-specific optimization | Out of scope by user choice |
 
-## Next evaluation round
+## Deferred evaluation gaps
 
-Prioritize a matched C2 correctness comparison and representative appended-history tool workloads at nearly full context, then 8K C8 replay/restart. Use the [speed and capacity tools](Speed-benchmarks.md) to record actual prompts, runtime identity, first scores, cache evidence, and phase timings. Keep cold and reused work separate.
+The [96 GiB campaign](96GiB-comparison-campaign.md) is closed with KV15/batch8K/LMCache selected as best. The gaps above remain open; no further campaign on this stack is scheduled. If revisited, use the [speed and capacity tools](Speed-benchmarks.md) to record actual prompts, runtime identity, first scores, cache evidence, and phase timings. Keep cold and reused work separate.
 
 Dependency upgrades require a [candidate build and validation](MyLLMBox.md#upgrade-dependencies); deleting old LMCache data does not update libraries. Recheck correctness and performance against the pinned runtime before adopting an upgrade.
 

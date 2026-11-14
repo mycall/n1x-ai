@@ -82,7 +82,8 @@ if($AgentOutputTokens -ge $config.Context){throw 'Agent output allowance must le
 $native=$config.ContainsKey('Backend') -and $config.Backend -eq 'native'
 $partitionCheck=$null
 if($config.UseLMCache){
-    $partitionCheck=Confirm-N1xBenchmarkPartition -Group "LMCache benchmarks ($($config.Profile), $Suite)"
+    $requiredPartition=if($config.ContainsKey('RequiredPartitionMiB')){$config.RequiredPartitionMiB}else{90112}
+    $partitionCheck=Confirm-N1xBenchmarkPartition -Group "LMCache benchmarks ($($config.Profile), $Suite)" -RequiredMiB $requiredPartition
 }
 if($native -or $LocalClient -or $Suite -in @('speed','capacity')){
     if($Suite -notin @('agents','recovery','mixed','speculation','scheduler','speed','capacity') -or $Build -or $Smoke){throw 'The Windows client supports agents, recovery, mixed, speculation, scheduler, speed and capacity without -Build or -Smoke.'}

@@ -6,7 +6,8 @@ Set-StrictMode -Version Latest
 $config=Get-N1xConfig -Root $PSScriptRoot -Profile $Profile
 if(-not $config.UseLMCache){throw 'Select an LMCache profile.'}
 . "$PSScriptRoot/scripts/benchmark-partition.ps1"
-$partition=Confirm-N1xBenchmarkPartition -Group "LMCache restart restores ($Profile)"
+$requiredPartition=if($config.ContainsKey('RequiredPartitionMiB')){$config.RequiredPartitionMiB}else{90112}
+$partition=Confirm-N1xBenchmarkPartition -Group "LMCache restart restores ($Profile)" -RequiredMiB $requiredPartition
 $destination=Join-Path $PSScriptRoot ('results/restores/'+(Get-Date -Format 'yyyyMMdd-HHmmss'))
 New-Item -ItemType Directory -Force $destination | Out-Null
 $partition | ConvertTo-Json | Set-Content (Join-Path $destination 'partition.json') -Encoding UTF8

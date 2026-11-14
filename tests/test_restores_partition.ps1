@@ -5,6 +5,7 @@ $temporary=Join-Path ([IO.Path]::GetTempPath()) ('n1x-restore-gate-'+[guid]::New
 $global:N1xRestoreTestCalls=[Collections.Generic.List[string]]::new()
 $global:N1xRestoreTestReadings=[Collections.Generic.Queue[string]]::new()
 $global:N1xRestoreTestAnswer='cancel'
+$global:N1xRestoreTestPartition=0
 function nvidia-smi {
     $global:LASTEXITCODE=0
     $global:N1xRestoreTestReadings.Dequeue()
@@ -28,7 +29,9 @@ try {
     @'
 function Get-N1xConfig {
     param($Root,$Profile)
-    return @{UseLMCache=$true;Container='n1x-restore-fixture'}
+    $settings=@{UseLMCache=$true;Container='n1x-restore-fixture'}
+    if($global:N1xRestoreTestPartition){$settings.RequiredPartitionMiB=$global:N1xRestoreTestPartition}
+    return $settings
 }
 '@ | Set-Content "$temporary/scripts/config.ps1" -Encoding UTF8
     @'
@@ -50,6 +53,15 @@ $global:N1xRestoreTestCalls.Add($Action)
     if($receipt.Count -ne 1){throw 'Verified partition receipt was not saved'}
     $saved=Get-Content $receipt[0].FullName -Raw|ConvertFrom-Json
     if($saved.actualMiB -ne 90112 -or $saved.requiredMiB -ne 90112){throw 'Wrong partition recorded'}
+    $global:N1xRestoreTestPartition=98304
+    $global:N1xRestoreTestReadings.Enqueue('98304')
+    $global:N1xRestoreTestCalls.Clear()
+    & "$temporary/test-restores.ps1" -Profile qwen38fn-best
+    if(($global:N1xRestoreTestCalls -join ',') -ne 'wait,probe-seed,restart,wait,probe-verify'){
+        throw 'Configured 96 GiB partition did not pass the restore gate'
+    }
+    $receipts=@(Get-ChildItem "$temporary/results/restores" -Recurse -Filter partition.json | ForEach-Object {Get-Content $_.FullName -Raw | ConvertFrom-Json})
+    if(-not @($receipts | Where-Object {$_.actualMiB -eq 98304 -and $_.requiredMiB -eq 98304}).Count){throw 'Configured partition receipt missing'}
     Write-Output 'Restore entrypoint partition checks passed; model and GPU commands were mocked'
 } finally {
     $resolved=[IO.Path]::GetFullPath($temporary)
@@ -57,5 +69,5 @@ $global:N1xRestoreTestCalls.Add($Action)
     if(-not $resolved.StartsWith($prefix,[StringComparison]::OrdinalIgnoreCase) -or
        [IO.Path]::GetFileName($resolved) -notlike 'n1x-restore-gate-*'){throw 'Unsafe test cleanup path'}
     if(Test-Path -LiteralPath $resolved){Remove-Item -LiteralPath $resolved -Recurse -Force}
-    Remove-Variable N1xRestoreTestCalls,N1xRestoreTestReadings,N1xRestoreTestAnswer -Scope Global
+    Remove-Variable N1xRestoreTestCalls,N1xRestoreTestReadings,N1xRestoreTestAnswer,N1xRestoreTestPartition -Scope Global
 }

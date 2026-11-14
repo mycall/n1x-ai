@@ -1,12 +1,14 @@
 # Component review and top ten
 
-**Selected default: `qwen38fn-best`.** The 8K prefill batch prioritizes measured C1 performance; `qwen38fn-lmcache-4k` remains the faster measured cold-C8 alternative. C1/C2 are the intended common workload and C8 the worst case, but **C2 is unmeasured**. See the [matched comparison](Benchmarks.md#matched-prefill-comparison) for speeds, context lengths, and cache evidence.
+**Selected default, November 13, 2026: `qwen38fn-best`.** The profile pins the tested runtime and 96 GiB partition, with DFlash2 K3, batch8K, KV15 GiB, eight slots, and LMCache RAM4/SSD160. KV15 completed 48/48 near-full C2/C4 tool tasks; its C4 correct-work throughput was about 31% higher than the completed KV11 C4 measurement. The KV11 C2 run was incomplete, configuration order was not counterbalanced, and there was no matched 88 GiB control. This is a practical deployment choice from the completed evidence, not a demonstrated partition winner. See the [campaign](96GiB-comparison-campaign.md).
 
-Selection requires measured speed and **100% first-attempt correctness**. Resource and restore coverage remain reported observations, not automatic promotion vetoes. The 24 new 8K first attempts were correct; this is bounded retrieval quality, not general coding-agent qualification. [Measured results](Benchmarks.md) · [runtime](MyLLMBox.md) · [exact model files](Model-assets.md).
+The historical 88 GiB comparison favored batch8K at C1 and batch4K at cold C8; `qwen38fn-lmcache-4k` preserves that older runtime and KV11 configuration. Those results and the historical ranking below do not establish relative speed against today's best. The earlier [96 GiB KV11 trial](Near-full-tools-96GiB.md) covers bounded C1/C2 appended histories; the subsequent KV15 campaign covers C2/C4. General output quality and matched partition speed remain unmeasured.
 
-## Top 10 component combinations
+Selection requires measured speed and **100% first-attempt correctness** in the selected workload. The 48/48 KV15 result covers bounded tool tasks, not general coding-agent qualification or failure-free reliability across the campaign. Resource and restore coverage remain reported observations. [Measured results](Benchmarks.md) · [runtime](MyLLMBox.md) · [exact model files](Model-assets.md).
 
-Final deployment preference, November 8, 2026. These are reviewed configurations, not ten selectable profile names or a matched universal speed leaderboard. All use the same W4 target. DFlash2 is K3; standard SSM means FP32 with RecoverSSM off. KV/RAM/SSD sizes are GiB. All partitions are 88 GiB except row 7. Missing near-full evidence stays missing.
+## Historical top 10 component combinations
+
+Deployment preference as of November 8, 2026, superseded by the selection above. These are reviewed configurations, not ten selectable profile names or a matched universal speed leaderboard. All use the same W4 target. DFlash2 is K3; standard SSM means FP32 with RecoverSSM off. KV/RAM/SSD sizes are GiB. All partitions are 88 GiB except row 7. Missing near-full evidence stays missing.
 
 | Rank | Combination | Actual input / output allowance | Client concurrency and evidence | Disposition | Exact model bundle |
 | ---: | --- | --- | --- | --- | --- |

@@ -18,7 +18,7 @@ Profile names use the model family prefix `qwen38fn-`. The table describes check
 
 | Profile | Context | Speculation | LMCache | KV allocation |
 | --- | --- | --- | --- | --- |
-| qwen38fn-best (default, MyLLMBox Linux; batch8K) | 262,144 | Three DFlash2 draft tokens | On | 11 GiB FP8, BF16 draft KV |
+| qwen38fn-best (default, MyLLMBox Linux; batch8K, 96 GiB partition) | 262,144 | Three DFlash2 draft tokens | On | 15 GiB FP8, BF16 draft KV |
 | qwen38fn-lmcache-4k (batch4K alternate) | 262,144 | Three DFlash2 draft tokens | On | 11 GiB FP8, BF16 draft KV |
 | qwen38fn-baseline | 32,768 | Off | Off | 4 GiB |
 | qwen38fn-mtp | 32,768 | One draft token, Triton | Off | 4 GiB |

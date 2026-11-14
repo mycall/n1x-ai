@@ -4,17 +4,21 @@ The selected profiles use a pinned MyLLMBox v5.4 image with the project's LMCach
 
 ## Existing installation
 
-`qwen38fn-best` and `qwen38fn-lmcache-4k` share the runtime and model assets below. Loading is offline.
+`qwen38fn-best` pins the image tested in the 96 GiB campaign. `qwen38fn-lmcache-4k` retains the historical 88 GiB image. Both use the same model assets and load offline.
+
+| Profile | Image tag | Immutable image ID | GPU partition |
+| --- | --- | --- | --- |
+| Best | `n1x-ai:mbx-setup-1447755d89af469f894bfa8dcb51506d` | `sha256:819970fd46a90c1e70b7cd06aeb15d5ce3c75b02b62892a8322f42de225566bc` | 96 GiB |
+| 4K alternate | `n1x-ai:mbx-cache-test` | `sha256:de420cb63cedf084f8838e1e11a7db611e43418c04b3cebc756bc4a5955571aa` | 88 GiB |
+
+The following software measurements describe the historical image; use image provenance for the exact contents of another build.
 
 | Component | Pinned or measured value |
 | --- | --- |
-| Image tag | `n1x-ai:mbx-cache-test` |
-| Required image ID | `sha256:de420cb63cedf084f8838e1e11a7db611e43418c04b3cebc756bc4a5955571aa` |
 | Guest Python / vLLM | 3.12.3 / 0.32.0 |
 | Guest Torch / CUDA | 2.13.0+cu130 / 13.0.88 |
 | LMCache | 0.5.6 with local compatibility patches |
 | Required WSLC version | 3.0.5.0 |
-| Required GPU partition | 88 GiB |
 | Measured host driver / CUDA toolkit | 621.14 / 13.5.37 |
 | Model and storage prerequisites | [W4 target, DFlash2, and both prepared PLE volumes](Model-assets.md) |
 
@@ -50,7 +54,7 @@ A fresh build reproduces the pinned stack; it does not automatically select newe
 
 Changed vendor versions or source fail validation until reviewed. Compile extensions against the new guest stack and run the [local and GPU checks](Development.md) before comparing model correctness and performance.
 
-Candidate builds also apply `runtime/myllmbox/patch_qsa_ring.py`, guarded by the audited QSA source hash. It makes the speculative raw-key ring fit power-of-two attention blocks for DFlash2 depths 5-7. The prepared image listed above predates this fix. Selecting another draft depth does not patch an existing image; see [experimental draft depth](Configuration.md#experimental-draft-depth).
+Candidate builds also apply `runtime/myllmbox/patch_qsa_ring.py`, guarded by the audited QSA source hash. It makes the speculative raw-key ring fit power-of-two attention blocks for DFlash2 depths 5-7. The historical `mbx-cache-test` image predates this fix. Selecting another draft depth does not patch an existing image; see [experimental draft depth](Configuration.md#experimental-draft-depth).
 
 ### Select a candidate
 
