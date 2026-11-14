@@ -90,6 +90,8 @@ This also applies after selecting a rebuilt image or changing the HTTP model nam
 
 The readiness timeout defaults to 3,600 seconds and begins after launch. `start -Wait` explicitly requests the default behavior; `-NoWait` skips readiness waiting. Both switches apply only to `start` and cannot be combined. Startup errors stop immediately. `start -PrintOnly` previews without waiting or contacting the server. `restart` and `recreate` retain their separate launch-only behavior; use `wait` afterward when needed.
 
+While the container starts, readiness polling shows elapsed time with a loading/warmup message. Connection failures before the API is listening are expected and do not appear as startup errors. A stopped container or expired readiness timeout still fails explicitly; timeout errors retain the last health-check detail for diagnosis.
+
 ## LAN access
 
 Best defaults to localhost. Set `LanAccess = $true` in `config.local.psd1` and recreate to publish on all IPv4 interfaces. Startup adds a Windows Firewall rule for the configured port, restricted to `LocalSubnet` across all network profiles, including Public Wi-Fi. The API has no authentication.

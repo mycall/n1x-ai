@@ -517,8 +517,10 @@ switch ($Action) {
         $selected=Get-ManagedContainer
         if(-not $selected){throw "Container '$name' does not exist in this WSLC session. Run .\n1x.ps1 start successfully before wait; use the same non-elevated terminal."}
         Assert-Configuration $selected
-        $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
+        $waitStarted = Get-Date
+        $deadline = $waitStarted.AddSeconds($TimeoutSeconds)
         $lastNotice = [datetime]::MinValue
+        $lastHealthError = $null
         Write-Host "Waiting up to $TimeoutSeconds seconds for $Profile at $endpoint ..."
         while ((Get-Date) -lt $deadline) {
             # A WSLC transport timeout does not mean the container has stopped.
@@ -531,15 +533,19 @@ switch ($Action) {
                     $health = Invoke-WebRequest "$endpoint/health" -UseBasicParsing -TimeoutSec ([math]::Min(30, $remaining))
                     if ($health.StatusCode -eq 200) { Write-Host "READY: $endpoint/v1 ($Profile)"; return }
                 } catch {
+                    $lastHealthError = $_.Exception.Message
+                    Write-Verbose "Health check pending: $lastHealthError"
                     if (((Get-Date) - $lastNotice).TotalSeconds -ge 60) {
-                        Write-Host "API not ready; retrying: $($_.Exception.Message)"
+                        $elapsed = [int][math]::Floor(((Get-Date) - $waitStarted).TotalSeconds)
+                        Write-Host "Waiting for model API (${elapsed}s elapsed). Loading and warmup can take several minutes."
                         $lastNotice = Get-Date
                     }
                 }
             } else { Write-Host 'WSLC temporarily unavailable; retrying without stopping the container.' }
             Start-Sleep -Seconds 10
         }
-        throw "API did not become ready within $TimeoutSeconds seconds. Container left running for inspection."
+        $detail = if($lastHealthError){" Last health check: $lastHealthError"}else{''}
+        throw "API did not become ready within $TimeoutSeconds seconds. Container left running for inspection; use .\n1x.ps1 logs -Profile $Profile.$detail"
     }
     'status' {
         $selected = Get-ManagedContainer
