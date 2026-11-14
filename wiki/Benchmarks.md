@@ -211,8 +211,7 @@ Start the reference profile, then run its thinking-enabled agent benchmark:
 
 ```powershell
 # Stop any other model profile using the API port first.
-.\n1x.ps1 start -Profile qwen38fn-cache-dflash
-.\n1x.ps1 wait -Profile qwen38fn-cache-dflash -TimeoutSeconds 1800
+.\n1x.ps1 start -Profile qwen38fn-cache-dflash -TimeoutSeconds 1800
 .\benchmark.ps1 -Build -Suite agents
 
 # vLLM serving, AIPerf multi-turn retrieval, and the RULER subset.

@@ -55,4 +55,4 @@ foreach($key in ($settings.Keys|Sort-Object)){
 $lines+='}'
 [IO.File]::WriteAllText($localPath,($lines -join "`n"),[Text.UTF8Encoding]::new($false))
 Write-Host "Setup complete. Default profile: $($settings.DefaultProfile)"
-Write-Host 'Next: .\n1x.ps1 start; .\n1x.ps1 wait; .\n1x.ps1 test'
+Write-Host 'Next: .\n1x.ps1 start; .\n1x.ps1 test'

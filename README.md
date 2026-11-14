@@ -13,7 +13,6 @@ From a non-administrator PowerShell in this repository:
 ```powershell
 .\n1x.ps1 setup
 .\n1x.ps1 start
-.\n1x.ps1 wait
 .\n1x.ps1 test
 ```
 
@@ -28,7 +27,7 @@ The default API is **`http://127.0.0.1:8000/v1`**, with model ID **`qwen/qwen38f
 .\n1x.ps1 stop
 ```
 
-Set local paths and the default profile in `config.local.psd1`; see [Configuration](wiki/Configuration.md). Use `recreate` after changing runtime settings. Start and stop manage this checkout's model entries in supported clients without changing their selected defaults.
+Set local paths and the default profile in `config.local.psd1`; see [Configuration](wiki/Configuration.md). `start` applies changed container settings and waits for API readiness; use `start -NoWait` to return after launch. Start and stop manage this checkout's model entries in supported clients without changing their selected defaults.
 
 ## Documentation
 

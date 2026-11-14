@@ -36,8 +36,7 @@ Optional native source-update and DFlash experiments are preserved in the local 
 
 ```powershell
 .\n1x.ps1 start -Profile qwen38fn-myllmbox -PrintOnly
-.\n1x.ps1 start -Profile qwen38fn-myllmbox
-.\n1x.ps1 wait -Profile qwen38fn-myllmbox -TimeoutSeconds 1800
+.\n1x.ps1 start -Profile qwen38fn-myllmbox -TimeoutSeconds 1800
 .\n1x.ps1 stop -Profile qwen38fn-myllmbox
 ```
 

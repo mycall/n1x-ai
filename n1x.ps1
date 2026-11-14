@@ -8,6 +8,8 @@ param(
     [string]$Suite = 'smoke',
     [ValidateRange(1, 86400)]
     [int]$TimeoutSeconds = 3600,
+    [switch]$Wait,
+    [switch]$NoWait,
     [switch]$PrintOnly,
     [switch]$DenyFirewall,
     [switch]$SkipDownload,
@@ -20,6 +22,20 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
+if(($Wait -or $NoWait) -and $Action -ne 'start'){
+    throw '-Wait and -NoWait apply only to start. Use the wait action for an existing service.'
+}
+if($Wait -and $NoWait){throw 'Choose either -Wait or -NoWait.'}
+$waitForStart=$Action -eq 'start' -and -not $NoWait -and (-not $PSBoundParameters.ContainsKey('Wait') -or $Wait)
+if($waitForStart -and -not $PrintOnly){
+    # Reuse the regular lifecycle paths, releasing their locks before waiting.
+    $startOptions=@{}
+    foreach($key in $PSBoundParameters.Keys){if($key -notin @('Wait','NoWait')){$startOptions[$key]=$PSBoundParameters[$key]}}
+    $startOptions.NoWait=$true
+    & $PSCommandPath @startOptions
+    & $PSCommandPath wait -Profile $Profile -ModelRoot $ModelRoot -Port $Port -TimeoutSeconds $TimeoutSeconds
+    return
+}
 . "$PSScriptRoot/scripts/config.ps1"
 function Update-LanAccess([switch]$Remove) {
     if($PrintOnly){return}
@@ -42,7 +58,7 @@ Actions:
   list profiles  List available profiles and the configured default
   setup       Install prerequisites, download models, build image (with LMCache)
   build       Build the selected container runtime (MyLLMBox creates a candidate)
-  start       Start the selected container or native Windows profile
+  start       Start and wait for readiness; recreate stale managed containers
   stop        Stop the container and remove client/firewall registrations
   restart     Restart the running container with its existing configuration
   recreate    Remove and re-create the container to apply configuration changes
@@ -59,7 +75,9 @@ Common options:
   -Port <n>            Override the configured API port
   -ModelRoot <path>    Override the configured model root
   -PrintOnly           Preview what would run without changing anything
-  -TimeoutSeconds <n>  For wait
+  -TimeoutSeconds <n>  Readiness timeout for start/wait (default 3600s)
+  -NoWait              With start, return after launch without waiting for readiness
+  -Wait                Explicitly request start's default readiness wait
   -Rebuild             For MyLLMBox build: bypass image layer cache
   -LmcacheFromSource   For MyLLMBox build: compile LMCache against the guest stack
   -ImageTag <tag>      Candidate output tag for MyLLMBox build
@@ -67,6 +85,7 @@ Common options:
 Examples:
   .\n1x.ps1 list profiles
   .\n1x.ps1 start
+  .\n1x.ps1 start -NoWait
   .\n1x.ps1 status -Profile qwen38fn-mtp
   .\n1x.ps1 wait -TimeoutSeconds 600
   .\n1x.ps1 start -PrintOnly
@@ -295,18 +314,24 @@ function Assert-ProfileRunning {
     if($myllmbox){Assert-Configuration $container}
 }
 
-function Assert-Configuration($Container) {
+function Test-Configuration($Container) {
     $property=$Container.Config.Labels.PSObject.Properties['n1x-ai.config-sha']
     if($null -ne $property){
-        if($property.Value -eq $fingerprint){return}
+        if($property.Value -eq $fingerprint){return $true}
         # Older labels included the default selection, which does not affect an
         # already selected profile. All actual settings must still match.
         $legacyDefaults=@('qwen38fn-baseline',$config.DefaultProfile)+@(Get-ChildItem "$PSScriptRoot/profiles" -Filter '*.psd1' -File | ForEach-Object BaseName)
         foreach($legacyDefault in ($legacyDefaults|Select-Object -Unique)){
-            if($property.Value -eq (Get-ConfigFingerprint -LegacyDefault $legacyDefault)){return}
+            if($property.Value -eq (Get-ConfigFingerprint -LegacyDefault $legacyDefault)){return $true}
         }
     }
-    throw "Container settings differ. Run .\n1x.ps1 recreate -Profile $Profile to apply your configuration."
+    return $false
+}
+
+function Assert-Configuration($Container) {
+    if(-not (Test-Configuration $Container)){
+        throw "Container settings differ. Run .\n1x.ps1 start -Profile $Profile -Wait to apply your configuration."
+    }
 }
 
 function Write-Headroom {
@@ -347,8 +372,11 @@ switch ($Action) {
             Assert-NoOtherProfile
             $existing = Get-ManagedContainer
             if ($existing) {
-                Assert-Configuration $existing
-                if ($config.UseLMCache -and -not $existing.State.Running -and $existing.State.ExitCode -ne 0) {
+                if(-not (Test-Configuration $existing)){
+                    Write-Host "Recreating $name to apply changed settings; named volumes are preserved."
+                    if($existing.State.Running){Invoke-Wslc @('stop',$name)}
+                    Invoke-Wslc @('rm',$name)
+                } elseif ($config.UseLMCache -and -not $existing.State.Running -and $existing.State.ExitCode -ne 0) {
                     Write-Host "Recreating $name after an unsuccessful exit; named volumes are preserved."
                     Invoke-Wslc @('rm', $name)
                 } else {
@@ -475,7 +503,7 @@ switch ($Action) {
         if(-not $old){throw "No managed container $name"}
         Assert-Configuration $old
         if($config.UseLMCache -and -not $old.State.Running -and $old.State.ExitCode -ne 0){
-            & $PSCommandPath start -Profile $Profile -ModelRoot $config.ModelRoot -Port $config.Port -DenyFirewall:$DenyFirewall
+            & $PSCommandPath start -NoWait -Profile $Profile -ModelRoot $config.ModelRoot -Port $config.Port -DenyFirewall:$DenyFirewall
         } else {
             if($requiresHostMonitor){Write-Headroom; Start-MemoryMonitor}
             Invoke-Wslc @('restart', $name)

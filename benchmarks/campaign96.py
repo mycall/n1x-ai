@@ -156,7 +156,7 @@ class Campaign:
         desired=(kv,cache,batch)
         self.guard()
         if self.current is None:
-            self.command(self.psfile('n1x.ps1','start','-Profile','qwen38fn-best'),name+'-start',timeout=180)
+            self.command(self.psfile('n1x.ps1','start','-NoWait','-Profile','qwen38fn-best'),name+'-start',timeout=180)
             self.command(self.psfile('n1x.ps1','wait','-Profile','qwen38fn-best','-TimeoutSeconds','1200'),name+'-ready',timeout=1250)
             _,effective=self.capture('initial')
             self.current=(int(effective['KvCacheBytes'])//1024**3,effective['UseLMCache'],effective['BatchedTokens'])

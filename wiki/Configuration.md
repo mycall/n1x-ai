@@ -61,7 +61,9 @@ Set `BatchedTokens` in `config.local.psd1` and recreate the service to apply an 
 
 | Action | Purpose |
 | --- | --- |
-| `start` / `wait` | Launch the selected profile / wait for API readiness |
+| `start` | Launch and wait for API readiness; replace stale managed containers while preserving named volumes |
+| `start -NoWait` | Return after launch without waiting for API readiness |
+| `wait` | Wait for an existing service with matching settings; does not start or replace it |
 | `status` / `logs` / `doctor` | Inspect readiness, logs, and installation diagnostics |
 | `test` | Run API smoke checks; [additional suites](Development.md#service-validation) are explicit |
 | `stop` | Stop serving and remove managed client/firewall registrations |
@@ -73,14 +75,20 @@ Use the same profile argument across commands, or set `DefaultProfile`. Only one
 
 Changing only `DefaultProfile` changes which profile commands select; it does not change an existing profile's runtime settings or require recreating that profile.
 
-Existing containers retain their creation settings. After configuration changes:
+After configuration changes, `start` detects a stale container fingerprint and recreates the project-owned container. An already-running container with matching settings is reused. To apply settings and wait for readiness:
 
 ```powershell
-.\n1x.ps1 recreate
+.\n1x.ps1 start
+# Allow a longer cold start when needed:
+.\n1x.ps1 start -TimeoutSeconds 7200
+# Launch in the background and inspect readiness separately:
+.\n1x.ps1 start -NoWait
 .\n1x.ps1 wait
 ```
 
-Also recreate after selecting a rebuilt image or changing the HTTP model name. MyLLMBox image selection requires a matching tag and immutable ID; see [candidate selection](MyLLMBox.md#select-a-candidate). Configuration and recipe fingerprints prevent silently reusing stale settings.
+This also applies after selecting a rebuilt image or changing the HTTP model name. `recreate` remains available to force replacement even when settings match. MyLLMBox image selection requires a matching tag and immutable ID; see [candidate selection](MyLLMBox.md#select-a-candidate). Configuration and recipe fingerprints prevent silently reusing stale settings.
+
+The readiness timeout defaults to 3,600 seconds and begins after launch. `start -Wait` explicitly requests the default behavior; `-NoWait` skips readiness waiting. Both switches apply only to `start` and cannot be combined. Startup errors stop immediately. `start -PrintOnly` previews without waiting or contacting the server. `restart` and `recreate` retain their separate launch-only behavior; use `wait` afterward when needed.
 
 ## LAN access
 
