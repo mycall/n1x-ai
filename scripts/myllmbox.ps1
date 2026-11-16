@@ -13,6 +13,14 @@ function Get-N1xMyllmboxEnvironment {
     param([string]$Root,[hashtable]$Config)
     $paths=Get-N1xMyllmboxPaths $Root $Config
     $environment=Import-PowerShellDataFile $paths.Environment
+    if($Config.ContainsKey('MyllmboxCheckpointPle') -and $Config.MyllmboxCheckpointPle -isnot [bool]){
+        throw 'MyllmboxCheckpointPle must be a boolean'
+    }
+    if($Config.ContainsKey('MyllmboxCheckpointPle') -and $Config.MyllmboxCheckpointPle){
+        if($environment.ContainsKey('MBX_PLE_FP8_DIR') -or $environment.MBX_PLE_MMAP -ne '1'){
+            throw 'Checkpoint PLE requires mmap and must not select an external FP8 table'
+        }
+    }
     if($environment.HF_HUB_OFFLINE -ne '1' -or $environment.TRANSFORMERS_OFFLINE -ne '1'){
         throw 'MyLLMBox requires offline loading of the existing local weights'
     }
@@ -52,8 +60,11 @@ function Get-N1xMyllmboxArguments {
         '--label',"n1x-ai.profile=$($Config.Profile)",'--label',"n1x-ai.config-sha=$Fingerprint",
         '--gpus','all','--shm-size','1g','--stop-timeout','60','--ulimit','memlock=-1:-1',
         '--publish',"${publish}:$($Config.Port):8000",'--volume',"$($paths.Model):/model:ro",
-        '--volume',"$($paths.Drafter):/drafter:ro",'--volume',"$($Config.PleVolume):/ple-table-fp8:ro",
-        '--volume',"$($Config.CacheVolume):/cache",'--volume',"${recipeDirectory}:/n1x-config:ro",
+        '--volume',"$($paths.Drafter):/drafter:ro")
+    if(-not($Config.ContainsKey('MyllmboxCheckpointPle') -and $Config.MyllmboxCheckpointPle)){
+        $arguments+=@('--volume',"$($Config.PleVolume):/ple-table-fp8:ro")
+    }
+    $arguments+=@('--volume',"$($Config.CacheVolume):/cache",'--volume',"${recipeDirectory}:/n1x-config:ro",
         '--volume',"$($paths.State):/state:ro")
     if($Config.UseLMCache){$arguments+=@('--volume',"$($Config.LmcacheVolume):/lmcache")}
     foreach($key in @($environment.Keys|Sort-Object)){$arguments+=@('--env',"$key=$($environment[$key])")}
@@ -148,8 +159,9 @@ function Confirm-N1xMyllmboxStorage {
     $rows=@(& wslc volume list --format json)
     if($LASTEXITCODE -ne 0){throw 'Cannot inspect WSLC volumes; check wslc info from the same non-administrator terminal'}
     $volumes=@($rows | Where-Object {$_.Trim()} | ForEach-Object {($_|ConvertFrom-Json).Name})
-    $ready=$false
-    if($Config.PleVolume -in $volumes){
+    $checkpointPle=$Config.ContainsKey('MyllmboxCheckpointPle') -and $Config.MyllmboxCheckpointPle
+    $ready=$checkpointPle
+    if(-not $checkpointPle -and $Config.PleVolume -in $volumes){
         & wslc run --rm --entrypoint python3 --volume "$($Config.PleVolume):/table:ro" --volume "${Root}/scripts:/checks:ro" $Config.ImageId /checks/check-ple.py | Out-Host
         $ready=$LASTEXITCODE -eq 0
     }

@@ -70,6 +70,17 @@ try{
     $global:n1xStorageFixture.ready=$false
     try{Confirm-N1xMyllmboxStorage $fixture $config -Prepare -SkipPleCopy;throw 'SkipPleCopy ignored'}
     catch{if($_.Exception.Message -notlike 'Missing or incomplete FP8 PLE volume*'){throw}}
+    # A checkpoint-native PLE profile needs only its runtime cache volume.
+    # It must not download or copy the unrelated FP8 table on a fresh setup.
+    $config.MyllmboxCheckpointPle=$true
+    $global:n1xStorageFixture.volumes=@()
+    $downloads=$global:n1xStorageFixture.downloads
+    $copies=$global:n1xStorageFixture.copies
+    Confirm-N1xMyllmboxStorage $fixture $config -Prepare -SkipPleCopy
+    if($global:n1xStorageFixture.downloads -ne $downloads -or $global:n1xStorageFixture.copies -ne $copies -or
+        ($global:n1xStorageFixture.volumes -join ',') -ne 'fixture-cache'){
+        throw 'Checkpoint PLE setup touched the external FP8 table'
+    }
 }finally{
     Remove-Item Function:wslc
     Remove-Variable n1xStorageFixture -Scope Global

@@ -105,6 +105,22 @@ try{
 }finally{Remove-Item Function:wslc;Remove-Item Function:Invoke-WebRequest}
 Write-Host 'MyLLMBox offline launch contract checks passed'
 
+foreach($profile in @('qwen38fn-az-dflash','qwen38fn-az-kv19')){
+    $az=Get-N1xConfig -Root $root -Profile $profile
+    $azArguments=@(Get-N1xMyllmboxArguments $root $az 'az-fixture')
+    if(@($azArguments|Where-Object {$_ -like '*:/ple-table-fp8:ro' -or $_ -like 'MBX_PLE_FP8_DIR=*'}).Count){
+        throw 'AZ incorrectly uses the external FP8 table'
+    }
+    if($azArguments -notcontains 'MBX_PLE_MMAP=1' -or
+        -not @($azArguments|Where-Object {$_ -like '*Qwen3.8-Flash-Next-FP4-Local-AZ:/model:ro'}).Count){
+        throw 'AZ checkpoint-native PLE launch is incomplete'
+    }
+}
+$mismatched=Get-N1xConfig -Root $root -Profile qwen38fn-best
+$mismatched.MyllmboxCheckpointPle=$true
+try{Get-N1xMyllmboxEnvironment $root $mismatched;throw 'Mismatched PLE configuration accepted'}
+catch{if($_.Exception.Message -ne 'Checkpoint PLE requires mmap and must not select an external FP8 table'){throw}}
+
 # Rebuilding is explicit and cannot silently retag the selected runtime.
 $buildPreview=& "$root/build.ps1" -Myllmbox -Rebuild -LmcacheFromSource -PrintOnly
 $publicPreview=& "$root/n1x.ps1" build -Profile qwen38fn-best -Rebuild -LmcacheFromSource -PrintOnly
