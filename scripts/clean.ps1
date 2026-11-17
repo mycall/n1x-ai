@@ -82,21 +82,26 @@ foreach($file in $files){
 }
 if($VhdPath){
     $before=(Get-Item -LiteralPath $VhdPath).Length
+    Write-Host 'Compacting the detached VHDX. This may take several minutes.'
     if(Get-Command Optimize-VHD -ErrorAction SilentlyContinue){Optimize-VHD -Path $VhdPath -Mode Full}
     else {
         if($VhdPath -match '["\r\n]'){throw 'Invalid disk path'}
         $commandFile=Join-Path ([IO.Path]::GetTempPath()) ('n1x-compact-'+[guid]::NewGuid().ToString('N')+'.txt')
         try {
             [IO.File]::WriteAllLines($commandFile,@(('select vdisk file="'+$VhdPath+'"'),'compact vdisk','exit'))
-            $output=& diskpart.exe /s $commandFile
-            $exitCode=$LASTEXITCODE
+            . "$PSScriptRoot/process.ps1"
+            $result=Invoke-N1xCapturedProcess -FilePath (Join-Path $env:SystemRoot 'System32/diskpart.exe') -ArgumentList @('/s',$commandFile)
+            $output=$result.Stdout+$result.Stderr
+            $exitCode=$result.ExitCode
             $output | Write-Host
             if($exitCode -ne 0 -or ($output -join "`n") -notmatch 'successfully compacted'){
                 throw 'DiskPart compaction could not be verified; inspect its output (localized Windows may use different success text).'
             }
         } finally {Remove-Item -LiteralPath $commandFile -Force}
     }
-    Write-Host "VHDX length: $before -> $((Get-Item -LiteralPath $VhdPath).Length) bytes"
+    $after=(Get-Item -LiteralPath $VhdPath).Length
+    Write-Host "VHDX length: $before -> $after bytes"
+    Write-Host ('VHDX size: {0:N2} -> {1:N2} GiB; file size reduction: {2:N2} GiB' -f ($before/1GB),($after/1GB),(($before-$after)/1GB))
 } else {
     & wslc system session run /usr/sbin/fstrim -av
     if($LASTEXITCODE -ne 0){Write-Warning 'Ignored files cleaned, but WSLC trim failed. Retry from an interactive terminal. No physical disk reclamation is claimed.'}

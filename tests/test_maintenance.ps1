@@ -4,9 +4,27 @@ $root=Split-Path $PSScriptRoot -Parent
 . "$root/scripts/models.ps1"
 . "$root/scripts/config.ps1"
 . "$root/scripts/upstream.ps1"
+. "$root/scripts/process.ps1"
 $temporary=Join-Path ([IO.Path]::GetTempPath()) ('n1x-maintenance-'+[guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $temporary | Out-Null
 try {
+    # Real native-process regression: preserve spaced arguments, drain both
+    # streams beyond pipe capacity, and retain a nonzero exit status.
+    $captureScript=Join-Path $temporary 'capture fixture.ps1'
+    [IO.File]::WriteAllText($captureScript,@'
+param([string]$Value)
+[Console]::Out.WriteLine($Value)
+[Console]::Error.WriteLine($Value)
+for($i=0;$i -lt 5000;$i++){
+    [Console]::Out.WriteLine('stdout-payload-'+$i)
+    [Console]::Error.WriteLine('stderr-payload-'+$i)
+}
+exit 7
+'@)
+    $capture=Invoke-N1xCapturedProcess -FilePath (Get-Command pwsh).Source -ArgumentList @('-NoProfile','-File',$captureScript,'literal value with spaces')
+    if($capture.ExitCode -ne 7 -or $capture.Stdout -notmatch 'literal value with spaces' -or
+        $capture.Stderr -notmatch 'literal value with spaces' -or $capture.Stdout -notmatch 'stdout-payload-4999' -or
+        $capture.Stderr -notmatch 'stderr-payload-4999'){throw 'Native output capture lost arguments, output, or exit status'}
     & git init --quiet $temporary
     if($LASTEXITCODE -ne 0){throw 'Fixture git init failed'}
     [IO.File]::WriteAllText("$temporary/.gitignore",".build/`nresults/`nconfig.local.psd1`nmodels/`n.state/`nnested/`n")

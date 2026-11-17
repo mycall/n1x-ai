@@ -6,10 +6,10 @@ function Get-N1xProfileList {
         [pscustomobject]@{
             Profile=$name
             Default=if($name -eq $settings.DefaultProfile){'*'}else{''}
-            Runtime=if($settings.ContainsKey('Backend') -and $settings.Backend -eq 'native'){'Windows'}else{'WSLC'}
+            Runtime=if($settings.ContainsKey('Backend') -and $settings.Backend -eq 'tensorfold-trial'){'TensorFold trial'}elseif($settings.ContainsKey('Backend') -and $settings.Backend -eq 'native'){'Windows'}else{'WSLC'}
             Context=$settings.Context
-            Speculation=if($settings.DFlash){"DFlash2 K$($settings.DFlashTokens)"}elseif($settings.Mtp){'MTP'}else{'Off'}
-            LMCache=$settings.UseLMCache
+            Speculation=if($settings.ContainsKey('Backend') -and $settings.Backend -eq 'tensorfold-trial'){'DFlash2 requested (blocked)'}elseif($settings.DFlash){"DFlash2 K$($settings.DFlashTokens)"}elseif($settings.Mtp){'MTP'}else{'Off'}
+            LMCache=if($settings.ContainsKey('Backend') -and $settings.Backend -eq 'tensorfold-trial'){'Requested (unwired)'}else{$settings.UseLMCache}
         }
     }
 }
@@ -47,7 +47,7 @@ function Get-N1xConfig {
         $config.DFlashTokens=3
     }
     if($config.ContainsKey('Backend')){
-        if($config.Backend -notin @('native','wslc-myllmbox')){throw 'Unknown serving backend'}
+        if($config.Backend -notin @('native','wslc-myllmbox','tensorfold-trial')){throw 'Unknown serving backend'}
         if($config.Backend -eq 'native'){
         foreach($key in @('NativeRuntimeRoot','NativeConfig','NativeModel')){
             if(-not $config.ContainsKey($key) -or -not $config[$key]){throw "Missing native setting: $key"}

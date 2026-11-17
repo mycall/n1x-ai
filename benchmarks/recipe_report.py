@@ -12,7 +12,8 @@ def read(path):
 
 def summarize(folder):
     result = {'name': folder.name, 'status': read(folder / 'status.json')}
-    for name in ('variant.json', 'config.json', 'failure.json', 'intentional-stop.json'):
+    for name in ('variant.json', 'config.json', 'failure.json', 'intentional-stop.json',
+                 'measurement-plan.json', 'quality-screens.json'):
         path = folder / name
         if path.exists():
             result[name.removesuffix('.json')] = read(path)

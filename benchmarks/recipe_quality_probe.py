@@ -25,7 +25,7 @@ VARIANTS = {'xhigh-t1': ('xhigh', 1.0), 'medium-t1': ('medium', 1.0),
 class ParameterProbe(Probe):
     def chat(self, messages, salt, **extra):
         extra.update(temperature=self.args.temperature, top_p=0.95, top_k=20,
-                     presence_penalty=0, seed=42, max_tokens=8192,
+                     presence_penalty=0, seed=self.args.seed, max_tokens=8192,
                      chat_template_kwargs=thinking_kwargs(True, self.args.effort))
         return super().chat(messages, salt, **extra)
 
@@ -57,7 +57,7 @@ def run_quality(args, prepared, client):
         def ask(task):
             payload = deepcopy(task['payload'])
             payload.update(temperature=args.temperature, top_p=0.95, top_k=20,
-                           presence_penalty=0, seed=42, max_tokens=8192,
+                           presence_penalty=0, seed=args.seed, max_tokens=8192,
                            cache_salt=uuid.uuid4().hex,
                            chat_template_kwargs=thinking_kwargs(True, args.effort))
             count = token_count(client, payload)
@@ -105,13 +105,14 @@ def main():
     parser.add_argument('--variants', choices=VARIANTS, nargs='+', default=list(VARIANTS))
     parser.add_argument('--phases', choices=['agents', 'recovery', 'quality'], nargs='+', default=['agents', 'recovery'])
     parser.add_argument('--quality-depth', type=int, default=32768)
+    parser.add_argument('--seed', type=int, default=42)
     args = parser.parse_args()
     args.out.mkdir(parents=True, exist_ok=False)
     client = Client(args.url)
     client.get('/health')
     meta = dict(utc=datetime.now(timezone.utc).isoformat(), variants={v:VARIANTS[v] for v in args.variants},
                 phases=args.phases, quality_depth=args.quality_depth, output_tokens=8192,
-                top_p=0.95, top_k=20, seed=42, presence_penalty=0,
+                top_p=0.95, top_k=20, seed=args.seed, presence_penalty=0,
                 model=client.get('/v1/models'),
                 note='Recipe candidate recorded by the parent trial. Fixed seed; scheduler may change reproducibility. '
                      'Agents C1/C2, two sessions/two turns and forward/reverse concurrency sweeps. '
@@ -133,7 +134,7 @@ def main():
         for phase in args.phases:
             folder = args.out / variant / phase
             config = SimpleNamespace(out=folder, url=args.url, no_lmcache_metrics=True,
-                effort=effort, temperature=temperature, agent_thinking=True,
+                effort=effort, temperature=temperature, seed=args.seed, agent_thinking=True,
                 agent_output_tokens=8192, agent_sessions=2, agent_turns=2, agent_concurrency=[1,2])
             print(f'START {variant} {phase}', flush=True)
             client.get('/health')
@@ -142,11 +143,14 @@ def main():
                     ParameterProbe(config).agents()
                 elif phase == 'recovery':
                     recovery.Probe = ParameterProbe
-                    recovery.run(config)
-                    summary = json.loads((folder/'summary.json').read_text())
-                    summary['max_output_tokens'] = 8192
-                    summary.update(reasoning_effort=effort, temperature=temperature)
-                    save(folder/'summary.json', summary)
+                    try:
+                        recovery.run(config)
+                    finally:
+                        if (folder/'summary.json').exists():
+                            summary = json.loads((folder/'summary.json').read_text())
+                            summary.update(max_output_tokens=8192, reasoning_effort=effort,
+                                           temperature=temperature, seed=args.seed)
+                            save(folder/'summary.json', summary)
                 else:
                     run_quality(config, prepared, client)
             except Exception as error:

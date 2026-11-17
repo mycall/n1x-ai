@@ -54,6 +54,8 @@ A fresh build reproduces the pinned stack; it does not automatically select newe
 
 Changed vendor versions or source fail validation until reviewed. Compile extensions against the new guest stack and run the [local and GPU checks](Development.md) before comparing model correctness and performance.
 
+The [November 15 CUDA allocator trial](CUDA-allocator-trial.md) found that adding `PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True` alone is rejected by this image's KV-connector compatibility guard. Keep it off with the selected LMCache runtime; the CuMem alternative requires separate integration qualification.
+
 Candidate builds also apply `runtime/myllmbox/patch_qsa_ring.py`, guarded by the audited QSA source hash. It makes the speculative raw-key ring fit power-of-two attention blocks for DFlash2 depths 5-7. The historical `mbx-cache-test` image predates this fix. Selecting another draft depth does not patch an existing image; see [experimental draft depth](Configuration.md#experimental-draft-depth).
 
 ### Select a candidate

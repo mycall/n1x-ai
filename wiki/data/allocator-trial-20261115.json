@@ -1,0 +1,790 @@
+{
+  "date": "2026-11-15",
+  "disposition": "Do not enable as a standalone setting with the selected LMCache runtime.",
+  "image": "sha256:819970fd46a90c1e70b7cd06aeb15d5ce3c75b02b62892a8322f42de225566bc",
+  "environment_difference": {
+    "PYTORCH_CUDA_ALLOC_CONF": {
+      "control": null,
+      "candidate": "expandable_segments:True"
+    }
+  },
+  "serving_arguments_semantically_equal": true,
+  "control": {
+    "config": {
+      "MyllmboxEnvironment": "runtime/myllmbox/environment.psd1",
+      "Context": 262144,
+      "MyllmboxModel": "Qwen3.8-Flash-Next-W4A16-AutoRound-hybrid",
+      "ImageId": "sha256:819970fd46a90c1e70b7cd06aeb15d5ce3c75b02b62892a8322f42de225566bc",
+      "KvCacheBytes": "16106127360",
+      "PleWorkers": 8,
+      "CacheVolume": "n1x-mbx-w4-dflash-test-cache",
+      "RestoreWaitMs": 0,
+      "Container": "n1x-allocator-trial",
+      "DFlash": true,
+      "Profile": "qwen38fn-best",
+      "RequiredPartitionMiB": 98304,
+      "KvCacheDtype": "fp8",
+      "LmcacheChunkTokens": 4096,
+      "LanAccess": false,
+      "MyllmboxConfig": "profiles/qwen38fn-best.yaml",
+      "MaxOutputTokens": 8192,
+      "LmcacheL2GiB": 160,
+      "Backend": "wslc-myllmbox",
+      "LmcacheL1GiB": 4,
+      "BatchedTokens": 8192,
+      "UseLMCache": true,
+      "PleVolume": "n1x-ple-native",
+      "Image": "n1x-ai:mbx-setup-1447755d89af469f894bfa8dcb51506d",
+      "MaxSequences": 8,
+      "DefaultProfile": "qwen38fn-best",
+      "MyllmboxDrafter": "Qwen3.8-Flash-Next-DFlash2",
+      "ModelRoot": "C:\\Users\\michael\\models",
+      "Mtp": false,
+      "MyllmboxWSLCVersion": "3.0.5.0",
+      "DFlashTokens": 3,
+      "WindowsMinimumGiB": 4,
+      "LmcacheVolume": "n1x-allocator-trial-20261115",
+      "LmcacheNamespace": "qwen-allocator-trial-20261115",
+      "Port": 8000,
+      "CacheBlockTokens": 4096
+    },
+    "windows_scheme": "Power Scheme GUID: 381b4222-f694-41f0-9685-ff5bb260df2e  (Balanced)",
+    "speed_settings": {
+      "protocol": "n1x-speed-v1",
+      "profile": "qwen38fn-best",
+      "depths": [
+        4096,
+        32768,
+        131072,
+        253944
+      ],
+      "concurrency": [
+        1,
+        2
+      ],
+      "repeats": 2,
+      "modes": [
+        "cold"
+      ],
+      "extension_tokens": 2048,
+      "output_tokens": 512,
+      "thinking": true,
+      "reasoning_effort": "xhigh",
+      "context_limit": 262144,
+      "tolerance": 8,
+      "seed": 42,
+      "prompt_recipe_sha256": "82e7fc4e312859a8fd51dda592cfddc9da04120559bb9d612a7903c7e81364ae",
+      "read_basis": "added rendered tokens for incremental; full rendered prompt for cold",
+      "timing_policy": "direct-server-preferred; PP fallback e2e-minus-decode",
+      "repeat_order": "forward grid on even repeats, reverse on odd repeats",
+      "fixed_output": true,
+      "correctness_claim": false,
+      "generator_sha256": "bdcbb5851407a65beb2ad2cef4f822f24b1172a2c63ac7c1ed9cbf15d69ff447"
+    },
+    "speed_cells": [
+      {
+        "mode": "cold",
+        "concurrency": 1,
+        "depth": 4096,
+        "status": "complete",
+        "expected_requests": 2,
+        "recorded_requests": 2,
+        "valid_requests": 2,
+        "timing_sources": [
+          {
+            "pp": "server-scheduled-to-first-token",
+            "decode": "server-first-to-last-token",
+            "requests": 2
+          }
+        ],
+        "timing_source": [
+          "server-scheduled-to-first-token",
+          "server-first-to-last-token"
+        ],
+        "read_write_tks": [
+          2573.6754719191595,
+          48.494552571796454
+        ],
+        "input_tokens": [
+          4090,
+          4090
+        ],
+        "history_tokens": [
+          0,
+          0
+        ],
+        "read_tokens": [
+          4090,
+          4090
+        ],
+        "completion_tokens": [
+          512,
+          512
+        ],
+        "cached_tokens": [
+          0,
+          0
+        ],
+        "cached_prompt_fraction": 0.0,
+        "mean_client_ttft_s": 1.6879741999982798,
+        "mean_e2e_s": 12.198901800002204,
+        "notes": []
+      },
+      {
+        "mode": "cold",
+        "concurrency": 1,
+        "depth": 32768,
+        "status": "complete",
+        "expected_requests": 2,
+        "recorded_requests": 2,
+        "valid_requests": 2,
+        "timing_sources": [
+          {
+            "pp": "server-scheduled-to-first-token",
+            "decode": "server-first-to-last-token",
+            "requests": 2
+          }
+        ],
+        "timing_source": [
+          "server-scheduled-to-first-token",
+          "server-first-to-last-token"
+        ],
+        "read_write_tks": [
+          2980.2961486440654,
+          48.20224651427869
+        ],
+        "input_tokens": [
+          32760,
+          32760
+        ],
+        "history_tokens": [
+          0,
+          0
+        ],
+        "read_tokens": [
+          32760,
+          32760
+        ],
+        "completion_tokens": [
+          512,
+          512
+        ],
+        "cached_tokens": [
+          0,
+          0
+        ],
+        "cached_prompt_fraction": 0.0,
+        "mean_client_ttft_s": 11.15021269999852,
+        "mean_e2e_s": 21.72909575000085,
+        "notes": []
+      },
+      {
+        "mode": "cold",
+        "concurrency": 1,
+        "depth": 131072,
+        "status": "complete",
+        "expected_requests": 2,
+        "recorded_requests": 2,
+        "valid_requests": 2,
+        "timing_sources": [
+          {
+            "pp": "server-scheduled-to-first-token",
+            "decode": "server-first-to-last-token",
+            "requests": 2
+          }
+        ],
+        "timing_source": [
+          "server-scheduled-to-first-token",
+          "server-first-to-last-token"
+        ],
+        "read_write_tks": [
+          2913.8734057717647,
+          44.560920236895086
+        ],
+        "input_tokens": [
+          131080,
+          131080
+        ],
+        "history_tokens": [
+          0,
+          0
+        ],
+        "read_tokens": [
+          131080,
+          131080
+        ],
+        "completion_tokens": [
+          512,
+          512
+        ],
+        "cached_tokens": [
+          0,
+          0
+        ],
+        "cached_prompt_fraction": 0.0,
+        "mean_client_ttft_s": 45.37069699999847,
+        "mean_e2e_s": 56.73450669999875,
+        "notes": []
+      },
+      {
+        "mode": "cold",
+        "concurrency": 1,
+        "depth": 253944,
+        "status": "complete",
+        "expected_requests": 2,
+        "recorded_requests": 2,
+        "valid_requests": 2,
+        "timing_sources": [
+          {
+            "pp": "server-scheduled-to-first-token",
+            "decode": "server-first-to-last-token",
+            "requests": 2
+          }
+        ],
+        "timing_source": [
+          "server-scheduled-to-first-token",
+          "server-first-to-last-token"
+        ],
+        "read_write_tks": [
+          2857.694831610625,
+          44.54972244215192
+        ],
+        "input_tokens": [
+          253945,
+          253945
+        ],
+        "history_tokens": [
+          0,
+          0
+        ],
+        "read_tokens": [
+          253945,
+          253945
+        ],
+        "completion_tokens": [
+          512,
+          512
+        ],
+        "cached_tokens": [
+          0,
+          0
+        ],
+        "cached_prompt_fraction": 0.0,
+        "mean_client_ttft_s": 89.57856399999946,
+        "mean_e2e_s": 100.8571403499991,
+        "notes": []
+      },
+      {
+        "mode": "cold",
+        "concurrency": 2,
+        "depth": 4096,
+        "status": "complete",
+        "expected_requests": 4,
+        "recorded_requests": 4,
+        "valid_requests": 4,
+        "timing_sources": [
+          {
+            "pp": "server-scheduled-to-first-token",
+            "decode": "server-first-to-last-token",
+            "requests": 4
+          }
+        ],
+        "timing_source": [
+          "server-scheduled-to-first-token",
+          "server-first-to-last-token"
+        ],
+        "read_write_tks": [
+          1861.1261774609409,
+          36.03270719858619
+        ],
+        "input_tokens": [
+          4090,
+          4090
+        ],
+        "history_tokens": [
+          0,
+          0
+        ],
+        "read_tokens": [
+          4090,
+          4090
+        ],
+        "completion_tokens": [
+          512,
+          512
+        ],
+        "cached_tokens": [
+          0,
+          0
+        ],
+        "cached_prompt_fraction": 0.0,
+        "mean_client_ttft_s": 2.6361379000009038,
+        "mean_e2e_s": 16.815808874996947,
+        "notes": []
+      },
+      {
+        "mode": "cold",
+        "concurrency": 2,
+        "depth": 32768,
+        "status": "complete",
+        "expected_requests": 4,
+        "recorded_requests": 4,
+        "valid_requests": 4,
+        "timing_sources": [
+          {
+            "pp": "server-scheduled-to-first-token",
+            "decode": "server-first-to-last-token",
+            "requests": 4
+          }
+        ],
+        "timing_source": [
+          "server-scheduled-to-first-token",
+          "server-first-to-last-token"
+        ],
+        "read_write_tks": [
+          2215.0274024278697,
+          28.501776230276256
+        ],
+        "input_tokens": [
+          32760,
+          32760
+        ],
+        "history_tokens": [
+          0,
+          0
+        ],
+        "read_tokens": [
+          32760,
+          32760
+        ],
+        "completion_tokens": [
+          512,
+          512
+        ],
+        "cached_tokens": [
+          0,
+          0
+        ],
+        "cached_prompt_fraction": 0.0,
+        "mean_client_ttft_s": 18.43604790000245,
+        "mean_e2e_s": 36.34974504999991,
+        "notes": []
+      },
+      {
+        "mode": "cold",
+        "concurrency": 2,
+        "depth": 131072,
+        "status": "complete",
+        "expected_requests": 4,
+        "recorded_requests": 4,
+        "valid_requests": 4,
+        "timing_sources": [
+          {
+            "pp": "server-scheduled-to-first-token",
+            "decode": "server-first-to-last-token",
+            "requests": 4
+          }
+        ],
+        "timing_source": [
+          "server-scheduled-to-first-token",
+          "server-first-to-last-token"
+        ],
+        "read_write_tks": [
+          2294.4388336160123,
+          11.917443505328455
+        ],
+        "input_tokens": [
+          131080,
+          131080
+        ],
+        "history_tokens": [
+          0,
+          0
+        ],
+        "read_tokens": [
+          131080,
+          131080
+        ],
+        "completion_tokens": [
+          512,
+          512
+        ],
+        "cached_tokens": [
+          0,
+          0
+        ],
+        "cached_prompt_fraction": 0.0,
+        "mean_client_ttft_s": 79.97536185000172,
+        "mean_e2e_s": 122.78176347499902,
+        "notes": []
+      },
+      {
+        "mode": "cold",
+        "concurrency": 2,
+        "depth": 253944,
+        "status": "complete",
+        "expected_requests": 4,
+        "recorded_requests": 4,
+        "valid_requests": 4,
+        "timing_sources": [
+          {
+            "pp": "server-scheduled-to-first-token",
+            "decode": "server-first-to-last-token",
+            "requests": 4
+          }
+        ],
+        "timing_source": [
+          "server-scheduled-to-first-token",
+          "server-first-to-last-token"
+        ],
+        "read_write_tks": [
+          2150.6441021457845,
+          7.32048578336806
+        ],
+        "input_tokens": [
+          253945,
+          253945
+        ],
+        "history_tokens": [
+          0,
+          0
+        ],
+        "read_tokens": [
+          253945,
+          253945
+        ],
+        "completion_tokens": [
+          512,
+          512
+        ],
+        "cached_tokens": [
+          0,
+          0
+        ],
+        "cached_prompt_fraction": 0.0,
+        "mean_client_ttft_s": 169.94752927499758,
+        "mean_e2e_s": 239.62676482499592,
+        "notes": []
+      }
+    ],
+    "tools": {
+      "protocol": "n1x-near-full-tools-v1",
+      "results": [
+        {
+          "concurrency": 2,
+          "correct_tasks": 12,
+          "planned_tasks": 12,
+          "elapsed_s": 504.8513438000009,
+          "correct_tasks_s": 0.0237693731974176,
+          "preemptions": 0.0,
+          "input_range": [
+            250002,
+            250408
+          ],
+          "phases": {
+            "cold-selection": {
+              "requests": 4,
+              "mean_e2e_s": 229.00155624999934,
+              "mean_client_ttft_s": 166.25905577499907,
+              "mean_pp_s": 116.40472564999982,
+              "generated_range": [
+                156,
+                181
+              ],
+              "cached_tokens": 0,
+              "cached_fraction": 0.0,
+              "requests_with_cache": 0,
+              "write_tks": 2.620300199889259,
+              "timing_sources": [
+                [
+                  "server-scheduled-to-first-token",
+                  "server-first-to-last-token"
+                ]
+              ]
+            },
+            "appended-selection": {
+              "requests": 8,
+              "mean_e2e_s": 4.462436087499555,
+              "mean_client_ttft_s": 2.4705733499995404,
+              "mean_pp_s": 0.528368799999896,
+              "generated_range": [
+                69,
+                135
+              ],
+              "cached_tokens": 1998848,
+              "cached_fraction": 0.9986031482121696,
+              "requests_with_cache": 8,
+              "write_tks": 43.796441381468206,
+              "timing_sources": [
+                [
+                  "server-scheduled-to-first-token",
+                  "server-first-to-last-token"
+                ]
+              ]
+            },
+            "tool-continuation": {
+              "requests": 12,
+              "mean_e2e_s": 3.3770669083338967,
+              "mean_client_ttft_s": 2.442772058334716,
+              "mean_pp_s": 0.5615594249999655,
+              "generated_range": [
+                42,
+                101
+              ],
+              "cached_tokens": 2998272,
+              "cached_fraction": 0.9982709969984668,
+              "requests_with_cache": 12,
+              "write_tks": 49.8034035894643,
+              "timing_sources": [
+                [
+                  "server-scheduled-to-first-token",
+                  "server-first-to-last-token"
+                ]
+              ]
+            }
+          },
+          "appended_task_mean_s": 9.462671287499688,
+          "appended_task_timing_basis": "Selection plus continuation, including harness tokenization; first cold task excluded",
+          "cache_counter_deltas": {
+            "vllm:prefix_cache_hits_total": 4997120.0,
+            "vllm:external_prefix_cache_hits_total": 0.0
+          }
+        },
+        {
+          "concurrency": 4,
+          "correct_tasks": 12,
+          "planned_tasks": 12,
+          "elapsed_s": 1204.782076399999,
+          "correct_tasks_s": 0.009960307540312284,
+          "preemptions": 3.0,
+          "input_range": [
+            250002,
+            250404
+          ],
+          "phases": {
+            "cold-selection": {
+              "requests": 4,
+              "mean_e2e_s": 458.0142102000009,
+              "mean_client_ttft_s": 298.72882772499906,
+              "mean_pp_s": 124.6102570249999,
+              "generated_range": [
+                153,
+                190
+              ],
+              "cached_tokens": 0,
+              "cached_fraction": 0.0,
+              "requests_with_cache": 0,
+              "write_tks": 1.0258487343896636,
+              "timing_sources": [
+                [
+                  "server-scheduled-to-first-token",
+                  "server-first-to-last-token"
+                ]
+              ]
+            },
+            "appended-selection": {
+              "requests": 8,
+              "mean_e2e_s": 156.96064360000037,
+              "mean_client_ttft_s": 90.86765876250229,
+              "mean_pp_s": 40.39166623750003,
+              "generated_range": [
+                86,
+                98
+              ],
+              "cached_tokens": 1499136,
+              "cached_fraction": 0.7489523611591272,
+              "requests_with_cache": 6,
+              "write_tks": 1.4236264330256474,
+              "timing_sources": [
+                [
+                  "server-scheduled-to-first-token",
+                  "server-first-to-last-token"
+                ]
+              ]
+            },
+            "tool-continuation": {
+              "requests": 12,
+              "mean_e2e_s": 121.29499362500064,
+              "mean_client_ttft_s": 83.67252633333435,
+              "mean_pp_s": 47.197206374999986,
+              "generated_range": [
+                42,
+                103
+              ],
+              "cached_tokens": 1998848,
+              "cached_fraction": 0.6655142195811237,
+              "requests_with_cache": 8,
+              "write_tks": 1.4733173953008838,
+              "timing_sources": [
+                [
+                  "server-scheduled-to-first-token",
+                  "server-first-to-last-token"
+                ]
+              ]
+            }
+          },
+          "appended_task_mean_s": 261.1631648749999,
+          "appended_task_timing_basis": "Selection plus continuation, including harness tokenization; first cold task excluded",
+          "cache_counter_deltas": {
+            "vllm:prefix_cache_hits_total": 2998272.0,
+            "vllm:external_prefix_cache_hits_total": 499712.0
+          }
+        }
+      ],
+      "limits": "Synthetic tool selection and append-only continuations. Cold selection and warm phases have different generated work; their latency ratio is not a matched cache speedup. No cache-off comparison, displaced replay, or SSD restart qualification."
+    },
+    "telemetry": {
+      "speed": {
+        "gpu_samples": 254,
+        "gpu_used_MiB_range": [
+          90330.0,
+          91519.0
+        ],
+        "sm_clock_MHz_range": [
+          721.0,
+          2372.0
+        ],
+        "sm_clock_MHz_median": 1735.0,
+        "windows_free_GiB_range": [
+          4.970058441162109,
+          5.480827331542969
+        ],
+        "host_samples": 13,
+        "host_sampling_note": "Control speed host sampling started late; tool-phase sampling is continuous."
+      },
+      "tools": {
+        "gpu_samples": 341,
+        "gpu_used_MiB_range": [
+          90860.0,
+          91565.0
+        ],
+        "sm_clock_MHz_range": [
+          364.0,
+          2281.0
+        ],
+        "sm_clock_MHz_median": 1469.0,
+        "windows_free_GiB_range": [
+          4.967784881591797,
+          8.604320526123047
+        ],
+        "host_samples": 347,
+        "host_sampling_note": "Control speed host sampling started late; tool-phase sampling is continuous."
+      }
+    }
+  },
+  "candidate": {
+    "status": "rejected before API readiness and model loading",
+    "failure": "RuntimeError('candidate-ready exited 1; see its log')",
+    "guard": "VllmConfig._verify_kv_transfer_compat rejects expandable_segments:True with any KV connector unless enable_cumem_allocator is enabled.",
+    "connector": "LMCacheMPConnector",
+    "performance_measured": false,
+    "service_restore_measured": false,
+    "container_exit_code": 1,
+    "alternative": "CuMemAllocator disables expandable segments inside its pool. Interaction with the local n1x_vmm/segmented allocation and IPC patches is unqualified; guard was not bypassed."
+  },
+  "gpu_cache_roundtrip": {
+    "passed": true,
+    "both_restores_byte_correct": true,
+    "second_restore_waited": true,
+    "scope": "Standalone 248.625 MiB GPU pool, 64 MiB host pool; not a vLLM startup or model-serving qualification."
+  },
+  "historical_comparison": [
+    {
+      "concurrency": 2,
+      "current_correct_tasks_s": 0.0237693731974176,
+      "historical_correct_tasks_s": 0.022940164404511566,
+      "throughput_change_percent": 3.6146593297428753
+    },
+    {
+      "concurrency": 4,
+      "current_correct_tasks_s": 0.009960307540312284,
+      "historical_correct_tasks_s": 0.009659658048105098,
+      "throughput_change_percent": 3.1124237598261884
+    }
+  ],
+  "limits": [
+    "No candidate speed/accuracy comparison is possible after startup rejection.",
+    "Speed uses 512 fixed output tokens and two repeats; tool tasks use 8192 output allowance and one C2/C4 pass.",
+    "Historical campaign used two tool passes; different dates and operating conditions prevent a controlled historical speedup claim.",
+    "Independent initially empty SSD volumes; model weights, image, serving arguments and other environment values unchanged.",
+    "The tool harness fixed-path default-container memory samples are stale for this isolated container; use trial-host-memory.jsonl.",
+    "A generic configuration guard is not proof that the local patched allocator corrupts memory."
+  ],
+  "orchestration_notes": [
+    "Initial startup cancelled before inference when the user expanded the comparison protocol.",
+    "One setup retry stopped on an existing trial-volume error before inference.",
+    "Control controller stopped deliberately after both measured suites passed, to switch to a fresh candidate volume; its failed/STOP status is not a benchmark failure.",
+    "Original config.local.psd1 bytes restored; initial service state was stopped."
+  ],
+  "artifact_sha256": {
+    "results/benchmarks/allocator-comparison-v2-20261115/candidate-environment.psd1": "ff2d981eb4b8c3a7b2da52c77982e837224b34226c20a2c55782ae483d7d2a4e",
+    "results/benchmarks/allocator-comparison-v2-20261115/control-allocator.json": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+    "results/benchmarks/allocator-comparison-v2-20261115/control-host.json": "fff340132fe6aa6d8205d05470512173e5deab7ae5e069fa43b0648ca04077e4",
+    "results/benchmarks/allocator-comparison-v2-20261115/control-host.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "results/benchmarks/allocator-comparison-v2-20261115/control-ready.log": "fee025e9ab0195b23124dec114f5667b00a1ca605afd550aa38ed3c4e7b2925d",
+    "results/benchmarks/allocator-comparison-v2-20261115/control-recreate.log": "19fd93855743dea6bba08e35f43fdc6a08983212f1df9e089c97db99f71e2b42",
+    "results/benchmarks/allocator-comparison-v2-20261115/control-speed.log": "1915d7300e62f6ca06c18d63818b9e40525f66f2c2e82cec5813fc4be1703e35",
+    "results/benchmarks/allocator-comparison-v2-20261115/control-tools.log": "6cfca07e4bd7d35681a8d3d36ce78dafb307f4df93aecea24a3d9a7b9930b25b",
+    "results/benchmarks/allocator-comparison-v2-20261115/failure.json": "32f565e9cee8eea9e44d1f97d0fd48802d0cb4471a82412de167ed1303438ac5",
+    "results/benchmarks/allocator-comparison-v2-20261115/final-server.log": "e94e4c05ad6ea63263c28cd93857a422a4653e9b6acd91177c5c822b7e3608c2",
+    "results/benchmarks/allocator-comparison-v2-20261115/gpu-telemetry.jsonl": "1875d2177d56dd3abaeb15eae753977a37ec6a3152654458398a036177b0dc89",
+    "results/benchmarks/allocator-comparison-v2-20261115/heartbeat.json": "036b7655dadf904b435a1e20626f6ba8b9973b5ccf19b771ed53272413dc752c",
+    "results/benchmarks/allocator-comparison-v2-20261115/inspect-cache.log": "d99fc39df69a6a93c91ca6b957b53237b1ee6d8e5d1a2be8b66f1dae6c9d767e",
+    "results/benchmarks/allocator-comparison-v2-20261115/original-config.psd1": "8730dcff7ff21fd7e0d4f5a70f100ef30537ee42644abe3a0c622c5054d5ddd7",
+    "results/benchmarks/allocator-comparison-v2-20261115/run_trial.py": "9dc7dace81f7e08c4a5d43e33edc8d4ff8938938796f0be26b0e9d87f446bc3c",
+    "results/benchmarks/allocator-comparison-v2-20261115/status.json": "de41e432e4c83244bbec09fb7e8fcfc022cb0b48e1c92cd855e56071a0b6b26b",
+    "results/benchmarks/allocator-comparison-v2-20261115/stop-trial.log": "53f1d96ddcf465637454df4342f31c5f7be362d62a8777ae5e0f4d06a6631ee9",
+    "results/benchmarks/allocator-comparison-v2-20261115/trial-host-memory.jsonl": "dcebe56f49f45b4fc16bf8f822cb0650b442c5d5375ccc357f55e55ff9d9f165",
+    "results/benchmarks/allocator-comparison-v2-20261115/control-speed/comparison.json": "138e78fe2429eb8d0e316f98b27da691bc4b4e15be962cfeb5e2ec7cf4fb5c4c",
+    "results/benchmarks/allocator-comparison-v2-20261115/control-speed/plan.json": "0fd3202adde4412e526e5474064a126df26fbcc2332802a57dddba8e117d664d",
+    "results/benchmarks/allocator-comparison-v2-20261115/control-speed/requests.jsonl": "c8b18fa050b17f278c384d4ab7167d3f08bcc1cb8d2fc60c5e00a2248922c936",
+    "results/benchmarks/allocator-comparison-v2-20261115/control-speed/run.json": "2260562c53aeb022a0044494a367f0189a009661fc1cd9379d93767162784eb3",
+    "results/benchmarks/allocator-comparison-v2-20261115/control-speed/summary.json": "0ee99c8c902b344a0fe4d8d1c7324229c69d5fcda23d143908b9739cd97e2285",
+    "results/benchmarks/allocator-comparison-v2-20261115/control-tools/calibration.json": "abe059ff74a45c34e13b12c4e7e2dbe8610d3c2d2e62b992aaa1896988dff830",
+    "results/benchmarks/allocator-comparison-v2-20261115/control-tools/partial-group.json": "82014ad004625801d0a3e9b2661d4e9a589cb2c393ba789a393263c347accc50",
+    "results/benchmarks/allocator-comparison-v2-20261115/control-tools/r0-c2-after.prom": "fcd05b010bc6cf0026ad9d1c2148d9a49adbb44d20dcb8e7eb2bc1037d82a451",
+    "results/benchmarks/allocator-comparison-v2-20261115/control-tools/r0-c2-before.prom": "ad598152a65d39a6f9dbc8579cedfcddc48807c60f5bd2fd660cab9673e7a1d9",
+    "results/benchmarks/allocator-comparison-v2-20261115/control-tools/r0-c4-after.prom": "8d397e0c8ea54076161c79051262b633fe8f00bf902030d91b0bb79e4db618d5",
+    "results/benchmarks/allocator-comparison-v2-20261115/control-tools/r0-c4-before.prom": "a4cf28d6af733c4b9cde19ea0cfaf0789bc8855cda898fa4088d3fea80b925d1",
+    "results/benchmarks/allocator-comparison-v2-20261115/control-tools/requests.jsonl": "e20f8c87c70090e2977ecc72f1a5b40f9129c8137ee4c84dfd85f4d4ddb8bb2c",
+    "results/benchmarks/allocator-comparison-v2-20261115/control-tools/run.json": "b869effc21fd1ca3b52c150b9df5f738c13aade7a1f824d68f0c5beff9f4d701",
+    "results/benchmarks/allocator-comparison-v2-20261115/control-tools/scheduler.jsonl": "24922f97fa24d8d2b8e350e893123830ff9fda1c8324efa99427c51d96f7b49a",
+    "results/benchmarks/allocator-comparison-v2-20261115/control-tools/summary.json": "90368042f59aa6a6f4b13d7fd322051139f4e286bb172d341ab4505a39cad67d",
+    "results/benchmarks/allocator-comparison-v2-20261115/control-tools/tasks.jsonl": "70470f6df1d9fe197f024b87ca935f34556881c7afd1f2403dfd2ecc8548ea4d",
+    "results/benchmarks/allocator-candidate-20261115/candidate-environment.psd1": "ff2d981eb4b8c3a7b2da52c77982e837224b34226c20a2c55782ae483d7d2a4e",
+    "results/benchmarks/allocator-candidate-20261115/candidate-ready.log": "2526dac3ca1f603f0cb566dbffdf41f25b20c8a02e258a474cfb7c844c8b673f",
+    "results/benchmarks/allocator-candidate-20261115/candidate-recreate.log": "d67e5143e7c2f29eabaa60f660b6616be755c8c923ca24db8d9aa0410c67365f",
+    "results/benchmarks/allocator-candidate-20261115/cleanup-container.log": "53f1d96ddcf465637454df4342f31c5f7be362d62a8777ae5e0f4d06a6631ee9",
+    "results/benchmarks/allocator-candidate-20261115/cleanup-volumes.log": "bf2ad1a64ef7fa31ce4372a3150b66e47cf0edcc84f0c93599a3a70a89602fb7",
+    "results/benchmarks/allocator-candidate-20261115/create-cache.log": "8fda87118e6d88e7545d353e5a5f247aaf2563bc8e7caba1e0806e6158ad146c",
+    "results/benchmarks/allocator-candidate-20261115/failed-container.json": "f47d05390169c2490e86f00f620c6f2b548979ebb04905deee72f75e4a1beb58",
+    "results/benchmarks/allocator-candidate-20261115/failure.json": "96ca741649f00b5a4af33c408e0a7f9639885d34b10b9b0877828eaa45ca3c95",
+    "results/benchmarks/allocator-candidate-20261115/final-server.log": "fdaa2b2f223a5aef3bba2e0bd5c39f1e4ffb699afae739c67b43c7fe0a89eb5a",
+    "results/benchmarks/allocator-candidate-20261115/gpu-telemetry.jsonl": "3736c459d27da574fe6be3eb7e2f8bec4a1cf310f3b8a759b9425ec673782c52",
+    "results/benchmarks/allocator-candidate-20261115/heartbeat.json": "a3b57b2bedab00de014513b9925fbdff0dd6613f3576ab75b81a3302bfaaa6fe",
+    "results/benchmarks/allocator-candidate-20261115/original-config.psd1": "8730dcff7ff21fd7e0d4f5a70f100ef30537ee42644abe3a0c622c5054d5ddd7",
+    "results/benchmarks/allocator-candidate-20261115/run_trial.py": "2f63cdcd2a63a58f012e75f5566881c86ed1d5f10ed2cbce990f561887ef6ba8",
+    "results/benchmarks/allocator-candidate-20261115/status.json": "52345dc8aa1e146453d68d10e592fdd4e19dc034d4943107edebf57d835acc44",
+    "results/benchmarks/allocator-candidate-20261115/stop-trial.log": "53f1d96ddcf465637454df4342f31c5f7be362d62a8777ae5e0f4d06a6631ee9",
+    "results/benchmarks/allocator-candidate-20261115/trial-host-memory.jsonl": "155a96588359a52418acf8c4efc789bae1d8360cdbff61f38477eae0588cf8c6",
+    "results/benchmarks/allocator-candidate-20261115/trial-volumes-before-cleanup.json": "2f7a02e090c2f548ae4e9c9e7c324f62ca09aeb119b3e2839afcee738219cff1",
+    "results/benchmarks/allocator-candidate-20261115/vendor-cumem.py": "60a7d50d96eb9f9542d58346f29c4b01f266556efb194257829ba4c241ea8d05",
+    "results/benchmarks/allocator-candidate-20261115/vendor-vllm-config.py": "2d20734b6eea4f758707b16b8b425467e23a4ef0d287dd86e0b2d1e8092d31ce",
+    "results/benchmarks/allocator-20261115/candidate-environment.psd1": "ff2d981eb4b8c3a7b2da52c77982e837224b34226c20a2c55782ae483d7d2a4e",
+    "results/benchmarks/allocator-20261115/control-ready.log": "c2dd1eeebe37a6768fcc395cca210e34c72f50e90b2c179009ea15e7ba264c0e",
+    "results/benchmarks/allocator-20261115/control-recreate.log": "49aa6a64f4d7c60e0935be9cda6da3e56b3e162cf8854cb6734c95b386909875",
+    "results/benchmarks/allocator-20261115/create-cache.log": "8041be0b6c5a6a52fd821b8d4ba0ef0b13649840d142897bf2e0eda71c3b3a53",
+    "results/benchmarks/allocator-20261115/failure.json": "8c42fda78803d2abff42582de78a124781e37b3b329cd6d68f07d52a38b9386f",
+    "results/benchmarks/allocator-20261115/final-server.log": "d87e5171d5d75c9683db9725952d0de91959b44ab7b236afe1baca14938268b3",
+    "results/benchmarks/allocator-20261115/gpu-cache-roundtrip.log": "cb0a6d01f2497da0e9568d99423c14fcac00b02d1c137c16d69956e87fc5de4b",
+    "results/benchmarks/allocator-20261115/gpu-telemetry.jsonl": "e17e1853857647f711ad96110794e4bda9df716be8736f2a89633e1281c49881",
+    "results/benchmarks/allocator-20261115/heartbeat.json": "f46cd6d889076dde5fe0987e38df08f1e325b8f446f8121cb9c5bba4b25560da",
+    "results/benchmarks/allocator-20261115/original-config.psd1": "8730dcff7ff21fd7e0d4f5a70f100ef30537ee42644abe3a0c622c5054d5ddd7",
+    "results/benchmarks/allocator-20261115/run_trial.py": "e532e6287296694357c2b1fd6e89479cee30261220464e69d6d4a143ac780c3f",
+    "results/benchmarks/allocator-20261115/status.json": "c8bb29fd5a7fd4fad0f41ea934612878faf7507fda796927ae4078bdea139a95",
+    "results/benchmarks/allocator-20261115/stop-trial.log": "53f1d96ddcf465637454df4342f31c5f7be362d62a8777ae5e0f4d06a6631ee9",
+    "results/benchmarks/allocator-20261115/summarize_trial.py": "a220da9554a58aa9654befaada7b50848129461f304173fb4398773688e629d5",
+    "results/benchmarks/allocator-20261115/watch_host.py": "3e0e43ee0a4370e3e95af7f5b53901c841148d05153b18b017293aed1df585c1",
+    "results/benchmarks/allocator-20261115/write_review.py": "2ae7e3fc60e838e9f56f2061eff83cd0acd345a4b8c2c2917b52974fab5fb55e"
+  }
+}

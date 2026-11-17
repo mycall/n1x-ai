@@ -10,10 +10,15 @@ try{
     Set-Content "$temporary/scripts/monitor-memory.ps1" 'param($Container,$OutputPath) Start-Sleep -Seconds 120'
     $config=@{Container='fixture-monitor';MyllmboxConfig='recipe.yaml';MyllmboxEnvironment='env.psd1';ModelRoot=$temporary;MyllmboxModel='model';MyllmboxDrafter='draft'}
     $record=Join-Path $temporary '.state/fixture-monitor/monitor.json'
+    New-Item -ItemType Directory -Force (Split-Path $record -Parent)|Out-Null
+    Set-Content (Join-Path (Split-Path $record -Parent) 'host.json') '{"updatedUnixSeconds":1,"availableGiB":0,"availableCommitGiB":0}'
     Start-N1xMyllmboxMonitor $temporary $config
     $first=Get-Process -Id (Get-Content $record -Raw|ConvertFrom-Json).pid
     $null=$first.Handle
     $owned.Add($first)
+    $snapshot=Get-Content (Join-Path (Split-Path $record -Parent) 'host.json') -Raw|ConvertFrom-Json
+    if([DateTimeOffset]::UtcNow.ToUnixTimeSeconds()-$snapshot.updatedUnixSeconds -gt 15 -or
+        $snapshot.availableGiB -le 0 -or $snapshot.availableCommitGiB -le 0){throw 'Startup retained a stale memory snapshot'}
     Start-N1xMyllmboxMonitor $temporary $config
     $second=Get-Process -Id (Get-Content $record -Raw|ConvertFrom-Json).pid
     $null=$second.Handle
@@ -28,6 +33,7 @@ try{
     # Simulate the old monitor exiting naturally during its CIM identity read.
     function Get-CimInstance {
         param($ClassName,$Filter)
+        if($ClassName -eq 'Win32_OperatingSystem'){return @{FreePhysicalMemory=8*1MB;FreeVirtualMemory=16*1MB}}
         if(-not $third.HasExited){$third.Kill();$null=$third.WaitForExit(5000)}
         return $null
     }

@@ -22,6 +22,9 @@ def run(args):
     variant = args.variant.resolve()
     original = (ROOT/'config.local.psd1').read_bytes()
     save(out/'variant.json',json.loads(variant.read_text(encoding='utf-8-sig')))
+    save(out/'measurement-plan.json',dict(quality_seeds=args.quality_seeds,
+        continue_after_quality_failure=args.continue_after_quality_failure,
+        skip_screen=args.skip_screen,long=args.long,long_concurrency=args.long_concurrency,restore=args.restore))
     sources=[Path(__file__),ROOT/'benchmarks/recipe_trial_host.ps1',ROOT/'benchmarks/recipe_quality_probe.py',
              ROOT/'benchmarks/speed_probe.py',ROOT/'benchmarks/near_full_tools_probe.py']
     save(out/'source-hashes.json',{str(path.relative_to(ROOT)):hashlib.sha256(path.read_bytes()).hexdigest() for path in sources})
@@ -117,14 +120,27 @@ def run(args):
                 '--host-record',out/'host.json','--depths',*args.depths,'--concurrency','1','2','--repeats','2',
                 '--output-tokens','512','--context-limit','262144','--mode','cold','--timeout','900'],'speed',timeout=5400)
             quality=ROOT/'benchmarks/recipe_quality_probe.py'
-            command([sys.executable,quality,'--out',out/'quality','--variants','xhigh-t06','--phases','quality','recovery',
-                     '--quality-depth','32768'],'quality',timeout=2400)
-            completed=json.loads((out/'quality/completed.json').read_text())
-            if completed['failures']:
-                raise RuntimeError('Quality screen failed; retained first scores')
-            scores=json.loads((out/'quality/xhigh-t06/quality/summary.json').read_text())
-            if len(scores)!=2 or any(row['correct']!=row['planned'] for row in scores):
-                raise RuntimeError('Archive quality screen did not pass every first attempt')
+            screens=[]
+            for index,seed in enumerate(args.quality_seeds):
+                label='quality' if index==0 else f'quality-seed-{seed}'
+                folder=out/label
+                command([sys.executable,quality,'--out',folder,'--variants','xhigh-t06','--phases','quality','recovery',
+                         '--quality-depth','32768','--seed',str(seed)],label,timeout=2400)
+                completed=json.loads((folder/'completed.json').read_text())
+                scores_path=folder/'xhigh-t06/quality/summary.json'
+                scores=json.loads(scores_path.read_text()) if scores_path.exists() else []
+                recovery_path=folder/'xhigh-t06/recovery/summary.json'
+                recovery=json.loads(recovery_path.read_text()) if recovery_path.exists() else {}
+                passed=(not completed['failures'] and len(scores)==2
+                        and all(row['correct']==row['planned']==4 for row in scores)
+                        and recovery.get('correct')==recovery.get('planned')==24)
+                screens.append(dict(seed=seed,folder=label,passed=passed,failures=completed['failures'],
+                    archive=scores,recovery={k:v for k,v in recovery.items() if k!='rows'}))
+                save(out/'quality-screens.json',screens)
+                if not passed:
+                    failure='Quality screen failed; retained first scores'
+                    if not args.continue_after_quality_failure:
+                        raise RuntimeError(failure)
         if args.long:
             command([sys.executable,ROOT/'benchmarks/near_full_tools_probe.py','--out',out/'near-full',
                 '--host',out/'host.json','--target','250000','--concurrency',*args.long_concurrency,'--sessions','4',
@@ -155,6 +171,8 @@ def run(args):
         watcher.join(10)
         if (ROOT/'config.local.psd1').read_bytes()!=original:
             failure=(failure or '')+' Selected configuration changed externally; not overwritten.'
+        if failure and not (out/'failure.json').exists():
+            save(out/'failure.json',dict(error=failure))
         status('finished',success=failure is None,error=failure)
     if failure:
         raise SystemExit(failure)
@@ -169,8 +187,13 @@ if __name__=='__main__':
     parser.add_argument('--long',action='store_true')
     parser.add_argument('--restore',action='store_true')
     parser.add_argument('--skip-screen',action='store_true',help='Run only explicitly requested long/restore qualification')
+    parser.add_argument('--quality-seeds',nargs='+',type=int,default=[42])
+    parser.add_argument('--continue-after-quality-failure',action='store_true',
+                        help='Measure remaining workloads while retaining a failed overall status')
     parser.add_argument('--long-concurrency',nargs='+',choices=['2','4'],default=['2','4'])
     args=parser.parse_args()
     if args.skip_screen and not (args.long or args.restore):
         parser.error('--skip-screen requires --long or --restore')
+    if len(set(args.quality_seeds))!=len(args.quality_seeds):
+        parser.error('--quality-seeds must be unique')
     run(args)

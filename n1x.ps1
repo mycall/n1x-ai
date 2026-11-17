@@ -101,6 +101,18 @@ if($Action -eq 'list'){
 if($Action -ne 'build' -and ($LmcacheFromSource -or $ImageTag)){
     throw '-LmcacheFromSource and -ImageTag are build options'
 }
+$selectedConfig=@{}
+if(Test-Path -LiteralPath "$PSScriptRoot/config.psd1"){
+    $selectedConfig=Get-N1xConfig -Root $PSScriptRoot -Profile $Profile -ModelRoot $ModelRoot -Port $Port
+}
+if($selectedConfig.ContainsKey('Backend') -and $selectedConfig.Backend -eq 'tensorfold-trial'){
+    if($Action -notin @('setup','test','status')){
+        throw 'TensorFold is a feasibility-only profile. Use setup to install the pinned binary, or test for bounded load probes. Serving and benchmarks are not qualified; see wiki/TensorFold-trial.md.'
+    }
+    if($Action -eq 'test' -and $Suite -ne 'smoke'){throw 'TensorFold trial supports only the smoke/load probe.'}
+    & "$PSScriptRoot/scripts/tensorfold-trial.ps1" -Action $Action -Config $selectedConfig -Root $PSScriptRoot -PrintOnly:$PrintOnly
+    return
+}
 if($Action -eq 'build'){
     $buildConfig=Get-N1xConfig -Root $PSScriptRoot -Profile $Profile -ModelRoot $ModelRoot -Port $Port
     if($buildConfig.ContainsKey('Backend') -and $buildConfig.Backend -eq 'native'){

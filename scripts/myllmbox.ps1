@@ -247,6 +247,12 @@ function Start-N1xMyllmboxMonitor {
             }
         }
     }
+    # The monitor cannot inspect a container until it exists. Seed a real, fresh
+    # sample before launch so the supervisor never consumes yesterday's snapshot.
+    $os=Get-CimInstance Win32_OperatingSystem
+    $snapshot=@{availableGiB=$os.FreePhysicalMemory/1MB;availableCommitGiB=$os.FreeVirtualMemory/1MB;
+        updatedUnixSeconds=[DateTimeOffset]::UtcNow.ToUnixTimeSeconds()} | ConvertTo-Json -Compress
+    [IO.File]::WriteAllText((Join-Path $paths.State 'host.json'),$snapshot,[Text.UTF8Encoding]::new($false))
     $arguments=ConvertTo-N1xNativeCommandLine @('-NoProfile','-File',$scriptPath,'-Container',$Config.Container,
         '-OutputPath',(Join-Path $paths.State 'host.json'))
     $process=Start-Process pwsh -ArgumentList $arguments -WorkingDirectory $Root -WindowStyle Hidden -PassThru

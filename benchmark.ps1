@@ -62,6 +62,9 @@ if($Smoke -and $Suite -in @('agents','restores','soak','recovery','mixed')){
 }
 . "$PSScriptRoot/scripts/config.ps1"
 $config=Get-N1xConfig -Root $PSScriptRoot -Profile $Profile
+if($config.ContainsKey('Backend') -and $config.Backend -eq 'tensorfold-trial'){
+    throw 'TensorFold is a feasibility-only profile; run n1x.ps1 test for load probes before enabling benchmarks.'
+}
 if($SpeedPlanOnly){
     $planOut=Join-Path $PSScriptRoot ('results/benchmarks/speed-plan-'+(Get-Date -Format 'yyyyMMdd-HHmmss')+'-'+[guid]::NewGuid().ToString('N').Substring(0,8))
     $planArgs=@("$PSScriptRoot/benchmarks/speed_probe.py",'--plan-only','--out',$planOut,

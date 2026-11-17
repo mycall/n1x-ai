@@ -2202,6 +2202,3695 @@
         "speed/summary.json": "773d9f5e4f435895a6437c2bcfc70ab8df975ed7647f2a855c43014a29e4dff6",
         "status.json": "3be28b74cc725993f75892f1e49b794efd639db41c2fd0d7575df0c3c8eb0cd0"
       }
+    },
+    {
+      "name": "w4-kv19-batch4k-k3-rematch",
+      "status": {
+        "stage": "finished",
+        "unix_s": 1794892326.139239,
+        "success": true,
+        "error": null
+      },
+      "variant": {
+        "flags": {
+          "mamba-ssm-cache-dtype": "bfloat16"
+        },
+        "config": {
+          "Container": "n1x-recipe-trial",
+          "LmcacheNamespace": "qwen-recipe-w4-kv19-batch4k-k3-rematch-20261116",
+          "LmcacheVolume": "n1x-recipe-w4-kv19-batch4k-k3-rematch-20261116",
+          "KvCacheBytes": "20401094656",
+          "BatchedTokens": 4096
+        }
+      },
+      "config": {
+        "MaxOutputTokens": 8192,
+        "LmcacheVolume": "n1x-recipe-w4-kv19-batch4k-k3-rematch-20261116",
+        "Backend": "wslc-myllmbox",
+        "WindowsMinimumGiB": 4,
+        "DFlashTokens": 3,
+        "KvCacheDtype": "fp8",
+        "ModelRoot": "C:\\Users\\michael\\models",
+        "LmcacheNamespace": "qwen-recipe-w4-kv19-batch4k-k3-rematch-20261116",
+        "MyllmboxModel": "Qwen3.8-Flash-Next-W4A16-AutoRound-hybrid",
+        "Image": "n1x-ai:mbx-setup-1447755d89af469f894bfa8dcb51506d",
+        "LmcacheChunkTokens": 4096,
+        "CacheBlockTokens": 4096,
+        "MaxSequences": 8,
+        "DefaultProfile": "qwen38fn-best",
+        "Container": "n1x-recipe-trial",
+        "LanAccess": false,
+        "DFlash": true,
+        "LmcacheL1GiB": 4,
+        "BatchedTokens": 4096,
+        "ImageId": "sha256:819970fd46a90c1e70b7cd06aeb15d5ce3c75b02b62892a8322f42de225566bc",
+        "RestoreWaitMs": 0,
+        "CacheVolume": "n1x-mbx-w4-dflash-test-cache",
+        "Port": 8000,
+        "UseLMCache": true,
+        "PleVolume": "n1x-ple-native",
+        "MyllmboxWSLCVersion": "3.0.5.0",
+        "LmcacheL2GiB": 160,
+        "Profile": "qwen38fn-best",
+        "KvCacheBytes": "20401094656",
+        "MyllmboxConfig": "profiles/qwen38fn-best.yaml",
+        "MyllmboxEnvironment": "runtime/myllmbox/environment.psd1",
+        "MyllmboxDrafter": "Qwen3.8-Flash-Next-DFlash2",
+        "PleWorkers": 8,
+        "RequiredPartitionMiB": 98304,
+        "Mtp": false,
+        "Context": 262144
+      },
+      "recipe.yaml": "gpu-memory-utilization: 0.01\ndtype: bfloat16\nengram-config:\n  cpu_offload: false\nload-format: mbx\nmoe-backend: marlin\ndistributed-executor-backend: mp\nmax-model-len: 262144\nmax-num-seqs: 8\nmax-num-batched-tokens: 8192\nkv-cache-memory-bytes: 16106127360\nkv-cache-dtype: fp8\nkv-cache-dtype-skip-layers:\n- sliding_window\nmamba-ssm-cache-dtype: float32\nmamba-cache-mode: align\nblock-size: 4096\nprefix-match-unit: 64\ncompilation-config:\n  cudagraph_mode: FULL_AND_PIECEWISE\n  cudagraph_capture_sizes: [1, 2, 3, 4, 8, 12, 16, 20, 24, 28, 32]\n  compile_ranges_endpoints: [32]\nenable-prefix-caching: true\nenable-prompt-tokens-details: true\nenable-per-request-metrics: true\nenable-auto-tool-choice: true\ntool-call-parser: qwen3_xml\nreasoning-parser: qwen3\nasync-scheduling: true\nuse-replayssm: false\ndefault-chat-template-kwargs:\n  preserve_thinking: false\nspeculative-config:\n  method: dflash\n  model: /drafter\n  num_speculative_tokens: 3\n  disable_eagle_block_drop: true\n  max_model_len: 262144\n  kv_cache_dtype: auto\n  draft_load_config:\n    load_format: safetensors\n  attention_backend: TRITON_ATTN\n",
+      "environment.psd1": "@{\n    DO_NOT_TRACK = '1'\n    FLASHINFER_CUDA_ARCH_LIST = '12.1a'\n    FLASHINFER_NVCC_THREADS = '1'\n    FLASHINFER_WORKSPACE_BASE = '/cache/wsl305/flashinfer-workspace'\n    HF_HUB_DISABLE_TELEMETRY = '1'\n    HF_HUB_OFFLINE = '1'\n    LMCACHE_TRACK_USAGE = 'false'\n    MALLOC_MMAP_THRESHOLD_ = '65536'\n    MALLOC_TRIM_THRESHOLD_ = '131072'\n    MAX_JOBS = '1'\n    MBX_DEPTH_MODE = 'off'\n    MBX_DRAFT_FP8 = '0'\n    MBX_DRAFT_HEAD = '0'\n    MBX_DRAFT_HEAD2 = ''\n    MBX_LOADER_EMPTY_CACHE = '1'\n    MBX_LOADER_PREPARE = '0'\n    MBX_MARLIN_CSF = '1'\n    MBX_PLE_ASYNC = '1'\n    MBX_PLE_FP8_DIR = '/ple-table-fp8'\n    MBX_PLE_MMAP = '1'\n    MBX_PLE_MMAP_MODE = 'nvme'\n    MBX_PLE_MMAP_PREWARM = '0'\n    MBX_PLE_NVME_DIR = '/cache/ple-nvme-fp8'\n    MBX_PLE_PREFILL_CKPT = '1'\n    PYTHONFAULTHANDLER = '1'\n    PYTHONUNBUFFERED = '1'\n    TOKENIZERS_PARALLELISM = 'false'\n    TORCHINDUCTOR_COMPILE_THREADS = '1'\n    TORCH_CUDA_ARCH_LIST = '12.1a'\n    TRANSFORMERS_OFFLINE = '1'\n    TRITON_CACHE_DIR = '/cache/wsl305/triton'\n    VLLM_CACHE_ROOT = '/cache/wsl305/vllm-cache'\n    VLLM_FP8_HYBRID = '1'\n    VLLM_MARLIN_USE_ATOMIC_ADD = '1'\n    VLLM_NO_USAGE_STATS = '1'\n    VLLM_USE_BREAKABLE_CUDAGRAPH = '1'\n    VLLM_USE_DEEP_GEMM = '0'\n}\n",
+      "speed": [
+        {
+          "concurrency": 1,
+          "depth": 4096,
+          "recorded": 2,
+          "valid": 2,
+          "read_tokens_s": 2370.024921478445,
+          "write_tokens_s": 49.03175407218868,
+          "second_repetition": {
+            "samples": 1,
+            "read_tokens_s": 2331.0893511107,
+            "write_tokens_s": 50.50330346950656
+          }
+        },
+        {
+          "concurrency": 1,
+          "depth": 32768,
+          "recorded": 2,
+          "valid": 2,
+          "read_tokens_s": 2348.9152406841554,
+          "write_tokens_s": 51.1677217589409,
+          "second_repetition": {
+            "samples": 1,
+            "read_tokens_s": 2267.9783233609855,
+            "write_tokens_s": 50.90802634174679
+          }
+        },
+        {
+          "concurrency": 2,
+          "depth": 4096,
+          "recorded": 4,
+          "valid": 4,
+          "read_tokens_s": 2187.1778224232776,
+          "write_tokens_s": 35.62605303070132,
+          "second_repetition": {
+            "samples": 2,
+            "read_tokens_s": 2201.508603955943,
+            "write_tokens_s": 37.25041764570558
+          }
+        },
+        {
+          "concurrency": 2,
+          "depth": 32768,
+          "recorded": 4,
+          "valid": 4,
+          "read_tokens_s": 2023.4628766342394,
+          "write_tokens_s": 27.000238569035275,
+          "second_repetition": {
+            "samples": 2,
+            "read_tokens_s": 2006.2700409405725,
+            "write_tokens_s": 27.303326379213416
+          }
+        }
+      ],
+      "archive": [
+        {
+          "concurrency": 1,
+          "correct": 4,
+          "planned": 4,
+          "elapsed_s": 72.23990950000007,
+          "max_output_tokens": 8192
+        },
+        {
+          "concurrency": 2,
+          "correct": 4,
+          "planned": 4,
+          "elapsed_s": 69.9777436000004,
+          "max_output_tokens": 8192
+        }
+      ],
+      "recovery": {
+        "correct": 24,
+        "planned": 24,
+        "elapsed_s": 58.365735100000165,
+        "thinking": true,
+        "concurrency": 4,
+        "max_output_tokens": 8192,
+        "preemptions": 0.0,
+        "reasoning_effort": "xhigh",
+        "temperature": 0.6
+      },
+      "near_full": [
+        {
+          "group": "r0-c4",
+          "concurrency": 4,
+          "repeat": 0,
+          "elapsed_s": 507.33009710000624,
+          "correct_tasks": 12,
+          "planned_tasks": 12,
+          "correct_tasks_s": 0.023653238923916096,
+          "preemptions": 0.0,
+          "cache_evidence": {
+            "cold-selection": {
+              "requests": 4,
+              "requests_with_cached_tokens": 0,
+              "cached_tokens": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            "tool-continuation": {
+              "requests": 12,
+              "requests_with_cached_tokens": 12,
+              "cached_tokens": [
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856
+              ]
+            },
+            "appended-selection": {
+              "requests": 8,
+              "requests_with_cached_tokens": 8,
+              "cached_tokens": [
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856
+              ]
+            }
+          }
+        }
+      ],
+      "resources": {
+        "peak_gpu_used_mib": 93374,
+        "minimum_gpu_free_mib": 4917,
+        "minimum_host_available_gib": 5.7321624755859375
+      },
+      "evidence_sha256": {
+        "host.json": "e0d2ee1f818632b1c3dcda93d02847c600976020358a324156dfabfb40df1ce8",
+        "near-full/summary.json": "09b21509d2c7f501a46c0056b9d7edf100d9564dc5528467f605393e3cb7fc36",
+        "quality/completed.json": "25fcee07fb6eda5ee982c91e1c7fb38a8ca2f234b15020c611150ca7ff957716",
+        "quality/xhigh-t06/quality/summary.json": "90b1f0fcd370be3b6d1fff68f7e2e13c2670caaf695883b80830a22c8cfc56a6",
+        "quality/xhigh-t06/recovery/summary.json": "fae5e3b244abdfa548938a28108cd1a965a15aa7268579ebbe2c0e483cecb02a",
+        "speed/comparison.json": "faefd6820f3ff3218291c806a2f834ebddf9adc0c6e0d6b7e0d895c9eff53461",
+        "speed/summary.json": "a57b0a836a10181fcbaa2878889a5c25d953532205f1ffd72234b930cc172278",
+        "status.json": "5523221f92f0dfe98096fee9c15770c5c7785eed14bbf85f7cb1be895289a5bb"
+      }
+    },
+    {
+      "name": "w4-kv19-batch4k-k5",
+      "status": {
+        "stage": "finished",
+        "unix_s": 1794888835.6794534,
+        "success": false,
+        "error": "RuntimeError('Trial container exited before readiness (confirmed twice)')"
+      },
+      "variant": {
+        "flags": {
+          "mamba-ssm-cache-dtype": "bfloat16"
+        },
+        "config": {
+          "Container": "n1x-recipe-trial",
+          "LmcacheNamespace": "qwen-recipe-w4-kv19-batch4k-k5-20261116",
+          "LmcacheVolume": "n1x-recipe-w4-kv19-batch4k-k5-20261116",
+          "KvCacheBytes": "20401094656",
+          "BatchedTokens": 4096,
+          "DFlashTokens": 5
+        }
+      },
+      "config": {
+        "Container": "n1x-recipe-trial",
+        "PleVolume": "n1x-ple-native",
+        "Mtp": false,
+        "Image": "n1x-ai:mbx-setup-1447755d89af469f894bfa8dcb51506d",
+        "DefaultProfile": "qwen38fn-best",
+        "BatchedTokens": 4096,
+        "LanAccess": false,
+        "Backend": "wslc-myllmbox",
+        "LmcacheNamespace": "qwen-recipe-w4-kv19-batch4k-k5-20261116",
+        "MyllmboxModel": "Qwen3.8-Flash-Next-W4A16-AutoRound-hybrid",
+        "MyllmboxWSLCVersion": "3.0.5.0",
+        "ModelRoot": "C:\\Users\\michael\\models",
+        "MyllmboxEnvironment": "runtime/myllmbox/environment.psd1",
+        "LmcacheL2GiB": 160,
+        "UseLMCache": true,
+        "LmcacheChunkTokens": 4096,
+        "RestoreWaitMs": 0,
+        "RequiredPartitionMiB": 98304,
+        "KvCacheDtype": "fp8",
+        "CacheVolume": "n1x-mbx-w4-dflash-test-cache",
+        "Port": 8000,
+        "Profile": "qwen38fn-best",
+        "MyllmboxDrafter": "Qwen3.8-Flash-Next-DFlash2",
+        "MyllmboxConfig": "profiles/qwen38fn-best.yaml",
+        "MaxSequences": 8,
+        "KvCacheBytes": "20401094656",
+        "ImageId": "sha256:819970fd46a90c1e70b7cd06aeb15d5ce3c75b02b62892a8322f42de225566bc",
+        "LmcacheL1GiB": 4,
+        "PleWorkers": 8,
+        "MaxOutputTokens": 8192,
+        "Context": 262144,
+        "CacheBlockTokens": 4096,
+        "LmcacheVolume": "n1x-recipe-w4-kv19-batch4k-k5-20261116",
+        "DFlash": true,
+        "DFlashTokens": 5,
+        "WindowsMinimumGiB": 4
+      },
+      "failure": {
+        "error": "RuntimeError('Trial container exited before readiness (confirmed twice)')",
+        "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\michael\\AppData\\Local\\Programs\\Python\\Python314-arm64\\Lib\\urllib\\request.py\", line 1333, in do_open\n    h.request(req.get_method(), req.selector, req.data, headers,\n    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n              encode_chunked=req.has_header('Transfer-encoding'))\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\michael\\AppData\\Local\\Programs\\Python\\Python314-arm64\\Lib\\http\\client.py\", line 1386, in request\n    self._send_request(method, url, body, headers, encode_chunked)\n    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\michael\\AppData\\Local\\Programs\\Python\\Python314-arm64\\Lib\\http\\client.py\", line 1432, in _send_request\n    self.endheaders(body, encode_chunked=encode_chunked)\n    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\michael\\AppData\\Local\\Programs\\Python\\Python314-arm64\\Lib\\http\\client.py\", line 1381, in endheaders\n    self._send_output(message_body, encode_chunked=encode_chunked)\n    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\michael\\AppData\\Local\\Programs\\Python\\Python314-arm64\\Lib\\http\\client.py\", line 1141, in _send_output\n    self.send(msg)\n    ~~~~~~~~~^^^^^\n  File \"C:\\Users\\michael\\AppData\\Local\\Programs\\Python\\Python314-arm64\\Lib\\http\\client.py\", line 1085, in send\n    self.connect()\n    ~~~~~~~~~~~~^^\n  File \"C:\\Users\\michael\\AppData\\Local\\Programs\\Python\\Python314-arm64\\Lib\\http\\client.py\", line 1051, in connect\n    self.sock = self._create_connection(\n                ~~~~~~~~~~~~~~~~~~~~~~~^\n        (self.host,self.port), self.timeout, self.source_address)\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\michael\\AppData\\Local\\Programs\\Python\\Python314-arm64\\Lib\\socket.py\", line 874, in create_connection\n    raise exceptions[0]\n  File \"C:\\Users\\michael\\AppData\\Local\\Programs\\Python\\Python314-arm64\\Lib\\socket.py\", line 859, in create_connection\n    sock.connect(sa)\n    ~~~~~~~~~~~~^^^^\nConnectionRefusedError: [WinError 10061] No connection could be made because the target machine actively refused it\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"C:\\Users\\michael\\source\\github\\mycall\\n1x-ai\\benchmarks\\recipe_trial.py\", line 57, in wait_ready\n    client.get('/health')\n    ~~~~~~~~~~^^^^^^^^^^^\n  File \"C:\\Users\\michael\\source\\github\\mycall\\n1x-ai\\benchmarks\\speed_probe.py\", line 46, in get\n    with self.open(path, body) as response:\n         ~~~~~~~~~^^^^^^^^^^^^\n  File \"C:\\Users\\michael\\source\\github\\mycall\\n1x-ai\\benchmarks\\speed_probe.py\", line 43, in open\n    return urllib.request.build_opener(urllib.request.ProxyHandler({})).open(req, timeout=self.timeout)\n           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\michael\\AppData\\Local\\Programs\\Python\\Python314-arm64\\Lib\\urllib\\request.py\", line 487, in open\n    response = self._open(req, data)\n  File \"C:\\Users\\michael\\AppData\\Local\\Programs\\Python\\Python314-arm64\\Lib\\urllib\\request.py\", line 504, in _open\n    result = self._call_chain(self.handle_open, protocol, protocol +\n                              '_open', req)\n  File \"C:\\Users\\michael\\AppData\\Local\\Programs\\Python\\Python314-arm64\\Lib\\urllib\\request.py\", line 464, in _call_chain\n    result = func(*args)\n  File \"C:\\Users\\michael\\AppData\\Local\\Programs\\Python\\Python314-arm64\\Lib\\urllib\\request.py\", line 1362, in http_open\n    return self.do_open(http.client.HTTPConnection, req)\n           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\michael\\AppData\\Local\\Programs\\Python\\Python314-arm64\\Lib\\urllib\\request.py\", line 1336, in do_open\n    raise URLError(err)\nurllib.error.URLError: <urlopen error [WinError 10061] No connection could be made because the target machine actively refused it>\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"C:\\Users\\michael\\source\\github\\mycall\\n1x-ai\\benchmarks\\recipe_trial.py\", line 102, in run\n    wait_ready()\n    ~~~~~~~~~~^^\n  File \"C:\\Users\\michael\\source\\github\\mycall\\n1x-ai\\benchmarks\\recipe_trial.py\", line 77, in wait_ready\n    raise RuntimeError('Trial container exited before readiness (confirmed twice)')\nRuntimeError: Trial container exited before readiness (confirmed twice)\n"
+      },
+      "recipe.yaml": "gpu-memory-utilization: 0.01\ndtype: bfloat16\nengram-config:\n  cpu_offload: false\nload-format: mbx\nmoe-backend: marlin\ndistributed-executor-backend: mp\nmax-model-len: 262144\nmax-num-seqs: 8\nmax-num-batched-tokens: 8192\nkv-cache-memory-bytes: 16106127360\nkv-cache-dtype: fp8\nkv-cache-dtype-skip-layers:\n- sliding_window\nmamba-ssm-cache-dtype: float32\nmamba-cache-mode: align\nblock-size: 4096\nprefix-match-unit: 64\ncompilation-config:\n  cudagraph_mode: FULL_AND_PIECEWISE\n  cudagraph_capture_sizes: [1, 2, 3, 4, 8, 12, 16, 20, 24, 28, 32]\n  compile_ranges_endpoints: [32]\nenable-prefix-caching: true\nenable-prompt-tokens-details: true\nenable-per-request-metrics: true\nenable-auto-tool-choice: true\ntool-call-parser: qwen3_xml\nreasoning-parser: qwen3\nasync-scheduling: true\nuse-replayssm: false\ndefault-chat-template-kwargs:\n  preserve_thinking: false\nspeculative-config:\n  method: dflash\n  model: /drafter\n  num_speculative_tokens: 3\n  disable_eagle_block_drop: true\n  max_model_len: 262144\n  kv_cache_dtype: auto\n  draft_load_config:\n    load_format: safetensors\n  attention_backend: TRITON_ATTN\n",
+      "environment.psd1": "@{\n    DO_NOT_TRACK = '1'\n    FLASHINFER_CUDA_ARCH_LIST = '12.1a'\n    FLASHINFER_NVCC_THREADS = '1'\n    FLASHINFER_WORKSPACE_BASE = '/cache/wsl305/flashinfer-workspace'\n    HF_HUB_DISABLE_TELEMETRY = '1'\n    HF_HUB_OFFLINE = '1'\n    LMCACHE_TRACK_USAGE = 'false'\n    MALLOC_MMAP_THRESHOLD_ = '65536'\n    MALLOC_TRIM_THRESHOLD_ = '131072'\n    MAX_JOBS = '1'\n    MBX_DEPTH_MODE = 'off'\n    MBX_DRAFT_FP8 = '0'\n    MBX_DRAFT_HEAD = '0'\n    MBX_DRAFT_HEAD2 = ''\n    MBX_LOADER_EMPTY_CACHE = '1'\n    MBX_LOADER_PREPARE = '0'\n    MBX_MARLIN_CSF = '1'\n    MBX_PLE_ASYNC = '1'\n    MBX_PLE_FP8_DIR = '/ple-table-fp8'\n    MBX_PLE_MMAP = '1'\n    MBX_PLE_MMAP_MODE = 'nvme'\n    MBX_PLE_MMAP_PREWARM = '0'\n    MBX_PLE_NVME_DIR = '/cache/ple-nvme-fp8'\n    MBX_PLE_PREFILL_CKPT = '1'\n    PYTHONFAULTHANDLER = '1'\n    PYTHONUNBUFFERED = '1'\n    TOKENIZERS_PARALLELISM = 'false'\n    TORCHINDUCTOR_COMPILE_THREADS = '1'\n    TORCH_CUDA_ARCH_LIST = '12.1a'\n    TRANSFORMERS_OFFLINE = '1'\n    TRITON_CACHE_DIR = '/cache/wsl305/triton'\n    VLLM_CACHE_ROOT = '/cache/wsl305/vllm-cache'\n    VLLM_FP8_HYBRID = '1'\n    VLLM_MARLIN_USE_ATOMIC_ADD = '1'\n    VLLM_NO_USAGE_STATS = '1'\n    VLLM_USE_BREAKABLE_CUDAGRAPH = '1'\n    VLLM_USE_DEEP_GEMM = '0'\n}\n",
+      "resources": {
+        "peak_gpu_used_mib": 1368,
+        "minimum_gpu_free_mib": 96923,
+        "minimum_host_available_gib": 18.877761840820312
+      },
+      "evidence_sha256": {
+        "status.json": "8bbbe51dc40dc07f7f083fdfd9528e382711d9a87383614da4416d5894037ad1"
+      }
+    },
+    {
+      "name": "w4-kv19-batch4k-k5-v2",
+      "status": {
+        "stage": "finished",
+        "unix_s": 1794890924.8647661,
+        "success": true,
+        "error": null
+      },
+      "variant": {
+        "flags": {
+          "mamba-ssm-cache-dtype": "bfloat16"
+        },
+        "config": {
+          "Container": "n1x-recipe-trial",
+          "LmcacheNamespace": "qwen-recipe-w4-kv19-batch4k-k5-20261116",
+          "LmcacheVolume": "n1x-recipe-w4-kv19-batch4k-k5-20261116",
+          "KvCacheBytes": "20401094656",
+          "BatchedTokens": 4096,
+          "DFlashTokens": 5
+        }
+      },
+      "config": {
+        "Container": "n1x-recipe-trial",
+        "BatchedTokens": 4096,
+        "RequiredPartitionMiB": 98304,
+        "MyllmboxEnvironment": "runtime/myllmbox/environment.psd1",
+        "DFlash": true,
+        "LmcacheL2GiB": 160,
+        "MyllmboxDrafter": "Qwen3.8-Flash-Next-DFlash2",
+        "MyllmboxConfig": "profiles/qwen38fn-best.yaml",
+        "CacheBlockTokens": 4096,
+        "KvCacheDtype": "fp8",
+        "LmcacheL1GiB": 4,
+        "CacheVolume": "n1x-mbx-w4-dflash-test-cache",
+        "LmcacheChunkTokens": 4096,
+        "WindowsMinimumGiB": 4,
+        "Mtp": false,
+        "RestoreWaitMs": 0,
+        "MaxOutputTokens": 8192,
+        "Backend": "wslc-myllmbox",
+        "DFlashTokens": 5,
+        "LmcacheNamespace": "qwen-recipe-w4-kv19-batch4k-k5-20261116",
+        "MaxSequences": 8,
+        "PleVolume": "n1x-ple-native",
+        "DefaultProfile": "qwen38fn-best",
+        "LanAccess": false,
+        "LmcacheVolume": "n1x-recipe-w4-kv19-batch4k-k5-20261116",
+        "Context": 262144,
+        "Port": 8000,
+        "UseLMCache": true,
+        "KvCacheBytes": "20401094656",
+        "Image": "n1x-ai:mbx-setup-1447755d89af469f894bfa8dcb51506d",
+        "PleWorkers": 8,
+        "Profile": "qwen38fn-best",
+        "MyllmboxWSLCVersion": "3.0.5.0",
+        "MyllmboxModel": "Qwen3.8-Flash-Next-W4A16-AutoRound-hybrid",
+        "ImageId": "sha256:819970fd46a90c1e70b7cd06aeb15d5ce3c75b02b62892a8322f42de225566bc",
+        "ModelRoot": "C:\\Users\\michael\\models"
+      },
+      "recipe.yaml": "gpu-memory-utilization: 0.01\ndtype: bfloat16\nengram-config:\n  cpu_offload: false\nload-format: mbx\nmoe-backend: marlin\ndistributed-executor-backend: mp\nmax-model-len: 262144\nmax-num-seqs: 8\nmax-num-batched-tokens: 8192\nkv-cache-memory-bytes: 16106127360\nkv-cache-dtype: fp8\nkv-cache-dtype-skip-layers:\n- sliding_window\nmamba-ssm-cache-dtype: float32\nmamba-cache-mode: align\nblock-size: 4096\nprefix-match-unit: 64\ncompilation-config:\n  cudagraph_mode: FULL_AND_PIECEWISE\n  cudagraph_capture_sizes: [1, 2, 3, 4, 8, 12, 16, 20, 24, 28, 32]\n  compile_ranges_endpoints: [32]\nenable-prefix-caching: true\nenable-prompt-tokens-details: true\nenable-per-request-metrics: true\nenable-auto-tool-choice: true\ntool-call-parser: qwen3_xml\nreasoning-parser: qwen3\nasync-scheduling: true\nuse-replayssm: false\ndefault-chat-template-kwargs:\n  preserve_thinking: false\nspeculative-config:\n  method: dflash\n  model: /drafter\n  num_speculative_tokens: 3\n  disable_eagle_block_drop: true\n  max_model_len: 262144\n  kv_cache_dtype: auto\n  draft_load_config:\n    load_format: safetensors\n  attention_backend: TRITON_ATTN\n",
+      "environment.psd1": "@{\n    DO_NOT_TRACK = '1'\n    FLASHINFER_CUDA_ARCH_LIST = '12.1a'\n    FLASHINFER_NVCC_THREADS = '1'\n    FLASHINFER_WORKSPACE_BASE = '/cache/wsl305/flashinfer-workspace'\n    HF_HUB_DISABLE_TELEMETRY = '1'\n    HF_HUB_OFFLINE = '1'\n    LMCACHE_TRACK_USAGE = 'false'\n    MALLOC_MMAP_THRESHOLD_ = '65536'\n    MALLOC_TRIM_THRESHOLD_ = '131072'\n    MAX_JOBS = '1'\n    MBX_DEPTH_MODE = 'off'\n    MBX_DRAFT_FP8 = '0'\n    MBX_DRAFT_HEAD = '0'\n    MBX_DRAFT_HEAD2 = ''\n    MBX_LOADER_EMPTY_CACHE = '1'\n    MBX_LOADER_PREPARE = '0'\n    MBX_MARLIN_CSF = '1'\n    MBX_PLE_ASYNC = '1'\n    MBX_PLE_FP8_DIR = '/ple-table-fp8'\n    MBX_PLE_MMAP = '1'\n    MBX_PLE_MMAP_MODE = 'nvme'\n    MBX_PLE_MMAP_PREWARM = '0'\n    MBX_PLE_NVME_DIR = '/cache/ple-nvme-fp8'\n    MBX_PLE_PREFILL_CKPT = '1'\n    PYTHONFAULTHANDLER = '1'\n    PYTHONUNBUFFERED = '1'\n    TOKENIZERS_PARALLELISM = 'false'\n    TORCHINDUCTOR_COMPILE_THREADS = '1'\n    TORCH_CUDA_ARCH_LIST = '12.1a'\n    TRANSFORMERS_OFFLINE = '1'\n    TRITON_CACHE_DIR = '/cache/wsl305/triton'\n    VLLM_CACHE_ROOT = '/cache/wsl305/vllm-cache'\n    VLLM_FP8_HYBRID = '1'\n    VLLM_MARLIN_USE_ATOMIC_ADD = '1'\n    VLLM_NO_USAGE_STATS = '1'\n    VLLM_USE_BREAKABLE_CUDAGRAPH = '1'\n    VLLM_USE_DEEP_GEMM = '0'\n}\n",
+      "speed": [
+        {
+          "concurrency": 1,
+          "depth": 4096,
+          "recorded": 2,
+          "valid": 2,
+          "read_tokens_s": 2726.9380879043047,
+          "write_tokens_s": 50.23026990876781,
+          "second_repetition": {
+            "samples": 1,
+            "read_tokens_s": 2733.526908030165,
+            "write_tokens_s": 47.59029032908316
+          }
+        },
+        {
+          "concurrency": 1,
+          "depth": 32768,
+          "recorded": 2,
+          "valid": 2,
+          "read_tokens_s": 2913.9093228954366,
+          "write_tokens_s": 47.299283131694786,
+          "second_repetition": {
+            "samples": 1,
+            "read_tokens_s": 2899.9041517943506,
+            "write_tokens_s": 48.08734061328641
+          }
+        },
+        {
+          "concurrency": 2,
+          "depth": 4096,
+          "recorded": 4,
+          "valid": 4,
+          "read_tokens_s": 2246.3454767026046,
+          "write_tokens_s": 35.43515879784474,
+          "second_repetition": {
+            "samples": 2,
+            "read_tokens_s": 2571.378544958147,
+            "write_tokens_s": 34.56365118560723
+          }
+        },
+        {
+          "concurrency": 2,
+          "depth": 32768,
+          "recorded": 4,
+          "valid": 4,
+          "read_tokens_s": 2510.457418234897,
+          "write_tokens_s": 27.85801210091257,
+          "second_repetition": {
+            "samples": 2,
+            "read_tokens_s": 2499.56477930566,
+            "write_tokens_s": 27.667105820158167
+          }
+        }
+      ],
+      "archive": [
+        {
+          "concurrency": 1,
+          "correct": 4,
+          "planned": 4,
+          "elapsed_s": 64.45952110000508,
+          "max_output_tokens": 8192
+        },
+        {
+          "concurrency": 2,
+          "correct": 4,
+          "planned": 4,
+          "elapsed_s": 53.151554700001725,
+          "max_output_tokens": 8192
+        }
+      ],
+      "recovery": {
+        "correct": 24,
+        "planned": 24,
+        "elapsed_s": 57.47673969999596,
+        "thinking": true,
+        "concurrency": 4,
+        "max_output_tokens": 8192,
+        "preemptions": 0.0,
+        "reasoning_effort": "xhigh",
+        "temperature": 0.6
+      },
+      "near_full": [
+        {
+          "group": "r0-c4",
+          "concurrency": 4,
+          "repeat": 0,
+          "elapsed_s": 592.6769042999949,
+          "correct_tasks": 12,
+          "planned_tasks": 12,
+          "correct_tasks_s": 0.020247119320725152,
+          "preemptions": 0.0,
+          "cache_evidence": {
+            "cold-selection": {
+              "requests": 4,
+              "requests_with_cached_tokens": 0,
+              "cached_tokens": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            "tool-continuation": {
+              "requests": 12,
+              "requests_with_cached_tokens": 12,
+              "cached_tokens": [
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856
+              ]
+            },
+            "appended-selection": {
+              "requests": 8,
+              "requests_with_cached_tokens": 7,
+              "cached_tokens": [
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                0
+              ]
+            }
+          }
+        }
+      ],
+      "restore": {
+        "tokens_each": 130877,
+        "correct": 2,
+        "elapsed_s": 5.8437857999997505,
+        "qualified": true,
+        "delta": {
+          "vllm:prefix_cache_hits_total": 0.0,
+          "vllm:external_prefix_cache_hits_total": 253952.0,
+          "vllm:num_preemptions_total": 0.0,
+          "lmcache_mp_num_finished_retrieves_total": 2.0,
+          "lmcache_mp_l2_prefetch_load_completed_chunks_total": 66.0
+        },
+        "verification_requests": [
+          {
+            "prompt_tokens": 130877,
+            "cached_tokens": 126976,
+            "complete_chunk_tokens": 126976,
+            "prompt_coverage": 0.9701933876846199,
+            "complete_chunk_coverage": 1.0
+          },
+          {
+            "prompt_tokens": 130877,
+            "cached_tokens": 126976,
+            "complete_chunk_tokens": 126976,
+            "prompt_coverage": 0.9701933876846199,
+            "complete_chunk_coverage": 1.0
+          }
+        ]
+      },
+      "resources": {
+        "peak_gpu_used_mib": 93059,
+        "minimum_gpu_free_mib": 5232,
+        "minimum_host_available_gib": 5.027515411376953
+      },
+      "evidence_sha256": {
+        "host.json": "b73404d054e3eca1fea6fa14a304647c36434c172fffe165e52c5fe7dca5ab3c",
+        "near-full/summary.json": "70ef096dbc15a38f908628e382973375bbfd452a704ab729949ff5f57f7b01e5",
+        "quality/completed.json": "275c5646fc5fd8371887c7cf90fe7fc9954cd0bcfcce44c5afe5eec63c7ed4b0",
+        "quality/xhigh-t06/quality/summary.json": "a99543ec6f77982c68e6c348f9a3fb939f07f9fee306229b8216b333ef6600e5",
+        "quality/xhigh-t06/recovery/summary.json": "ea4378eb322346303ee13c121ae2acc8ab5027597260d3d0025e0c880a889878",
+        "restore/summary.json": "9e0f32dcc6423528afefe03d8ee646eec472add8ae49517bd612f0a4165da8d8",
+        "speed/comparison.json": "a00710094b3d27392a09f108e8884c970d5cf254a029878b27971ec1fdb910bf",
+        "speed/summary.json": "6770083b45fcec85b9903a0ebb1c8c1e7b0ee550a309adab0efd113d9c950fa2",
+        "status.json": "645914f1685f95e6d9277cea85d271cb8e6fc564b82af68b0f165298c4233ac3"
+      }
+    },
+    {
+      "name": "w4-kv19-batch8k-k5-20261117",
+      "status": {
+        "stage": "finished",
+        "unix_s": 1794936042.498026,
+        "success": false,
+        "error": "RuntimeError('Quality screen failed; retained first scores')"
+      },
+      "variant": {
+        "flags": {
+          "mamba-ssm-cache-dtype": "bfloat16"
+        },
+        "config": {
+          "Container": "n1x-recipe-trial",
+          "LmcacheNamespace": "qwen-recipe-w4-kv19-batch8k-k5-20261117",
+          "LmcacheVolume": "n1x-recipe-w4-kv19-batch8k-k5-20261117",
+          "KvCacheBytes": "20401094656",
+          "BatchedTokens": 8192,
+          "DFlashTokens": 5
+        }
+      },
+      "config": {
+        "MyllmboxDrafter": "Qwen3.8-Flash-Next-DFlash2",
+        "DefaultProfile": "qwen38fn-best",
+        "Backend": "wslc-myllmbox",
+        "RestoreWaitMs": 0,
+        "ImageId": "sha256:819970fd46a90c1e70b7cd06aeb15d5ce3c75b02b62892a8322f42de225566bc",
+        "MyllmboxWSLCVersion": "3.0.5.0",
+        "Context": 262144,
+        "LmcacheVolume": "n1x-recipe-w4-kv19-batch8k-k5-20261117",
+        "Profile": "qwen38fn-best",
+        "CacheBlockTokens": 4096,
+        "LmcacheNamespace": "qwen-recipe-w4-kv19-batch8k-k5-20261117",
+        "LmcacheChunkTokens": 4096,
+        "LmcacheL2GiB": 160,
+        "KvCacheDtype": "fp8",
+        "Mtp": false,
+        "UseLMCache": true,
+        "ModelRoot": "C:\\Users\\michael\\models",
+        "WindowsMinimumGiB": 4,
+        "LanAccess": false,
+        "DFlash": true,
+        "MaxSequences": 8,
+        "MyllmboxEnvironment": "runtime/myllmbox/environment.psd1",
+        "LmcacheL1GiB": 4,
+        "PleVolume": "n1x-ple-native",
+        "DFlashTokens": 5,
+        "KvCacheBytes": "20401094656",
+        "MyllmboxConfig": "profiles/qwen38fn-best.yaml",
+        "MaxOutputTokens": 8192,
+        "BatchedTokens": 8192,
+        "CacheVolume": "n1x-mbx-w4-dflash-test-cache",
+        "Image": "n1x-ai:mbx-setup-1447755d89af469f894bfa8dcb51506d",
+        "MyllmboxModel": "Qwen3.8-Flash-Next-W4A16-AutoRound-hybrid",
+        "RequiredPartitionMiB": 98304,
+        "Container": "n1x-recipe-trial",
+        "PleWorkers": 8,
+        "Port": 8000
+      },
+      "failure": {
+        "error": "RuntimeError('Quality screen failed; retained first scores')",
+        "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\michael\\source\\github\\mycall\\n1x-ai\\benchmarks\\recipe_trial.py\", line 124, in run\n    raise RuntimeError('Quality screen failed; retained first scores')\nRuntimeError: Quality screen failed; retained first scores\n"
+      },
+      "recipe.yaml": "gpu-memory-utilization: 0.01\ndtype: bfloat16\nengram-config:\n  cpu_offload: false\nload-format: mbx\nmoe-backend: marlin\ndistributed-executor-backend: mp\nmax-model-len: 262144\nmax-num-seqs: 8\nmax-num-batched-tokens: 8192\nkv-cache-memory-bytes: 16106127360\nkv-cache-dtype: fp8\nkv-cache-dtype-skip-layers:\n- sliding_window\nmamba-ssm-cache-dtype: float32\nmamba-cache-mode: align\nblock-size: 4096\nprefix-match-unit: 64\ncompilation-config:\n  cudagraph_mode: FULL_AND_PIECEWISE\n  cudagraph_capture_sizes: [1, 2, 3, 4, 8, 12, 16, 20, 24, 28, 32]\n  compile_ranges_endpoints: [32]\nenable-prefix-caching: true\nenable-prompt-tokens-details: true\nenable-per-request-metrics: true\nenable-auto-tool-choice: true\ntool-call-parser: qwen3_xml\nreasoning-parser: qwen3\nasync-scheduling: true\nuse-replayssm: false\ndefault-chat-template-kwargs:\n  preserve_thinking: false\nspeculative-config:\n  method: dflash\n  model: /drafter\n  num_speculative_tokens: 3\n  disable_eagle_block_drop: true\n  max_model_len: 262144\n  kv_cache_dtype: auto\n  draft_load_config:\n    load_format: safetensors\n  attention_backend: TRITON_ATTN\n",
+      "environment.psd1": "@{\n    DO_NOT_TRACK = '1'\n    FLASHINFER_CUDA_ARCH_LIST = '12.1a'\n    FLASHINFER_NVCC_THREADS = '1'\n    FLASHINFER_WORKSPACE_BASE = '/cache/wsl305/flashinfer-workspace'\n    HF_HUB_DISABLE_TELEMETRY = '1'\n    HF_HUB_OFFLINE = '1'\n    LMCACHE_TRACK_USAGE = 'false'\n    MALLOC_MMAP_THRESHOLD_ = '65536'\n    MALLOC_TRIM_THRESHOLD_ = '131072'\n    MAX_JOBS = '1'\n    MBX_DEPTH_MODE = 'off'\n    MBX_DRAFT_FP8 = '0'\n    MBX_DRAFT_HEAD = '0'\n    MBX_DRAFT_HEAD2 = ''\n    MBX_LOADER_EMPTY_CACHE = '1'\n    MBX_LOADER_PREPARE = '0'\n    MBX_MARLIN_CSF = '1'\n    MBX_PLE_ASYNC = '1'\n    MBX_PLE_FP8_DIR = '/ple-table-fp8'\n    MBX_PLE_MMAP = '1'\n    MBX_PLE_MMAP_MODE = 'nvme'\n    MBX_PLE_MMAP_PREWARM = '0'\n    MBX_PLE_NVME_DIR = '/cache/ple-nvme-fp8'\n    MBX_PLE_PREFILL_CKPT = '1'\n    PYTHONFAULTHANDLER = '1'\n    PYTHONUNBUFFERED = '1'\n    TOKENIZERS_PARALLELISM = 'false'\n    TORCHINDUCTOR_COMPILE_THREADS = '1'\n    TORCH_CUDA_ARCH_LIST = '12.1a'\n    TRANSFORMERS_OFFLINE = '1'\n    TRITON_CACHE_DIR = '/cache/wsl305/triton'\n    VLLM_CACHE_ROOT = '/cache/wsl305/vllm-cache'\n    VLLM_FP8_HYBRID = '1'\n    VLLM_MARLIN_USE_ATOMIC_ADD = '1'\n    VLLM_NO_USAGE_STATS = '1'\n    VLLM_USE_BREAKABLE_CUDAGRAPH = '1'\n    VLLM_USE_DEEP_GEMM = '0'\n}\n",
+      "speed": [
+        {
+          "concurrency": 1,
+          "depth": 4096,
+          "recorded": 2,
+          "valid": 2,
+          "read_tokens_s": 2753.5285306791543,
+          "write_tokens_s": 50.42694923929045,
+          "second_repetition": {
+            "samples": 1,
+            "read_tokens_s": 2720.6299515552,
+            "write_tokens_s": 47.621365893349974
+          }
+        },
+        {
+          "concurrency": 1,
+          "depth": 32768,
+          "recorded": 2,
+          "valid": 2,
+          "read_tokens_s": 3104.9557206870973,
+          "write_tokens_s": 43.597748115733836,
+          "second_repetition": {
+            "samples": 1,
+            "read_tokens_s": 3087.45260392705,
+            "write_tokens_s": 44.46029856734854
+          }
+        },
+        {
+          "concurrency": 2,
+          "depth": 4096,
+          "recorded": 4,
+          "valid": 4,
+          "read_tokens_s": 2601.227251385083,
+          "write_tokens_s": 36.63716503165652,
+          "second_repetition": {
+            "samples": 2,
+            "read_tokens_s": 2631.9706439388974,
+            "write_tokens_s": 36.577324071186794
+          }
+        },
+        {
+          "concurrency": 2,
+          "depth": 32768,
+          "recorded": 4,
+          "valid": 4,
+          "read_tokens_s": 2321.130440546466,
+          "write_tokens_s": 29.36936431318476,
+          "second_repetition": {
+            "samples": 2,
+            "read_tokens_s": 2315.2786453397966,
+            "write_tokens_s": 28.58120890610497
+          }
+        }
+      ],
+      "archive": [
+        {
+          "concurrency": 1,
+          "correct": 4,
+          "planned": 4,
+          "elapsed_s": 54.83464020000247,
+          "max_output_tokens": 8192
+        }
+      ],
+      "resources": {
+        "peak_gpu_used_mib": 94711,
+        "minimum_gpu_free_mib": 3580,
+        "minimum_host_available_gib": 5.432071685791016
+      },
+      "evidence_sha256": {
+        "host.json": "929c0090f0b53f7d0d4adadc5910a2ff58140c0167161018ed0c9465362d0f0e",
+        "quality/completed.json": "907eb156920850dee20d13eac4c632f030c8d8560d02cc248652c91930a726dd",
+        "quality/xhigh-t06/quality/summary.json": "ec8dfcddc30c67355fa3bfade3e3109960413146aa76daf7fffd2fb023f0218f",
+        "speed/comparison.json": "9847fe6b4f19492a372f7c3ca0d24b8dd1b2e486a3879c80dadb1e1cd08c2b82",
+        "speed/summary.json": "aca1099a8372a2f4c0362d204a3a652bacd0a33eeae44a08ce5e410dffa215d0",
+        "status.json": "2991a67ea9bac3d93292ef0b4fe029145d6418f1689f23aef130109f02a40dbb"
+      }
+    },
+    {
+      "name": "w4-kv19-batch8k-k5-20261117-v2",
+      "status": {
+        "stage": "finished",
+        "unix_s": 1794938950.0738118,
+        "success": false,
+        "error": "RuntimeError('restore-verify failed (1)')"
+      },
+      "variant": {
+        "flags": {
+          "mamba-ssm-cache-dtype": "bfloat16"
+        },
+        "config": {
+          "Container": "n1x-recipe-trial",
+          "LmcacheNamespace": "qwen-recipe-w4-kv19-batch8k-k5-20261117-v2",
+          "LmcacheVolume": "n1x-recipe-w4-kv19-batch8k-k5-20261117-v2",
+          "KvCacheBytes": "20401094656",
+          "BatchedTokens": 8192,
+          "DFlashTokens": 5
+        }
+      },
+      "config": {
+        "Container": "n1x-recipe-trial",
+        "DFlashTokens": 5,
+        "CacheVolume": "n1x-mbx-w4-dflash-test-cache",
+        "MyllmboxConfig": "profiles/qwen38fn-best.yaml",
+        "LmcacheChunkTokens": 4096,
+        "LmcacheL2GiB": 160,
+        "Port": 8000,
+        "BatchedTokens": 8192,
+        "MyllmboxWSLCVersion": "3.0.5.0",
+        "MyllmboxModel": "Qwen3.8-Flash-Next-W4A16-AutoRound-hybrid",
+        "DFlash": true,
+        "RestoreWaitMs": 0,
+        "LmcacheVolume": "n1x-recipe-w4-kv19-batch8k-k5-20261117-v2",
+        "Profile": "qwen38fn-best",
+        "Backend": "wslc-myllmbox",
+        "ImageId": "sha256:819970fd46a90c1e70b7cd06aeb15d5ce3c75b02b62892a8322f42de225566bc",
+        "MyllmboxDrafter": "Qwen3.8-Flash-Next-DFlash2",
+        "PleWorkers": 8,
+        "UseLMCache": true,
+        "LanAccess": false,
+        "RequiredPartitionMiB": 98304,
+        "Mtp": false,
+        "DefaultProfile": "qwen38fn-best",
+        "CacheBlockTokens": 4096,
+        "KvCacheBytes": "20401094656",
+        "WindowsMinimumGiB": 4,
+        "MyllmboxEnvironment": "runtime/myllmbox/environment.psd1",
+        "Image": "n1x-ai:mbx-setup-1447755d89af469f894bfa8dcb51506d",
+        "LmcacheNamespace": "qwen-recipe-w4-kv19-batch8k-k5-20261117-v2",
+        "PleVolume": "n1x-ple-native",
+        "Context": 262144,
+        "ModelRoot": "C:\\Users\\michael\\models",
+        "MaxOutputTokens": 8192,
+        "KvCacheDtype": "fp8",
+        "MaxSequences": 8,
+        "LmcacheL1GiB": 4
+      },
+      "failure": {
+        "error": "RuntimeError('restore-verify failed (1)')",
+        "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\michael\\source\\github\\mycall\\n1x-ai\\benchmarks\\recipe_trial.py\", line 142, in run\n                if not args.continue_after_quality_failure:\n                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    ...<2 lines>...\n        command([sys.executable,ROOT/'benchmarks/near_full_tools_probe.py','--out',out/'near-full',\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\michael\\source\\github\\mycall\\n1x-ai\\benchmarks\\recipe_trial.py\", line 43, in command\n    stderr=subprocess.STDOUT, timeout=timeout,\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nRuntimeError: restore-verify failed (1)\n"
+      },
+      "recipe.yaml": "gpu-memory-utilization: 0.01\ndtype: bfloat16\nengram-config:\n  cpu_offload: false\nload-format: mbx\nmoe-backend: marlin\ndistributed-executor-backend: mp\nmax-model-len: 262144\nmax-num-seqs: 8\nmax-num-batched-tokens: 8192\nkv-cache-memory-bytes: 16106127360\nkv-cache-dtype: fp8\nkv-cache-dtype-skip-layers:\n- sliding_window\nmamba-ssm-cache-dtype: float32\nmamba-cache-mode: align\nblock-size: 4096\nprefix-match-unit: 64\ncompilation-config:\n  cudagraph_mode: FULL_AND_PIECEWISE\n  cudagraph_capture_sizes: [1, 2, 3, 4, 8, 12, 16, 20, 24, 28, 32]\n  compile_ranges_endpoints: [32]\nenable-prefix-caching: true\nenable-prompt-tokens-details: true\nenable-per-request-metrics: true\nenable-auto-tool-choice: true\ntool-call-parser: qwen3_xml\nreasoning-parser: qwen3\nasync-scheduling: true\nuse-replayssm: false\ndefault-chat-template-kwargs:\n  preserve_thinking: false\nspeculative-config:\n  method: dflash\n  model: /drafter\n  num_speculative_tokens: 3\n  disable_eagle_block_drop: true\n  max_model_len: 262144\n  kv_cache_dtype: auto\n  draft_load_config:\n    load_format: safetensors\n  attention_backend: TRITON_ATTN\n",
+      "environment.psd1": "@{\n    DO_NOT_TRACK = '1'\n    FLASHINFER_CUDA_ARCH_LIST = '12.1a'\n    FLASHINFER_NVCC_THREADS = '1'\n    FLASHINFER_WORKSPACE_BASE = '/cache/wsl305/flashinfer-workspace'\n    HF_HUB_DISABLE_TELEMETRY = '1'\n    HF_HUB_OFFLINE = '1'\n    LMCACHE_TRACK_USAGE = 'false'\n    MALLOC_MMAP_THRESHOLD_ = '65536'\n    MALLOC_TRIM_THRESHOLD_ = '131072'\n    MAX_JOBS = '1'\n    MBX_DEPTH_MODE = 'off'\n    MBX_DRAFT_FP8 = '0'\n    MBX_DRAFT_HEAD = '0'\n    MBX_DRAFT_HEAD2 = ''\n    MBX_LOADER_EMPTY_CACHE = '1'\n    MBX_LOADER_PREPARE = '0'\n    MBX_MARLIN_CSF = '1'\n    MBX_PLE_ASYNC = '1'\n    MBX_PLE_FP8_DIR = '/ple-table-fp8'\n    MBX_PLE_MMAP = '1'\n    MBX_PLE_MMAP_MODE = 'nvme'\n    MBX_PLE_MMAP_PREWARM = '0'\n    MBX_PLE_NVME_DIR = '/cache/ple-nvme-fp8'\n    MBX_PLE_PREFILL_CKPT = '1'\n    PYTHONFAULTHANDLER = '1'\n    PYTHONUNBUFFERED = '1'\n    TOKENIZERS_PARALLELISM = 'false'\n    TORCHINDUCTOR_COMPILE_THREADS = '1'\n    TORCH_CUDA_ARCH_LIST = '12.1a'\n    TRANSFORMERS_OFFLINE = '1'\n    TRITON_CACHE_DIR = '/cache/wsl305/triton'\n    VLLM_CACHE_ROOT = '/cache/wsl305/vllm-cache'\n    VLLM_FP8_HYBRID = '1'\n    VLLM_MARLIN_USE_ATOMIC_ADD = '1'\n    VLLM_NO_USAGE_STATS = '1'\n    VLLM_USE_BREAKABLE_CUDAGRAPH = '1'\n    VLLM_USE_DEEP_GEMM = '0'\n}\n",
+      "speed": [
+        {
+          "concurrency": 1,
+          "depth": 4096,
+          "recorded": 2,
+          "valid": 2,
+          "read_tokens_s": 2779.7133259223356,
+          "write_tokens_s": 51.0834101517185,
+          "second_repetition": {
+            "samples": 1,
+            "read_tokens_s": 2752.0077040078286,
+            "write_tokens_s": 48.162333189263194
+          }
+        },
+        {
+          "concurrency": 1,
+          "depth": 32768,
+          "recorded": 2,
+          "valid": 2,
+          "read_tokens_s": 3111.7753850236772,
+          "write_tokens_s": 46.92692209091463,
+          "second_repetition": {
+            "samples": 1,
+            "read_tokens_s": 3100.9414367332497,
+            "write_tokens_s": 44.9833530343117
+          }
+        },
+        {
+          "concurrency": 2,
+          "depth": 4096,
+          "recorded": 4,
+          "valid": 4,
+          "read_tokens_s": 1935.2712567159674,
+          "write_tokens_s": 37.25030624480914,
+          "second_repetition": {
+            "samples": 2,
+            "read_tokens_s": 2615.968723758638,
+            "write_tokens_s": 34.369933671677884
+          }
+        },
+        {
+          "concurrency": 2,
+          "depth": 32768,
+          "recorded": 4,
+          "valid": 4,
+          "read_tokens_s": 2333.2482046728924,
+          "write_tokens_s": 29.305169387148133,
+          "second_repetition": {
+            "samples": 2,
+            "read_tokens_s": 2338.6023259677486,
+            "write_tokens_s": 30.007062846355183
+          }
+        }
+      ],
+      "archive": [
+        {
+          "concurrency": 1,
+          "correct": 4,
+          "planned": 4,
+          "elapsed_s": 58.37892550000106,
+          "max_output_tokens": 8192
+        },
+        {
+          "concurrency": 2,
+          "correct": 4,
+          "planned": 4,
+          "elapsed_s": 52.19518920000701,
+          "max_output_tokens": 8192
+        }
+      ],
+      "recovery": {
+        "correct": 24,
+        "planned": 24,
+        "elapsed_s": 50.30947710000328,
+        "thinking": true,
+        "concurrency": 4,
+        "max_output_tokens": 8192,
+        "preemptions": 0.0,
+        "reasoning_effort": "xhigh",
+        "temperature": 0.6
+      },
+      "near_full": [
+        {
+          "group": "r0-c4",
+          "concurrency": 4,
+          "repeat": 0,
+          "elapsed_s": 632.6280930000066,
+          "correct_tasks": 12,
+          "planned_tasks": 12,
+          "correct_tasks_s": 0.018968490544095825,
+          "preemptions": 0.0,
+          "cache_evidence": {
+            "cold-selection": {
+              "requests": 4,
+              "requests_with_cached_tokens": 0,
+              "cached_tokens": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            "tool-continuation": {
+              "requests": 12,
+              "requests_with_cached_tokens": 9,
+              "cached_tokens": [
+                249856,
+                0,
+                0,
+                249856,
+                249856,
+                249856,
+                0,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856
+              ]
+            },
+            "appended-selection": {
+              "requests": 8,
+              "requests_with_cached_tokens": 8,
+              "cached_tokens": [
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856
+              ]
+            }
+          }
+        }
+      ],
+      "restore": {
+        "tokens_each": 130877,
+        "correct": 2,
+        "elapsed_s": 7.664635600000111,
+        "qualified": false,
+        "delta": {
+          "vllm:prefix_cache_hits_total": 0.0,
+          "vllm:external_prefix_cache_hits_total": 245760.0,
+          "vllm:num_preemptions_total": 0.0,
+          "lmcache_mp_num_finished_retrieves_total": 2.0,
+          "lmcache_mp_l2_prefetch_load_completed_chunks_total": 64.0
+        },
+        "verification_requests": [
+          {
+            "prompt_tokens": 130877,
+            "cached_tokens": 122880,
+            "complete_chunk_tokens": 126976,
+            "prompt_coverage": 0.9388968267915676,
+            "complete_chunk_coverage": 0.967741935483871
+          },
+          {
+            "prompt_tokens": 130877,
+            "cached_tokens": 122880,
+            "complete_chunk_tokens": 126976,
+            "prompt_coverage": 0.9388968267915676,
+            "complete_chunk_coverage": 0.967741935483871
+          }
+        ]
+      },
+      "resources": {
+        "peak_gpu_used_mib": 95091,
+        "minimum_gpu_free_mib": 3200,
+        "minimum_host_available_gib": 5.200290679931641
+      },
+      "evidence_sha256": {
+        "host.json": "288b5599f12411e537c0db1e27891e6133e5505aa387112aca09fd79229e0b44",
+        "near-full/summary.json": "8bc5a42545caea485177bd26301df02ad67ab75f29b829d7dd9f6d699ea53af2",
+        "quality/completed.json": "4be1c317638309ec26d699ea2e32d8036974be476d33bd7613c15ee61cf66793",
+        "quality/xhigh-t06/quality/summary.json": "1ce9c21215372418c166c98867da461b7086e02d48792ef6cb8747a95fede202",
+        "quality/xhigh-t06/recovery/summary.json": "d0d2197396bd321490069b9432a0abc37e0ce594ce5a3fa8e105d81647c886f5",
+        "restore/summary.json": "63e85a9b6cae1402501827db196d9f99b566bf40858e53ff2566db0004b44ab3",
+        "speed/comparison.json": "8232f3457fa3cce6192a8797bf63d95181269b463811bbd2cf6f0f8500ceee9a",
+        "speed/summary.json": "1cd108e062a52c7d61394ccab719f3edc8486720f395bdd8ebd53b9f2a840b02",
+        "status.json": "784927635d79c28a6e3148c86d3054cb536590aff0a042d44543f2e1d34d5af0"
+      }
+    },
+    {
+      "name": "w4-kv20-batch4k-k5-20261117",
+      "status": {
+        "stage": "finished",
+        "unix_s": 1794935242.6197789,
+        "success": true,
+        "error": null
+      },
+      "variant": {
+        "flags": {
+          "mamba-ssm-cache-dtype": "bfloat16"
+        },
+        "config": {
+          "Container": "n1x-recipe-trial",
+          "LmcacheNamespace": "qwen-recipe-w4-kv20-batch4k-k5-20261117",
+          "LmcacheVolume": "n1x-recipe-w4-kv20-batch4k-k5-20261117",
+          "KvCacheBytes": "21474836480",
+          "BatchedTokens": 4096,
+          "DFlashTokens": 5
+        }
+      },
+      "config": {
+        "MyllmboxEnvironment": "runtime/myllmbox/environment.psd1",
+        "DFlashTokens": 5,
+        "LmcacheL2GiB": 160,
+        "PleVolume": "n1x-ple-native",
+        "MyllmboxWSLCVersion": "3.0.5.0",
+        "KvCacheBytes": "21474836480",
+        "WindowsMinimumGiB": 4,
+        "CacheBlockTokens": 4096,
+        "LmcacheVolume": "n1x-recipe-w4-kv20-batch4k-k5-20261117",
+        "DefaultProfile": "qwen38fn-best",
+        "Image": "n1x-ai:mbx-setup-1447755d89af469f894bfa8dcb51506d",
+        "Container": "n1x-recipe-trial",
+        "RequiredPartitionMiB": 98304,
+        "Backend": "wslc-myllmbox",
+        "LmcacheNamespace": "qwen-recipe-w4-kv20-batch4k-k5-20261117",
+        "Context": 262144,
+        "Port": 8000,
+        "Mtp": false,
+        "MyllmboxConfig": "profiles/qwen38fn-best.yaml",
+        "RestoreWaitMs": 0,
+        "MyllmboxDrafter": "Qwen3.8-Flash-Next-DFlash2",
+        "ImageId": "sha256:819970fd46a90c1e70b7cd06aeb15d5ce3c75b02b62892a8322f42de225566bc",
+        "Profile": "qwen38fn-best",
+        "MyllmboxModel": "Qwen3.8-Flash-Next-W4A16-AutoRound-hybrid",
+        "LanAccess": false,
+        "KvCacheDtype": "fp8",
+        "LmcacheChunkTokens": 4096,
+        "ModelRoot": "C:\\Users\\michael\\models",
+        "DFlash": true,
+        "LmcacheL1GiB": 4,
+        "UseLMCache": true,
+        "MaxSequences": 8,
+        "CacheVolume": "n1x-mbx-w4-dflash-test-cache",
+        "MaxOutputTokens": 8192,
+        "BatchedTokens": 4096,
+        "PleWorkers": 8
+      },
+      "recipe.yaml": "gpu-memory-utilization: 0.01\ndtype: bfloat16\nengram-config:\n  cpu_offload: false\nload-format: mbx\nmoe-backend: marlin\ndistributed-executor-backend: mp\nmax-model-len: 262144\nmax-num-seqs: 8\nmax-num-batched-tokens: 8192\nkv-cache-memory-bytes: 16106127360\nkv-cache-dtype: fp8\nkv-cache-dtype-skip-layers:\n- sliding_window\nmamba-ssm-cache-dtype: float32\nmamba-cache-mode: align\nblock-size: 4096\nprefix-match-unit: 64\ncompilation-config:\n  cudagraph_mode: FULL_AND_PIECEWISE\n  cudagraph_capture_sizes: [1, 2, 3, 4, 8, 12, 16, 20, 24, 28, 32]\n  compile_ranges_endpoints: [32]\nenable-prefix-caching: true\nenable-prompt-tokens-details: true\nenable-per-request-metrics: true\nenable-auto-tool-choice: true\ntool-call-parser: qwen3_xml\nreasoning-parser: qwen3\nasync-scheduling: true\nuse-replayssm: false\ndefault-chat-template-kwargs:\n  preserve_thinking: false\nspeculative-config:\n  method: dflash\n  model: /drafter\n  num_speculative_tokens: 3\n  disable_eagle_block_drop: true\n  max_model_len: 262144\n  kv_cache_dtype: auto\n  draft_load_config:\n    load_format: safetensors\n  attention_backend: TRITON_ATTN\n",
+      "environment.psd1": "@{\n    DO_NOT_TRACK = '1'\n    FLASHINFER_CUDA_ARCH_LIST = '12.1a'\n    FLASHINFER_NVCC_THREADS = '1'\n    FLASHINFER_WORKSPACE_BASE = '/cache/wsl305/flashinfer-workspace'\n    HF_HUB_DISABLE_TELEMETRY = '1'\n    HF_HUB_OFFLINE = '1'\n    LMCACHE_TRACK_USAGE = 'false'\n    MALLOC_MMAP_THRESHOLD_ = '65536'\n    MALLOC_TRIM_THRESHOLD_ = '131072'\n    MAX_JOBS = '1'\n    MBX_DEPTH_MODE = 'off'\n    MBX_DRAFT_FP8 = '0'\n    MBX_DRAFT_HEAD = '0'\n    MBX_DRAFT_HEAD2 = ''\n    MBX_LOADER_EMPTY_CACHE = '1'\n    MBX_LOADER_PREPARE = '0'\n    MBX_MARLIN_CSF = '1'\n    MBX_PLE_ASYNC = '1'\n    MBX_PLE_FP8_DIR = '/ple-table-fp8'\n    MBX_PLE_MMAP = '1'\n    MBX_PLE_MMAP_MODE = 'nvme'\n    MBX_PLE_MMAP_PREWARM = '0'\n    MBX_PLE_NVME_DIR = '/cache/ple-nvme-fp8'\n    MBX_PLE_PREFILL_CKPT = '1'\n    PYTHONFAULTHANDLER = '1'\n    PYTHONUNBUFFERED = '1'\n    TOKENIZERS_PARALLELISM = 'false'\n    TORCHINDUCTOR_COMPILE_THREADS = '1'\n    TORCH_CUDA_ARCH_LIST = '12.1a'\n    TRANSFORMERS_OFFLINE = '1'\n    TRITON_CACHE_DIR = '/cache/wsl305/triton'\n    VLLM_CACHE_ROOT = '/cache/wsl305/vllm-cache'\n    VLLM_FP8_HYBRID = '1'\n    VLLM_MARLIN_USE_ATOMIC_ADD = '1'\n    VLLM_NO_USAGE_STATS = '1'\n    VLLM_USE_BREAKABLE_CUDAGRAPH = '1'\n    VLLM_USE_DEEP_GEMM = '0'\n}\n",
+      "speed": [
+        {
+          "concurrency": 1,
+          "depth": 4096,
+          "recorded": 2,
+          "valid": 2,
+          "read_tokens_s": 2733.968823998628,
+          "write_tokens_s": 47.64441801634802,
+          "second_repetition": {
+            "samples": 1,
+            "read_tokens_s": 2723.4631477479484,
+            "write_tokens_s": 46.79134230506844
+          }
+        },
+        {
+          "concurrency": 1,
+          "depth": 32768,
+          "recorded": 2,
+          "valid": 2,
+          "read_tokens_s": 2884.2380677217984,
+          "write_tokens_s": 50.692741359438145,
+          "second_repetition": {
+            "samples": 1,
+            "read_tokens_s": 2881.31408186321,
+            "write_tokens_s": 52.16641453750342
+          }
+        },
+        {
+          "concurrency": 2,
+          "depth": 4096,
+          "recorded": 4,
+          "valid": 4,
+          "read_tokens_s": 2590.3997252783042,
+          "write_tokens_s": 36.00081628152208,
+          "second_repetition": {
+            "samples": 2,
+            "read_tokens_s": 2639.3188492375652,
+            "write_tokens_s": 36.03441781934273
+          }
+        },
+        {
+          "concurrency": 2,
+          "depth": 32768,
+          "recorded": 4,
+          "valid": 4,
+          "read_tokens_s": 2452.5367005020244,
+          "write_tokens_s": 27.181657838567762,
+          "second_repetition": {
+            "samples": 2,
+            "read_tokens_s": 2429.2129947189906,
+            "write_tokens_s": 27.630454181700692
+          }
+        }
+      ],
+      "archive": [
+        {
+          "concurrency": 1,
+          "correct": 4,
+          "planned": 4,
+          "elapsed_s": 59.744442600000184,
+          "max_output_tokens": 8192
+        },
+        {
+          "concurrency": 2,
+          "correct": 4,
+          "planned": 4,
+          "elapsed_s": 53.80124159999832,
+          "max_output_tokens": 8192
+        }
+      ],
+      "recovery": {
+        "correct": 24,
+        "planned": 24,
+        "elapsed_s": 52.21369999999297,
+        "thinking": true,
+        "concurrency": 4,
+        "max_output_tokens": 8192,
+        "preemptions": 0.0,
+        "reasoning_effort": "xhigh",
+        "temperature": 0.6
+      },
+      "near_full": [
+        {
+          "group": "r0-c4",
+          "concurrency": 4,
+          "repeat": 0,
+          "elapsed_s": 406.5717794999946,
+          "correct_tasks": 12,
+          "planned_tasks": 12,
+          "correct_tasks_s": 0.029515083449121092,
+          "preemptions": 0.0,
+          "cache_evidence": {
+            "cold-selection": {
+              "requests": 4,
+              "requests_with_cached_tokens": 0,
+              "cached_tokens": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            "tool-continuation": {
+              "requests": 12,
+              "requests_with_cached_tokens": 12,
+              "cached_tokens": [
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856
+              ]
+            },
+            "appended-selection": {
+              "requests": 8,
+              "requests_with_cached_tokens": 8,
+              "cached_tokens": [
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856
+              ]
+            }
+          }
+        }
+      ],
+      "restore": {
+        "tokens_each": 130877,
+        "correct": 2,
+        "elapsed_s": 5.405912100000023,
+        "qualified": true,
+        "delta": {
+          "vllm:prefix_cache_hits_total": 0.0,
+          "vllm:external_prefix_cache_hits_total": 253952.0,
+          "vllm:num_preemptions_total": 0.0,
+          "lmcache_mp_num_finished_retrieves_total": 2.0,
+          "lmcache_mp_l2_prefetch_load_completed_chunks_total": 66.0
+        },
+        "verification_requests": [
+          {
+            "prompt_tokens": 130877,
+            "cached_tokens": 126976,
+            "complete_chunk_tokens": 126976,
+            "prompt_coverage": 0.9701933876846199,
+            "complete_chunk_coverage": 1.0
+          },
+          {
+            "prompt_tokens": 130877,
+            "cached_tokens": 126976,
+            "complete_chunk_tokens": 126976,
+            "prompt_coverage": 0.9701933876846199,
+            "complete_chunk_coverage": 1.0
+          }
+        ]
+      },
+      "resources": {
+        "peak_gpu_used_mib": 94753,
+        "minimum_gpu_free_mib": 3538,
+        "minimum_host_available_gib": 4.517707824707031
+      },
+      "evidence_sha256": {
+        "host.json": "e34d9740d592c48cf157c504f598a04dd022f06c74308cc18c8abfe1849de55a",
+        "near-full/summary.json": "a19725c0b1eeac3575fc778aa99977d0c77014f5e25554fdbd22f4e282dd80a4",
+        "quality/completed.json": "15c7a383505cf6a794c0d6ffe44d42716aab1c9f0eb50006d45cc54df4bd55f4",
+        "quality/xhigh-t06/quality/summary.json": "8b5c6d33aebc68fb09efa199a8368089d4a030f47e666b68e8fd978956231667",
+        "quality/xhigh-t06/recovery/summary.json": "39f5c130ae878a56cd535590772666880cc065e14b0622f87ee75886e6e38cb5",
+        "restore/summary.json": "10520fe31e6dc8b9528b9395dce80ace411c3b99e970dd08d00d2543da5fcd49",
+        "speed/comparison.json": "4b07f876e680a6a2fd34704b200745aecd1dde10b6676b1b3937ad37b787da41",
+        "speed/summary.json": "2456f0432eaa75dce9e8a0e1c5252467838a764965954cc5b9598e96e88ada0f",
+        "status.json": "65953498a1cad510931b23da7de625f8643b1acb49448fbc86b82ffc1c99d05b"
+      }
+    },
+    {
+      "name": "w4-kv20-batch4k-k5-20261117-averages-r1",
+      "status": {
+        "stage": "finished",
+        "unix_s": 1794945347.8789756,
+        "success": true,
+        "error": null
+      },
+      "variant": {
+        "flags": {
+          "mamba-ssm-cache-dtype": "bfloat16"
+        },
+        "config": {
+          "Container": "n1x-recipe-trial",
+          "LmcacheNamespace": "qwen-recipe-w4-kv20-batch4k-k5-20261117-averages-r1",
+          "LmcacheVolume": "n1x-recipe-w4-kv20-batch4k-k5-20261117-averages-r1",
+          "KvCacheBytes": "21474836480",
+          "BatchedTokens": 4096,
+          "DFlashTokens": 5
+        }
+      },
+      "config": {
+        "LmcacheChunkTokens": 4096,
+        "Profile": "qwen38fn-best",
+        "MyllmboxWSLCVersion": "3.0.5.0",
+        "RequiredPartitionMiB": 98304,
+        "MyllmboxDrafter": "Qwen3.8-Flash-Next-DFlash2",
+        "DFlash": true,
+        "KvCacheDtype": "fp8",
+        "Container": "n1x-recipe-trial",
+        "DFlashTokens": 5,
+        "PleWorkers": 8,
+        "ModelRoot": "C:\\Users\\michael\\models",
+        "MaxSequences": 8,
+        "LmcacheL1GiB": 4,
+        "CacheBlockTokens": 4096,
+        "KvCacheBytes": "21474836480",
+        "MaxOutputTokens": 8192,
+        "LmcacheL2GiB": 160,
+        "RestoreWaitMs": 0,
+        "MyllmboxConfig": "profiles/qwen38fn-best.yaml",
+        "MyllmboxModel": "Qwen3.8-Flash-Next-W4A16-AutoRound-hybrid",
+        "LmcacheVolume": "n1x-recipe-w4-kv20-batch4k-k5-20261117-averages-r1",
+        "ImageId": "sha256:819970fd46a90c1e70b7cd06aeb15d5ce3c75b02b62892a8322f42de225566bc",
+        "Mtp": false,
+        "MyllmboxEnvironment": "runtime/myllmbox/environment.psd1",
+        "PleVolume": "n1x-ple-native",
+        "CacheVolume": "n1x-mbx-w4-dflash-test-cache",
+        "Image": "n1x-ai:mbx-setup-1447755d89af469f894bfa8dcb51506d",
+        "DefaultProfile": "qwen38fn-best",
+        "UseLMCache": true,
+        "LanAccess": false,
+        "Port": 8000,
+        "BatchedTokens": 4096,
+        "Context": 262144,
+        "LmcacheNamespace": "qwen-recipe-w4-kv20-batch4k-k5-20261117-averages-r1",
+        "Backend": "wslc-myllmbox",
+        "WindowsMinimumGiB": 4
+      },
+      "measurement-plan": {
+        "quality_seeds": [
+          45
+        ],
+        "continue_after_quality_failure": true,
+        "skip_screen": false,
+        "long": true,
+        "long_concurrency": [
+          "4"
+        ],
+        "restore": true
+      },
+      "quality-screens": [
+        {
+          "seed": 45,
+          "folder": "quality",
+          "passed": true,
+          "failures": [],
+          "archive": [
+            {
+              "concurrency": 1,
+              "correct": 4,
+              "planned": 4,
+              "elapsed_s": 58.21661529999983,
+              "max_output_tokens": 8192
+            },
+            {
+              "concurrency": 2,
+              "correct": 4,
+              "planned": 4,
+              "elapsed_s": 54.68498510000063,
+              "max_output_tokens": 8192
+            }
+          ],
+          "recovery": {
+            "correct": 24,
+            "planned": 24,
+            "elapsed_s": 53.67090409999946,
+            "thinking": true,
+            "concurrency": 4,
+            "max_output_tokens": 8192,
+            "preemptions": 0.0,
+            "reasoning_effort": "xhigh",
+            "temperature": 0.6,
+            "seed": 45
+          }
+        }
+      ],
+      "recipe.yaml": "gpu-memory-utilization: 0.01\ndtype: bfloat16\nengram-config:\n  cpu_offload: false\nload-format: mbx\nmoe-backend: marlin\ndistributed-executor-backend: mp\nmax-model-len: 262144\nmax-num-seqs: 8\nmax-num-batched-tokens: 8192\nkv-cache-memory-bytes: 16106127360\nkv-cache-dtype: fp8\nkv-cache-dtype-skip-layers:\n- sliding_window\nmamba-ssm-cache-dtype: float32\nmamba-cache-mode: align\nblock-size: 4096\nprefix-match-unit: 64\ncompilation-config:\n  cudagraph_mode: FULL_AND_PIECEWISE\n  cudagraph_capture_sizes: [1, 2, 3, 4, 8, 12, 16, 20, 24, 28, 32]\n  compile_ranges_endpoints: [32]\nenable-prefix-caching: true\nenable-prompt-tokens-details: true\nenable-per-request-metrics: true\nenable-auto-tool-choice: true\ntool-call-parser: qwen3_xml\nreasoning-parser: qwen3\nasync-scheduling: true\nuse-replayssm: false\ndefault-chat-template-kwargs:\n  preserve_thinking: false\nspeculative-config:\n  method: dflash\n  model: /drafter\n  num_speculative_tokens: 3\n  disable_eagle_block_drop: true\n  max_model_len: 262144\n  kv_cache_dtype: auto\n  draft_load_config:\n    load_format: safetensors\n  attention_backend: TRITON_ATTN\n",
+      "environment.psd1": "@{\n    DO_NOT_TRACK = '1'\n    FLASHINFER_CUDA_ARCH_LIST = '12.1a'\n    FLASHINFER_NVCC_THREADS = '1'\n    FLASHINFER_WORKSPACE_BASE = '/cache/wsl305/flashinfer-workspace'\n    HF_HUB_DISABLE_TELEMETRY = '1'\n    HF_HUB_OFFLINE = '1'\n    LMCACHE_TRACK_USAGE = 'false'\n    MALLOC_MMAP_THRESHOLD_ = '65536'\n    MALLOC_TRIM_THRESHOLD_ = '131072'\n    MAX_JOBS = '1'\n    MBX_DEPTH_MODE = 'off'\n    MBX_DRAFT_FP8 = '0'\n    MBX_DRAFT_HEAD = '0'\n    MBX_DRAFT_HEAD2 = ''\n    MBX_LOADER_EMPTY_CACHE = '1'\n    MBX_LOADER_PREPARE = '0'\n    MBX_MARLIN_CSF = '1'\n    MBX_PLE_ASYNC = '1'\n    MBX_PLE_FP8_DIR = '/ple-table-fp8'\n    MBX_PLE_MMAP = '1'\n    MBX_PLE_MMAP_MODE = 'nvme'\n    MBX_PLE_MMAP_PREWARM = '0'\n    MBX_PLE_NVME_DIR = '/cache/ple-nvme-fp8'\n    MBX_PLE_PREFILL_CKPT = '1'\n    PYTHONFAULTHANDLER = '1'\n    PYTHONUNBUFFERED = '1'\n    TOKENIZERS_PARALLELISM = 'false'\n    TORCHINDUCTOR_COMPILE_THREADS = '1'\n    TORCH_CUDA_ARCH_LIST = '12.1a'\n    TRANSFORMERS_OFFLINE = '1'\n    TRITON_CACHE_DIR = '/cache/wsl305/triton'\n    VLLM_CACHE_ROOT = '/cache/wsl305/vllm-cache'\n    VLLM_FP8_HYBRID = '1'\n    VLLM_MARLIN_USE_ATOMIC_ADD = '1'\n    VLLM_NO_USAGE_STATS = '1'\n    VLLM_USE_BREAKABLE_CUDAGRAPH = '1'\n    VLLM_USE_DEEP_GEMM = '0'\n}\n",
+      "speed": [
+        {
+          "concurrency": 1,
+          "depth": 4096,
+          "recorded": 2,
+          "valid": 2,
+          "read_tokens_s": 2738.0673401888016,
+          "write_tokens_s": 47.86075692967223,
+          "second_repetition": {
+            "samples": 1,
+            "read_tokens_s": 2708.9533624203536,
+            "write_tokens_s": 49.537076024550814
+          }
+        },
+        {
+          "concurrency": 1,
+          "depth": 32768,
+          "recorded": 2,
+          "valid": 2,
+          "read_tokens_s": 2879.4979927499435,
+          "write_tokens_s": 48.297420924338624,
+          "second_repetition": {
+            "samples": 1,
+            "read_tokens_s": 2870.789019799854,
+            "write_tokens_s": 46.93841652195505
+          }
+        },
+        {
+          "concurrency": 2,
+          "depth": 4096,
+          "recorded": 4,
+          "valid": 4,
+          "read_tokens_s": 2306.463433778464,
+          "write_tokens_s": 34.90855268267864,
+          "second_repetition": {
+            "samples": 2,
+            "read_tokens_s": 2321.0269721493564,
+            "write_tokens_s": 33.67300521561903
+          }
+        },
+        {
+          "concurrency": 2,
+          "depth": 32768,
+          "recorded": 4,
+          "valid": 4,
+          "read_tokens_s": 2526.266676550664,
+          "write_tokens_s": 27.036393170340425,
+          "second_repetition": {
+            "samples": 2,
+            "read_tokens_s": 2527.2730154446895,
+            "write_tokens_s": 26.69641165877225
+          }
+        }
+      ],
+      "archive": [
+        {
+          "concurrency": 1,
+          "correct": 4,
+          "planned": 4,
+          "elapsed_s": 58.21661529999983,
+          "max_output_tokens": 8192
+        },
+        {
+          "concurrency": 2,
+          "correct": 4,
+          "planned": 4,
+          "elapsed_s": 54.68498510000063,
+          "max_output_tokens": 8192
+        }
+      ],
+      "recovery": {
+        "correct": 24,
+        "planned": 24,
+        "elapsed_s": 53.67090409999946,
+        "thinking": true,
+        "concurrency": 4,
+        "max_output_tokens": 8192,
+        "preemptions": 0.0,
+        "reasoning_effort": "xhigh",
+        "temperature": 0.6,
+        "seed": 45
+      },
+      "near_full": [
+        {
+          "group": "r0-c4",
+          "concurrency": 4,
+          "repeat": 0,
+          "elapsed_s": 404.3884759999928,
+          "correct_tasks": 12,
+          "planned_tasks": 12,
+          "correct_tasks_s": 0.029674436123150585,
+          "preemptions": 0.0,
+          "cache_evidence": {
+            "cold-selection": {
+              "requests": 4,
+              "requests_with_cached_tokens": 0,
+              "cached_tokens": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            "tool-continuation": {
+              "requests": 12,
+              "requests_with_cached_tokens": 12,
+              "cached_tokens": [
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856
+              ]
+            },
+            "appended-selection": {
+              "requests": 8,
+              "requests_with_cached_tokens": 8,
+              "cached_tokens": [
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856
+              ]
+            }
+          }
+        }
+      ],
+      "restore": {
+        "tokens_each": 130877,
+        "correct": 2,
+        "elapsed_s": 5.346192100000053,
+        "qualified": true,
+        "delta": {
+          "vllm:prefix_cache_hits_total": 0.0,
+          "vllm:external_prefix_cache_hits_total": 253952.0,
+          "vllm:num_preemptions_total": 0.0,
+          "lmcache_mp_num_finished_retrieves_total": 2.0,
+          "lmcache_mp_l2_prefetch_load_completed_chunks_total": 66.0
+        },
+        "verification_requests": [
+          {
+            "prompt_tokens": 130877,
+            "cached_tokens": 126976,
+            "complete_chunk_tokens": 126976,
+            "prompt_coverage": 0.9701933876846199,
+            "complete_chunk_coverage": 1.0
+          },
+          {
+            "prompt_tokens": 130877,
+            "cached_tokens": 126976,
+            "complete_chunk_tokens": 126976,
+            "prompt_coverage": 0.9701933876846199,
+            "complete_chunk_coverage": 1.0
+          }
+        ]
+      },
+      "resources": {
+        "peak_gpu_used_mib": 94755,
+        "minimum_gpu_free_mib": 3536,
+        "minimum_host_available_gib": 5.303409576416016
+      },
+      "evidence_sha256": {
+        "host.json": "498b63ca375ce3203346be15c601d4566487c935367cf6f47eeaa713cfe9f2e2",
+        "near-full/summary.json": "938700915b301958e91a1412015b7d699f8cd825210827fed9292000a7719a95",
+        "quality/completed.json": "1481c61ee66980ff6acfa3501f81e5c9069ac0c1602487c6d341cd94677c0c9f",
+        "quality/xhigh-t06/quality/summary.json": "b797a7e4e5b8f29b72dae1b769471fd96a3a42dd4e36e37b63e305529cefce85",
+        "quality/xhigh-t06/recovery/summary.json": "8746838137affee0138b88b265ab13b7c34ce8fd88b2fe9c4ad805dd9ee838fa",
+        "restore/summary.json": "f0a20e253128d9ba8788958825d3bfa5812f149baa52ff31d5d8cd7159233987",
+        "speed/comparison.json": "b3ec6fa014321ce29d11925ca3c53f0af1f1266393a09d2392860a2043516fa1",
+        "speed/summary.json": "c95bedda144db93927e396d8a8f8b5d407b833865f92e7af035538429e672721",
+        "status.json": "2144ea70676a41aa4465a0189c400b904f84bf136411b255958cc686f6b86725"
+      }
+    },
+    {
+      "name": "w4-kv20-batch4k-k5-20261117-averages-r2",
+      "status": {
+        "stage": "finished",
+        "unix_s": 1794950864.071554,
+        "success": false,
+        "error": "Quality screen failed; retained first scores"
+      },
+      "variant": {
+        "flags": {
+          "mamba-ssm-cache-dtype": "bfloat16"
+        },
+        "config": {
+          "Container": "n1x-recipe-trial",
+          "LmcacheNamespace": "qwen-recipe-w4-kv20-batch4k-k5-20261117-averages-r2",
+          "LmcacheVolume": "n1x-recipe-w4-kv20-batch4k-k5-20261117-averages-r2",
+          "KvCacheBytes": "21474836480",
+          "BatchedTokens": 4096,
+          "DFlashTokens": 5
+        }
+      },
+      "config": {
+        "DFlash": true,
+        "KvCacheDtype": "fp8",
+        "BatchedTokens": 4096,
+        "LmcacheChunkTokens": 4096,
+        "CacheBlockTokens": 4096,
+        "Port": 8000,
+        "Mtp": false,
+        "MyllmboxModel": "Qwen3.8-Flash-Next-W4A16-AutoRound-hybrid",
+        "PleVolume": "n1x-ple-native",
+        "MaxSequences": 8,
+        "MyllmboxEnvironment": "runtime/myllmbox/environment.psd1",
+        "RestoreWaitMs": 0,
+        "Backend": "wslc-myllmbox",
+        "DefaultProfile": "qwen38fn-best",
+        "LmcacheL1GiB": 4,
+        "WindowsMinimumGiB": 4,
+        "LmcacheVolume": "n1x-recipe-w4-kv20-batch4k-k5-20261117-averages-r2",
+        "MyllmboxWSLCVersion": "3.0.5.0",
+        "Image": "n1x-ai:mbx-setup-1447755d89af469f894bfa8dcb51506d",
+        "MyllmboxDrafter": "Qwen3.8-Flash-Next-DFlash2",
+        "LmcacheL2GiB": 160,
+        "MyllmboxConfig": "profiles/qwen38fn-best.yaml",
+        "RequiredPartitionMiB": 98304,
+        "CacheVolume": "n1x-mbx-w4-dflash-test-cache",
+        "PleWorkers": 8,
+        "Profile": "qwen38fn-best",
+        "DFlashTokens": 5,
+        "LmcacheNamespace": "qwen-recipe-w4-kv20-batch4k-k5-20261117-averages-r2",
+        "LanAccess": false,
+        "Context": 262144,
+        "ModelRoot": "C:\\Users\\michael\\models",
+        "KvCacheBytes": "21474836480",
+        "ImageId": "sha256:819970fd46a90c1e70b7cd06aeb15d5ce3c75b02b62892a8322f42de225566bc",
+        "MaxOutputTokens": 8192,
+        "Container": "n1x-recipe-trial",
+        "UseLMCache": true
+      },
+      "failure": {
+        "error": "Quality screen failed; retained first scores"
+      },
+      "measurement-plan": {
+        "quality_seeds": [
+          46
+        ],
+        "continue_after_quality_failure": true,
+        "skip_screen": false,
+        "long": true,
+        "long_concurrency": [
+          "4"
+        ],
+        "restore": true
+      },
+      "quality-screens": [
+        {
+          "seed": 46,
+          "folder": "quality",
+          "passed": false,
+          "failures": [
+            {
+              "variant": "xhigh-t06",
+              "phase": "recovery",
+              "error": "Tool recovery qualification failed; inspect summary and responses"
+            }
+          ],
+          "archive": [
+            {
+              "concurrency": 1,
+              "correct": 4,
+              "planned": 4,
+              "elapsed_s": 66.07749209999747,
+              "max_output_tokens": 8192
+            },
+            {
+              "concurrency": 2,
+              "correct": 4,
+              "planned": 4,
+              "elapsed_s": 54.06879589999153,
+              "max_output_tokens": 8192
+            }
+          ],
+          "recovery": {
+            "correct": 23,
+            "planned": 24,
+            "elapsed_s": 48.86581119999755,
+            "thinking": true,
+            "concurrency": 4,
+            "max_output_tokens": 8192,
+            "preemptions": 0.0,
+            "reasoning_effort": "xhigh",
+            "temperature": 0.6,
+            "seed": 46
+          }
+        }
+      ],
+      "recipe.yaml": "gpu-memory-utilization: 0.01\ndtype: bfloat16\nengram-config:\n  cpu_offload: false\nload-format: mbx\nmoe-backend: marlin\ndistributed-executor-backend: mp\nmax-model-len: 262144\nmax-num-seqs: 8\nmax-num-batched-tokens: 8192\nkv-cache-memory-bytes: 16106127360\nkv-cache-dtype: fp8\nkv-cache-dtype-skip-layers:\n- sliding_window\nmamba-ssm-cache-dtype: float32\nmamba-cache-mode: align\nblock-size: 4096\nprefix-match-unit: 64\ncompilation-config:\n  cudagraph_mode: FULL_AND_PIECEWISE\n  cudagraph_capture_sizes: [1, 2, 3, 4, 8, 12, 16, 20, 24, 28, 32]\n  compile_ranges_endpoints: [32]\nenable-prefix-caching: true\nenable-prompt-tokens-details: true\nenable-per-request-metrics: true\nenable-auto-tool-choice: true\ntool-call-parser: qwen3_xml\nreasoning-parser: qwen3\nasync-scheduling: true\nuse-replayssm: false\ndefault-chat-template-kwargs:\n  preserve_thinking: false\nspeculative-config:\n  method: dflash\n  model: /drafter\n  num_speculative_tokens: 3\n  disable_eagle_block_drop: true\n  max_model_len: 262144\n  kv_cache_dtype: auto\n  draft_load_config:\n    load_format: safetensors\n  attention_backend: TRITON_ATTN\n",
+      "environment.psd1": "@{\n    DO_NOT_TRACK = '1'\n    FLASHINFER_CUDA_ARCH_LIST = '12.1a'\n    FLASHINFER_NVCC_THREADS = '1'\n    FLASHINFER_WORKSPACE_BASE = '/cache/wsl305/flashinfer-workspace'\n    HF_HUB_DISABLE_TELEMETRY = '1'\n    HF_HUB_OFFLINE = '1'\n    LMCACHE_TRACK_USAGE = 'false'\n    MALLOC_MMAP_THRESHOLD_ = '65536'\n    MALLOC_TRIM_THRESHOLD_ = '131072'\n    MAX_JOBS = '1'\n    MBX_DEPTH_MODE = 'off'\n    MBX_DRAFT_FP8 = '0'\n    MBX_DRAFT_HEAD = '0'\n    MBX_DRAFT_HEAD2 = ''\n    MBX_LOADER_EMPTY_CACHE = '1'\n    MBX_LOADER_PREPARE = '0'\n    MBX_MARLIN_CSF = '1'\n    MBX_PLE_ASYNC = '1'\n    MBX_PLE_FP8_DIR = '/ple-table-fp8'\n    MBX_PLE_MMAP = '1'\n    MBX_PLE_MMAP_MODE = 'nvme'\n    MBX_PLE_MMAP_PREWARM = '0'\n    MBX_PLE_NVME_DIR = '/cache/ple-nvme-fp8'\n    MBX_PLE_PREFILL_CKPT = '1'\n    PYTHONFAULTHANDLER = '1'\n    PYTHONUNBUFFERED = '1'\n    TOKENIZERS_PARALLELISM = 'false'\n    TORCHINDUCTOR_COMPILE_THREADS = '1'\n    TORCH_CUDA_ARCH_LIST = '12.1a'\n    TRANSFORMERS_OFFLINE = '1'\n    TRITON_CACHE_DIR = '/cache/wsl305/triton'\n    VLLM_CACHE_ROOT = '/cache/wsl305/vllm-cache'\n    VLLM_FP8_HYBRID = '1'\n    VLLM_MARLIN_USE_ATOMIC_ADD = '1'\n    VLLM_NO_USAGE_STATS = '1'\n    VLLM_USE_BREAKABLE_CUDAGRAPH = '1'\n    VLLM_USE_DEEP_GEMM = '0'\n}\n",
+      "speed": [
+        {
+          "concurrency": 1,
+          "depth": 4096,
+          "recorded": 2,
+          "valid": 2,
+          "read_tokens_s": 2785.6503047851543,
+          "write_tokens_s": 48.041281958198,
+          "second_repetition": {
+            "samples": 1,
+            "read_tokens_s": 2755.3062381405275,
+            "write_tokens_s": 48.5800650666732
+          }
+        },
+        {
+          "concurrency": 1,
+          "depth": 32768,
+          "recorded": 2,
+          "valid": 2,
+          "read_tokens_s": 2906.5910923407823,
+          "write_tokens_s": 45.585452788147556,
+          "second_repetition": {
+            "samples": 1,
+            "read_tokens_s": 2892.6292574827567,
+            "write_tokens_s": 46.638694949650194
+          }
+        },
+        {
+          "concurrency": 2,
+          "depth": 4096,
+          "recorded": 4,
+          "valid": 4,
+          "read_tokens_s": 2457.948460696855,
+          "write_tokens_s": 36.18124254249783,
+          "second_repetition": {
+            "samples": 2,
+            "read_tokens_s": 2649.8957421523382,
+            "write_tokens_s": 35.84940537534908
+          }
+        },
+        {
+          "concurrency": 2,
+          "depth": 32768,
+          "recorded": 4,
+          "valid": 4,
+          "read_tokens_s": 2519.4090193193774,
+          "write_tokens_s": 27.47707519998837,
+          "second_repetition": {
+            "samples": 2,
+            "read_tokens_s": 2509.102293213088,
+            "write_tokens_s": 27.84267143796001
+          }
+        }
+      ],
+      "archive": [
+        {
+          "concurrency": 1,
+          "correct": 4,
+          "planned": 4,
+          "elapsed_s": 66.07749209999747,
+          "max_output_tokens": 8192
+        },
+        {
+          "concurrency": 2,
+          "correct": 4,
+          "planned": 4,
+          "elapsed_s": 54.06879589999153,
+          "max_output_tokens": 8192
+        }
+      ],
+      "recovery": {
+        "correct": 23,
+        "planned": 24,
+        "elapsed_s": 48.86581119999755,
+        "thinking": true,
+        "concurrency": 4,
+        "max_output_tokens": 8192,
+        "preemptions": 0.0,
+        "reasoning_effort": "xhigh",
+        "temperature": 0.6,
+        "seed": 46
+      },
+      "near_full": [
+        {
+          "group": "r0-c4",
+          "concurrency": 4,
+          "repeat": 0,
+          "elapsed_s": 407.1115157000022,
+          "correct_tasks": 12,
+          "planned_tasks": 12,
+          "correct_tasks_s": 0.02947595323941345,
+          "preemptions": 0.0,
+          "cache_evidence": {
+            "cold-selection": {
+              "requests": 4,
+              "requests_with_cached_tokens": 0,
+              "cached_tokens": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            "tool-continuation": {
+              "requests": 12,
+              "requests_with_cached_tokens": 12,
+              "cached_tokens": [
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856
+              ]
+            },
+            "appended-selection": {
+              "requests": 8,
+              "requests_with_cached_tokens": 8,
+              "cached_tokens": [
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856
+              ]
+            }
+          }
+        }
+      ],
+      "restore": {
+        "tokens_each": 130877,
+        "correct": 2,
+        "elapsed_s": 5.337997699999505,
+        "qualified": true,
+        "delta": {
+          "vllm:prefix_cache_hits_total": 0.0,
+          "vllm:external_prefix_cache_hits_total": 253952.0,
+          "vllm:num_preemptions_total": 0.0,
+          "lmcache_mp_num_finished_retrieves_total": 2.0,
+          "lmcache_mp_l2_prefetch_load_completed_chunks_total": 66.0
+        },
+        "verification_requests": [
+          {
+            "prompt_tokens": 130877,
+            "cached_tokens": 126976,
+            "complete_chunk_tokens": 126976,
+            "prompt_coverage": 0.9701933876846199,
+            "complete_chunk_coverage": 1.0
+          },
+          {
+            "prompt_tokens": 130877,
+            "cached_tokens": 126976,
+            "complete_chunk_tokens": 126976,
+            "prompt_coverage": 0.9701933876846199,
+            "complete_chunk_coverage": 1.0
+          }
+        ]
+      },
+      "resources": {
+        "peak_gpu_used_mib": 94754,
+        "minimum_gpu_free_mib": 3537,
+        "minimum_host_available_gib": 5.432895660400391
+      },
+      "evidence_sha256": {
+        "host.json": "af2fe0daecc79a5261c92045b2e925848e43c1fea52cf1e54eec3f4f49fe1953",
+        "near-full/summary.json": "f414114a7111774703df62ccd3023dc2fcaa1947aaaddcca4f5ebe35150e3db6",
+        "quality/completed.json": "d2bfb4bf89184b6db7633ff74ddd0073e112c8d94b53081063a136d21cabea9d",
+        "quality/xhigh-t06/quality/summary.json": "f169210f8c9cdb0ef3f39177b07670ee09766b4949cb77842fb67e7eda0832f4",
+        "quality/xhigh-t06/recovery/summary.json": "cc65fe569755c1e120d27bb2f092bf2f1ac81a1a658129b2c16e3240ab59a131",
+        "restore/summary.json": "e59b2be6165229fe0db52f98b91d9ad396bb9797bef3d147cb51be14001dd17e",
+        "speed/comparison.json": "7daa96ea824d510a959479bfa26909b16b5be21e91908428d85c3b54881acba9",
+        "speed/summary.json": "09e8eb496015f6e28997ce59946cb9f3c51e6aa45e5f6a10d2939474e0792dd4",
+        "status.json": "457d526961139f466b9c79f24ca18ede48b1e675971002b9e1ece98965c99768"
+      }
+    },
+    {
+      "name": "w4-kv20-batch4k-k5-20261117-averages-r3",
+      "status": {
+        "stage": "finished",
+        "unix_s": 1794952741.9300237,
+        "success": true,
+        "error": null
+      },
+      "variant": {
+        "flags": {
+          "mamba-ssm-cache-dtype": "bfloat16"
+        },
+        "config": {
+          "Container": "n1x-recipe-trial",
+          "LmcacheNamespace": "qwen-recipe-w4-kv20-batch4k-k5-20261117-averages-r3",
+          "LmcacheVolume": "n1x-recipe-w4-kv20-batch4k-k5-20261117-averages-r3",
+          "KvCacheBytes": "21474836480",
+          "BatchedTokens": 4096,
+          "DFlashTokens": 5
+        }
+      },
+      "config": {
+        "RestoreWaitMs": 0,
+        "ModelRoot": "C:\\Users\\michael\\models",
+        "MyllmboxConfig": "profiles/qwen38fn-best.yaml",
+        "KvCacheDtype": "fp8",
+        "LmcacheL1GiB": 4,
+        "KvCacheBytes": "21474836480",
+        "WindowsMinimumGiB": 4,
+        "Context": 262144,
+        "PleWorkers": 8,
+        "Image": "n1x-ai:mbx-setup-1447755d89af469f894bfa8dcb51506d",
+        "MaxSequences": 8,
+        "Profile": "qwen38fn-best",
+        "DefaultProfile": "qwen38fn-best",
+        "LanAccess": false,
+        "LmcacheChunkTokens": 4096,
+        "BatchedTokens": 4096,
+        "Container": "n1x-recipe-trial",
+        "LmcacheVolume": "n1x-recipe-w4-kv20-batch4k-k5-20261117-averages-r3",
+        "DFlash": true,
+        "MyllmboxEnvironment": "runtime/myllmbox/environment.psd1",
+        "RequiredPartitionMiB": 98304,
+        "Backend": "wslc-myllmbox",
+        "Mtp": false,
+        "UseLMCache": true,
+        "LmcacheNamespace": "qwen-recipe-w4-kv20-batch4k-k5-20261117-averages-r3",
+        "LmcacheL2GiB": 160,
+        "MyllmboxWSLCVersion": "3.0.5.0",
+        "PleVolume": "n1x-ple-native",
+        "MyllmboxModel": "Qwen3.8-Flash-Next-W4A16-AutoRound-hybrid",
+        "ImageId": "sha256:819970fd46a90c1e70b7cd06aeb15d5ce3c75b02b62892a8322f42de225566bc",
+        "DFlashTokens": 5,
+        "Port": 8000,
+        "CacheVolume": "n1x-mbx-w4-dflash-test-cache",
+        "CacheBlockTokens": 4096,
+        "MaxOutputTokens": 8192,
+        "MyllmboxDrafter": "Qwen3.8-Flash-Next-DFlash2"
+      },
+      "measurement-plan": {
+        "quality_seeds": [
+          47
+        ],
+        "continue_after_quality_failure": true,
+        "skip_screen": false,
+        "long": true,
+        "long_concurrency": [
+          "4"
+        ],
+        "restore": true
+      },
+      "quality-screens": [
+        {
+          "seed": 47,
+          "folder": "quality",
+          "passed": true,
+          "failures": [],
+          "archive": [
+            {
+              "concurrency": 1,
+              "correct": 4,
+              "planned": 4,
+              "elapsed_s": 60.386369300002116,
+              "max_output_tokens": 8192
+            },
+            {
+              "concurrency": 2,
+              "correct": 4,
+              "planned": 4,
+              "elapsed_s": 57.20731080000405,
+              "max_output_tokens": 8192
+            }
+          ],
+          "recovery": {
+            "correct": 24,
+            "planned": 24,
+            "elapsed_s": 51.71860079999897,
+            "thinking": true,
+            "concurrency": 4,
+            "max_output_tokens": 8192,
+            "preemptions": 0.0,
+            "reasoning_effort": "xhigh",
+            "temperature": 0.6,
+            "seed": 47
+          }
+        }
+      ],
+      "recipe.yaml": "gpu-memory-utilization: 0.01\ndtype: bfloat16\nengram-config:\n  cpu_offload: false\nload-format: mbx\nmoe-backend: marlin\ndistributed-executor-backend: mp\nmax-model-len: 262144\nmax-num-seqs: 8\nmax-num-batched-tokens: 8192\nkv-cache-memory-bytes: 16106127360\nkv-cache-dtype: fp8\nkv-cache-dtype-skip-layers:\n- sliding_window\nmamba-ssm-cache-dtype: float32\nmamba-cache-mode: align\nblock-size: 4096\nprefix-match-unit: 64\ncompilation-config:\n  cudagraph_mode: FULL_AND_PIECEWISE\n  cudagraph_capture_sizes: [1, 2, 3, 4, 8, 12, 16, 20, 24, 28, 32]\n  compile_ranges_endpoints: [32]\nenable-prefix-caching: true\nenable-prompt-tokens-details: true\nenable-per-request-metrics: true\nenable-auto-tool-choice: true\ntool-call-parser: qwen3_xml\nreasoning-parser: qwen3\nasync-scheduling: true\nuse-replayssm: false\ndefault-chat-template-kwargs:\n  preserve_thinking: false\nspeculative-config:\n  method: dflash\n  model: /drafter\n  num_speculative_tokens: 3\n  disable_eagle_block_drop: true\n  max_model_len: 262144\n  kv_cache_dtype: auto\n  draft_load_config:\n    load_format: safetensors\n  attention_backend: TRITON_ATTN\n",
+      "environment.psd1": "@{\n    DO_NOT_TRACK = '1'\n    FLASHINFER_CUDA_ARCH_LIST = '12.1a'\n    FLASHINFER_NVCC_THREADS = '1'\n    FLASHINFER_WORKSPACE_BASE = '/cache/wsl305/flashinfer-workspace'\n    HF_HUB_DISABLE_TELEMETRY = '1'\n    HF_HUB_OFFLINE = '1'\n    LMCACHE_TRACK_USAGE = 'false'\n    MALLOC_MMAP_THRESHOLD_ = '65536'\n    MALLOC_TRIM_THRESHOLD_ = '131072'\n    MAX_JOBS = '1'\n    MBX_DEPTH_MODE = 'off'\n    MBX_DRAFT_FP8 = '0'\n    MBX_DRAFT_HEAD = '0'\n    MBX_DRAFT_HEAD2 = ''\n    MBX_LOADER_EMPTY_CACHE = '1'\n    MBX_LOADER_PREPARE = '0'\n    MBX_MARLIN_CSF = '1'\n    MBX_PLE_ASYNC = '1'\n    MBX_PLE_FP8_DIR = '/ple-table-fp8'\n    MBX_PLE_MMAP = '1'\n    MBX_PLE_MMAP_MODE = 'nvme'\n    MBX_PLE_MMAP_PREWARM = '0'\n    MBX_PLE_NVME_DIR = '/cache/ple-nvme-fp8'\n    MBX_PLE_PREFILL_CKPT = '1'\n    PYTHONFAULTHANDLER = '1'\n    PYTHONUNBUFFERED = '1'\n    TOKENIZERS_PARALLELISM = 'false'\n    TORCHINDUCTOR_COMPILE_THREADS = '1'\n    TORCH_CUDA_ARCH_LIST = '12.1a'\n    TRANSFORMERS_OFFLINE = '1'\n    TRITON_CACHE_DIR = '/cache/wsl305/triton'\n    VLLM_CACHE_ROOT = '/cache/wsl305/vllm-cache'\n    VLLM_FP8_HYBRID = '1'\n    VLLM_MARLIN_USE_ATOMIC_ADD = '1'\n    VLLM_NO_USAGE_STATS = '1'\n    VLLM_USE_BREAKABLE_CUDAGRAPH = '1'\n    VLLM_USE_DEEP_GEMM = '0'\n}\n",
+      "speed": [
+        {
+          "concurrency": 1,
+          "depth": 4096,
+          "recorded": 2,
+          "valid": 2,
+          "read_tokens_s": 2760.2277235117967,
+          "write_tokens_s": 46.99134380823981,
+          "second_repetition": {
+            "samples": 1,
+            "read_tokens_s": 2731.3443670303154,
+            "write_tokens_s": 47.50931619571581
+          }
+        },
+        {
+          "concurrency": 1,
+          "depth": 32768,
+          "recorded": 2,
+          "valid": 2,
+          "read_tokens_s": 2902.5303592514833,
+          "write_tokens_s": 48.19140668565905,
+          "second_repetition": {
+            "samples": 1,
+            "read_tokens_s": 2877.692836647764,
+            "write_tokens_s": 47.858439717834976
+          }
+        },
+        {
+          "concurrency": 2,
+          "depth": 4096,
+          "recorded": 4,
+          "valid": 4,
+          "read_tokens_s": 2451.670802412768,
+          "write_tokens_s": 35.602935778370224,
+          "second_repetition": {
+            "samples": 2,
+            "read_tokens_s": 2651.659355261962,
+            "write_tokens_s": 35.665374820492744
+          }
+        },
+        {
+          "concurrency": 2,
+          "depth": 32768,
+          "recorded": 4,
+          "valid": 4,
+          "read_tokens_s": 2525.695092722492,
+          "write_tokens_s": 27.27201302593543,
+          "second_repetition": {
+            "samples": 2,
+            "read_tokens_s": 2520.175413901809,
+            "write_tokens_s": 26.698437214814753
+          }
+        }
+      ],
+      "archive": [
+        {
+          "concurrency": 1,
+          "correct": 4,
+          "planned": 4,
+          "elapsed_s": 60.386369300002116,
+          "max_output_tokens": 8192
+        },
+        {
+          "concurrency": 2,
+          "correct": 4,
+          "planned": 4,
+          "elapsed_s": 57.20731080000405,
+          "max_output_tokens": 8192
+        }
+      ],
+      "recovery": {
+        "correct": 24,
+        "planned": 24,
+        "elapsed_s": 51.71860079999897,
+        "thinking": true,
+        "concurrency": 4,
+        "max_output_tokens": 8192,
+        "preemptions": 0.0,
+        "reasoning_effort": "xhigh",
+        "temperature": 0.6,
+        "seed": 47
+      },
+      "near_full": [
+        {
+          "group": "r0-c4",
+          "concurrency": 4,
+          "repeat": 0,
+          "elapsed_s": 406.5990771999932,
+          "correct_tasks": 12,
+          "planned_tasks": 12,
+          "correct_tasks_s": 0.029513101905289323,
+          "preemptions": 0.0,
+          "cache_evidence": {
+            "cold-selection": {
+              "requests": 4,
+              "requests_with_cached_tokens": 0,
+              "cached_tokens": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            "tool-continuation": {
+              "requests": 12,
+              "requests_with_cached_tokens": 12,
+              "cached_tokens": [
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856
+              ]
+            },
+            "appended-selection": {
+              "requests": 8,
+              "requests_with_cached_tokens": 8,
+              "cached_tokens": [
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856
+              ]
+            }
+          }
+        }
+      ],
+      "restore": {
+        "tokens_each": 130877,
+        "correct": 2,
+        "elapsed_s": 5.41394290000062,
+        "qualified": true,
+        "delta": {
+          "vllm:prefix_cache_hits_total": 0.0,
+          "vllm:external_prefix_cache_hits_total": 253952.0,
+          "vllm:num_preemptions_total": 0.0,
+          "lmcache_mp_num_finished_retrieves_total": 2.0,
+          "lmcache_mp_l2_prefetch_load_completed_chunks_total": 66.0
+        },
+        "verification_requests": [
+          {
+            "prompt_tokens": 130877,
+            "cached_tokens": 126976,
+            "complete_chunk_tokens": 126976,
+            "prompt_coverage": 0.9701933876846199,
+            "complete_chunk_coverage": 1.0
+          },
+          {
+            "prompt_tokens": 130877,
+            "cached_tokens": 126976,
+            "complete_chunk_tokens": 126976,
+            "prompt_coverage": 0.9701933876846199,
+            "complete_chunk_coverage": 1.0
+          }
+        ]
+      },
+      "resources": {
+        "peak_gpu_used_mib": 94808,
+        "minimum_gpu_free_mib": 3482,
+        "minimum_host_available_gib": 5.281589508056641
+      },
+      "evidence_sha256": {
+        "host.json": "577c7395a2e075b3576b43905a6fed313c8577d88777a21986148ce7cf162912",
+        "near-full/summary.json": "e7de3d73e183b36207fcb53d1696ad5ce0389ec08cb87f2d2133b6658f312e06",
+        "quality/completed.json": "ecce4ee2af523c1635d8c090cf27dfcde203210e5db331c081e09e4d001bac3e",
+        "quality/xhigh-t06/quality/summary.json": "bacc6ab0c324f197dff9cf3c5bf8cf51a8e597b98f028d1215ab38435031bb64",
+        "quality/xhigh-t06/recovery/summary.json": "26f79a3bc6924da1066a231b5f24639b15e2ae7d0a777114f0f8958b943315f0",
+        "restore/summary.json": "c5525315a9036284dfa2e005b068868dba1c2ae9e3ec4b2d8a39b485374ae72a",
+        "speed/comparison.json": "58536ed3e81faa22e52f14a76fa06cc8dc049c703ff5c36a1442eeccf19460e6",
+        "speed/summary.json": "12c073d4f4d6d4b64e094258b2594d3b0a46a7a234a0f892cd7f6214a1d07688",
+        "status.json": "70ea5b1a49c9bb781507bbb4a5da63a34357781ef38adee1eab0015e7e1d1049"
+      }
+    },
+    {
+      "name": "w4-kv20-batch4k-k5-repeat-20261117",
+      "status": {
+        "stage": "finished",
+        "unix_s": 1794941942.7794034,
+        "success": true,
+        "error": null
+      },
+      "variant": {
+        "flags": {
+          "mamba-ssm-cache-dtype": "bfloat16"
+        },
+        "config": {
+          "Container": "n1x-recipe-trial",
+          "LmcacheNamespace": "qwen-recipe-w4-kv20-batch4k-k5-repeat-20261117",
+          "LmcacheVolume": "n1x-recipe-w4-kv20-batch4k-k5-repeat-20261117",
+          "KvCacheBytes": "21474836480",
+          "BatchedTokens": 4096,
+          "DFlashTokens": 5
+        }
+      },
+      "config": {
+        "UseLMCache": true,
+        "MyllmboxConfig": "profiles/qwen38fn-best.yaml",
+        "MyllmboxDrafter": "Qwen3.8-Flash-Next-DFlash2",
+        "MaxSequences": 8,
+        "Port": 8000,
+        "Container": "n1x-recipe-trial",
+        "PleWorkers": 8,
+        "MaxOutputTokens": 8192,
+        "LmcacheNamespace": "qwen-recipe-w4-kv20-batch4k-k5-repeat-20261117",
+        "PleVolume": "n1x-ple-native",
+        "WindowsMinimumGiB": 4,
+        "BatchedTokens": 4096,
+        "Mtp": false,
+        "RestoreWaitMs": 0,
+        "ModelRoot": "C:\\Users\\michael\\models",
+        "ImageId": "sha256:819970fd46a90c1e70b7cd06aeb15d5ce3c75b02b62892a8322f42de225566bc",
+        "CacheVolume": "n1x-mbx-w4-dflash-test-cache",
+        "MyllmboxWSLCVersion": "3.0.5.0",
+        "Profile": "qwen38fn-best",
+        "KvCacheBytes": "21474836480",
+        "LmcacheVolume": "n1x-recipe-w4-kv20-batch4k-k5-repeat-20261117",
+        "LanAccess": false,
+        "LmcacheL1GiB": 4,
+        "Context": 262144,
+        "DefaultProfile": "qwen38fn-best",
+        "CacheBlockTokens": 4096,
+        "MyllmboxEnvironment": "runtime/myllmbox/environment.psd1",
+        "DFlashTokens": 5,
+        "RequiredPartitionMiB": 98304,
+        "Backend": "wslc-myllmbox",
+        "KvCacheDtype": "fp8",
+        "Image": "n1x-ai:mbx-setup-1447755d89af469f894bfa8dcb51506d",
+        "LmcacheChunkTokens": 4096,
+        "MyllmboxModel": "Qwen3.8-Flash-Next-W4A16-AutoRound-hybrid",
+        "LmcacheL2GiB": 160,
+        "DFlash": true
+      },
+      "measurement-plan": {
+        "quality_seeds": [
+          43,
+          44
+        ],
+        "continue_after_quality_failure": true,
+        "skip_screen": false,
+        "long": false,
+        "long_concurrency": [
+          "2",
+          "4"
+        ],
+        "restore": false
+      },
+      "quality-screens": [
+        {
+          "seed": 43,
+          "folder": "quality",
+          "passed": true,
+          "failures": [],
+          "archive": [
+            {
+              "concurrency": 1,
+              "correct": 4,
+              "planned": 4,
+              "elapsed_s": 60.321060000002035,
+              "max_output_tokens": 8192
+            },
+            {
+              "concurrency": 2,
+              "correct": 4,
+              "planned": 4,
+              "elapsed_s": 54.9005371999956,
+              "max_output_tokens": 8192
+            }
+          ],
+          "recovery": {
+            "correct": 24,
+            "planned": 24,
+            "elapsed_s": 53.31549140000425,
+            "thinking": true,
+            "concurrency": 4,
+            "max_output_tokens": 8192,
+            "preemptions": 0.0,
+            "reasoning_effort": "xhigh",
+            "temperature": 0.6,
+            "seed": 43
+          }
+        },
+        {
+          "seed": 44,
+          "folder": "quality-seed-44",
+          "passed": true,
+          "failures": [],
+          "archive": [
+            {
+              "concurrency": 1,
+              "correct": 4,
+              "planned": 4,
+              "elapsed_s": 56.746527700001025,
+              "max_output_tokens": 8192
+            },
+            {
+              "concurrency": 2,
+              "correct": 4,
+              "planned": 4,
+              "elapsed_s": 54.977238899999065,
+              "max_output_tokens": 8192
+            }
+          ],
+          "recovery": {
+            "correct": 24,
+            "planned": 24,
+            "elapsed_s": 48.69611370000348,
+            "thinking": true,
+            "concurrency": 4,
+            "max_output_tokens": 8192,
+            "preemptions": 0.0,
+            "reasoning_effort": "xhigh",
+            "temperature": 0.6,
+            "seed": 44
+          }
+        }
+      ],
+      "recipe.yaml": "gpu-memory-utilization: 0.01\ndtype: bfloat16\nengram-config:\n  cpu_offload: false\nload-format: mbx\nmoe-backend: marlin\ndistributed-executor-backend: mp\nmax-model-len: 262144\nmax-num-seqs: 8\nmax-num-batched-tokens: 8192\nkv-cache-memory-bytes: 16106127360\nkv-cache-dtype: fp8\nkv-cache-dtype-skip-layers:\n- sliding_window\nmamba-ssm-cache-dtype: float32\nmamba-cache-mode: align\nblock-size: 4096\nprefix-match-unit: 64\ncompilation-config:\n  cudagraph_mode: FULL_AND_PIECEWISE\n  cudagraph_capture_sizes: [1, 2, 3, 4, 8, 12, 16, 20, 24, 28, 32]\n  compile_ranges_endpoints: [32]\nenable-prefix-caching: true\nenable-prompt-tokens-details: true\nenable-per-request-metrics: true\nenable-auto-tool-choice: true\ntool-call-parser: qwen3_xml\nreasoning-parser: qwen3\nasync-scheduling: true\nuse-replayssm: false\ndefault-chat-template-kwargs:\n  preserve_thinking: false\nspeculative-config:\n  method: dflash\n  model: /drafter\n  num_speculative_tokens: 3\n  disable_eagle_block_drop: true\n  max_model_len: 262144\n  kv_cache_dtype: auto\n  draft_load_config:\n    load_format: safetensors\n  attention_backend: TRITON_ATTN\n",
+      "environment.psd1": "@{\n    DO_NOT_TRACK = '1'\n    FLASHINFER_CUDA_ARCH_LIST = '12.1a'\n    FLASHINFER_NVCC_THREADS = '1'\n    FLASHINFER_WORKSPACE_BASE = '/cache/wsl305/flashinfer-workspace'\n    HF_HUB_DISABLE_TELEMETRY = '1'\n    HF_HUB_OFFLINE = '1'\n    LMCACHE_TRACK_USAGE = 'false'\n    MALLOC_MMAP_THRESHOLD_ = '65536'\n    MALLOC_TRIM_THRESHOLD_ = '131072'\n    MAX_JOBS = '1'\n    MBX_DEPTH_MODE = 'off'\n    MBX_DRAFT_FP8 = '0'\n    MBX_DRAFT_HEAD = '0'\n    MBX_DRAFT_HEAD2 = ''\n    MBX_LOADER_EMPTY_CACHE = '1'\n    MBX_LOADER_PREPARE = '0'\n    MBX_MARLIN_CSF = '1'\n    MBX_PLE_ASYNC = '1'\n    MBX_PLE_FP8_DIR = '/ple-table-fp8'\n    MBX_PLE_MMAP = '1'\n    MBX_PLE_MMAP_MODE = 'nvme'\n    MBX_PLE_MMAP_PREWARM = '0'\n    MBX_PLE_NVME_DIR = '/cache/ple-nvme-fp8'\n    MBX_PLE_PREFILL_CKPT = '1'\n    PYTHONFAULTHANDLER = '1'\n    PYTHONUNBUFFERED = '1'\n    TOKENIZERS_PARALLELISM = 'false'\n    TORCHINDUCTOR_COMPILE_THREADS = '1'\n    TORCH_CUDA_ARCH_LIST = '12.1a'\n    TRANSFORMERS_OFFLINE = '1'\n    TRITON_CACHE_DIR = '/cache/wsl305/triton'\n    VLLM_CACHE_ROOT = '/cache/wsl305/vllm-cache'\n    VLLM_FP8_HYBRID = '1'\n    VLLM_MARLIN_USE_ATOMIC_ADD = '1'\n    VLLM_NO_USAGE_STATS = '1'\n    VLLM_USE_BREAKABLE_CUDAGRAPH = '1'\n    VLLM_USE_DEEP_GEMM = '0'\n}\n",
+      "speed": [
+        {
+          "concurrency": 1,
+          "depth": 4096,
+          "recorded": 2,
+          "valid": 2,
+          "read_tokens_s": 2407.947380285801,
+          "write_tokens_s": 48.403017733972774,
+          "second_repetition": {
+            "samples": 1,
+            "read_tokens_s": 2750.3151598925538,
+            "write_tokens_s": 48.82778813693073
+          }
+        },
+        {
+          "concurrency": 1,
+          "depth": 32768,
+          "recorded": 2,
+          "valid": 2,
+          "read_tokens_s": 2890.4720340676868,
+          "write_tokens_s": 48.719505290131494,
+          "second_repetition": {
+            "samples": 1,
+            "read_tokens_s": 2921.4509327200008,
+            "write_tokens_s": 50.6762763960699
+          }
+        },
+        {
+          "concurrency": 2,
+          "depth": 4096,
+          "recorded": 4,
+          "valid": 4,
+          "read_tokens_s": 2476.465142095937,
+          "write_tokens_s": 36.78904634726682,
+          "second_repetition": {
+            "samples": 2,
+            "read_tokens_s": 2626.0425798359583,
+            "write_tokens_s": 35.89747738064669
+          }
+        },
+        {
+          "concurrency": 2,
+          "depth": 32768,
+          "recorded": 4,
+          "valid": 4,
+          "read_tokens_s": 2560.190330613639,
+          "write_tokens_s": 27.30803540625205,
+          "second_repetition": {
+            "samples": 2,
+            "read_tokens_s": 2554.2589689488345,
+            "write_tokens_s": 26.845377941182225
+          }
+        }
+      ],
+      "archive": [
+        {
+          "concurrency": 1,
+          "correct": 4,
+          "planned": 4,
+          "elapsed_s": 60.321060000002035,
+          "max_output_tokens": 8192
+        },
+        {
+          "concurrency": 2,
+          "correct": 4,
+          "planned": 4,
+          "elapsed_s": 54.9005371999956,
+          "max_output_tokens": 8192
+        }
+      ],
+      "recovery": {
+        "correct": 24,
+        "planned": 24,
+        "elapsed_s": 53.31549140000425,
+        "thinking": true,
+        "concurrency": 4,
+        "max_output_tokens": 8192,
+        "preemptions": 0.0,
+        "reasoning_effort": "xhigh",
+        "temperature": 0.6,
+        "seed": 43
+      },
+      "resources": {
+        "peak_gpu_used_mib": 94143,
+        "minimum_gpu_free_mib": 4148,
+        "minimum_host_available_gib": 5.434200286865234
+      },
+      "evidence_sha256": {
+        "host.json": "6e5b159130a586bc91a714b7ee77a5b3dc1e1d85ffa403c11d1bfd3906758421",
+        "quality/completed.json": "83c5d8b28aeea726f1a2070729b83ef6df8cd6ffb13a158a559c0f4d29585195",
+        "quality/xhigh-t06/quality/summary.json": "d1d6498b40d332703ca081f4fc1dffbd8b53e6ae8f781b29ce06a633ebe54b33",
+        "quality/xhigh-t06/recovery/summary.json": "0373c47b1096c1e5879552a14f4f4f28b3348feb61871a033dc268f0c8a2ce4a",
+        "quality-seed-44/completed.json": "4d8062e4b3a6326b1bb0fa9ee25eeed8409230f8b3a5d7fb998b02ed3cecab44",
+        "quality-seed-44/xhigh-t06/quality/summary.json": "f56046ff7d957ce146822bbec05eb86f3ca1d362acc407f1bee8bb3c335e3350",
+        "quality-seed-44/xhigh-t06/recovery/summary.json": "b1f0f1088d670b21c58d2a28f82c6ff3e3bdef598277e125ce2e2807553c260a",
+        "speed/comparison.json": "ca4c02c723470a0d9a73daccb0cfeb0ed396f57a46c321bd3787cabe537965a6",
+        "speed/summary.json": "1ee650d412300388ed0db950310163c0bb0e8f90bd60a0df19dca7f39b66e75e",
+        "status.json": "42f9fe22c007e65f706c73f338fa49eb17c2fb05b8dd87de95b37c49f6482160"
+      }
+    },
+    {
+      "name": "w4-kv20-batch8k-k5-20261117",
+      "status": {
+        "stage": "finished",
+        "unix_s": 1794936875.0287895,
+        "success": false,
+        "error": "RuntimeError('Quality screen failed; retained first scores')"
+      },
+      "variant": {
+        "flags": {
+          "mamba-ssm-cache-dtype": "bfloat16"
+        },
+        "config": {
+          "Container": "n1x-recipe-trial",
+          "LmcacheNamespace": "qwen-recipe-w4-kv20-batch8k-k5-20261117",
+          "LmcacheVolume": "n1x-recipe-w4-kv20-batch8k-k5-20261117",
+          "KvCacheBytes": "21474836480",
+          "BatchedTokens": 8192,
+          "DFlashTokens": 5
+        }
+      },
+      "config": {
+        "LmcacheNamespace": "qwen-recipe-w4-kv20-batch8k-k5-20261117",
+        "ImageId": "sha256:819970fd46a90c1e70b7cd06aeb15d5ce3c75b02b62892a8322f42de225566bc",
+        "RequiredPartitionMiB": 98304,
+        "CacheBlockTokens": 4096,
+        "Profile": "qwen38fn-best",
+        "Port": 8000,
+        "LanAccess": false,
+        "DefaultProfile": "qwen38fn-best",
+        "BatchedTokens": 8192,
+        "Mtp": false,
+        "KvCacheDtype": "fp8",
+        "MaxOutputTokens": 8192,
+        "Context": 262144,
+        "Container": "n1x-recipe-trial",
+        "PleWorkers": 8,
+        "DFlash": true,
+        "UseLMCache": true,
+        "MyllmboxEnvironment": "runtime/myllmbox/environment.psd1",
+        "PleVolume": "n1x-ple-native",
+        "MyllmboxWSLCVersion": "3.0.5.0",
+        "DFlashTokens": 5,
+        "RestoreWaitMs": 0,
+        "LmcacheL2GiB": 160,
+        "Image": "n1x-ai:mbx-setup-1447755d89af469f894bfa8dcb51506d",
+        "Backend": "wslc-myllmbox",
+        "MaxSequences": 8,
+        "LmcacheChunkTokens": 4096,
+        "MyllmboxModel": "Qwen3.8-Flash-Next-W4A16-AutoRound-hybrid",
+        "LmcacheL1GiB": 4,
+        "MyllmboxConfig": "profiles/qwen38fn-best.yaml",
+        "MyllmboxDrafter": "Qwen3.8-Flash-Next-DFlash2",
+        "CacheVolume": "n1x-mbx-w4-dflash-test-cache",
+        "ModelRoot": "C:\\Users\\michael\\models",
+        "LmcacheVolume": "n1x-recipe-w4-kv20-batch8k-k5-20261117",
+        "KvCacheBytes": "21474836480",
+        "WindowsMinimumGiB": 4
+      },
+      "failure": {
+        "error": "RuntimeError('Quality screen failed; retained first scores')",
+        "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\michael\\source\\github\\mycall\\n1x-ai\\benchmarks\\recipe_trial.py\", line 124, in run\n    raise RuntimeError('Quality screen failed; retained first scores')\nRuntimeError: Quality screen failed; retained first scores\n"
+      },
+      "recipe.yaml": "gpu-memory-utilization: 0.01\ndtype: bfloat16\nengram-config:\n  cpu_offload: false\nload-format: mbx\nmoe-backend: marlin\ndistributed-executor-backend: mp\nmax-model-len: 262144\nmax-num-seqs: 8\nmax-num-batched-tokens: 8192\nkv-cache-memory-bytes: 16106127360\nkv-cache-dtype: fp8\nkv-cache-dtype-skip-layers:\n- sliding_window\nmamba-ssm-cache-dtype: float32\nmamba-cache-mode: align\nblock-size: 4096\nprefix-match-unit: 64\ncompilation-config:\n  cudagraph_mode: FULL_AND_PIECEWISE\n  cudagraph_capture_sizes: [1, 2, 3, 4, 8, 12, 16, 20, 24, 28, 32]\n  compile_ranges_endpoints: [32]\nenable-prefix-caching: true\nenable-prompt-tokens-details: true\nenable-per-request-metrics: true\nenable-auto-tool-choice: true\ntool-call-parser: qwen3_xml\nreasoning-parser: qwen3\nasync-scheduling: true\nuse-replayssm: false\ndefault-chat-template-kwargs:\n  preserve_thinking: false\nspeculative-config:\n  method: dflash\n  model: /drafter\n  num_speculative_tokens: 3\n  disable_eagle_block_drop: true\n  max_model_len: 262144\n  kv_cache_dtype: auto\n  draft_load_config:\n    load_format: safetensors\n  attention_backend: TRITON_ATTN\n",
+      "environment.psd1": "@{\n    DO_NOT_TRACK = '1'\n    FLASHINFER_CUDA_ARCH_LIST = '12.1a'\n    FLASHINFER_NVCC_THREADS = '1'\n    FLASHINFER_WORKSPACE_BASE = '/cache/wsl305/flashinfer-workspace'\n    HF_HUB_DISABLE_TELEMETRY = '1'\n    HF_HUB_OFFLINE = '1'\n    LMCACHE_TRACK_USAGE = 'false'\n    MALLOC_MMAP_THRESHOLD_ = '65536'\n    MALLOC_TRIM_THRESHOLD_ = '131072'\n    MAX_JOBS = '1'\n    MBX_DEPTH_MODE = 'off'\n    MBX_DRAFT_FP8 = '0'\n    MBX_DRAFT_HEAD = '0'\n    MBX_DRAFT_HEAD2 = ''\n    MBX_LOADER_EMPTY_CACHE = '1'\n    MBX_LOADER_PREPARE = '0'\n    MBX_MARLIN_CSF = '1'\n    MBX_PLE_ASYNC = '1'\n    MBX_PLE_FP8_DIR = '/ple-table-fp8'\n    MBX_PLE_MMAP = '1'\n    MBX_PLE_MMAP_MODE = 'nvme'\n    MBX_PLE_MMAP_PREWARM = '0'\n    MBX_PLE_NVME_DIR = '/cache/ple-nvme-fp8'\n    MBX_PLE_PREFILL_CKPT = '1'\n    PYTHONFAULTHANDLER = '1'\n    PYTHONUNBUFFERED = '1'\n    TOKENIZERS_PARALLELISM = 'false'\n    TORCHINDUCTOR_COMPILE_THREADS = '1'\n    TORCH_CUDA_ARCH_LIST = '12.1a'\n    TRANSFORMERS_OFFLINE = '1'\n    TRITON_CACHE_DIR = '/cache/wsl305/triton'\n    VLLM_CACHE_ROOT = '/cache/wsl305/vllm-cache'\n    VLLM_FP8_HYBRID = '1'\n    VLLM_MARLIN_USE_ATOMIC_ADD = '1'\n    VLLM_NO_USAGE_STATS = '1'\n    VLLM_USE_BREAKABLE_CUDAGRAPH = '1'\n    VLLM_USE_DEEP_GEMM = '0'\n}\n",
+      "speed": [
+        {
+          "concurrency": 1,
+          "depth": 4096,
+          "recorded": 2,
+          "valid": 2,
+          "read_tokens_s": 2784.6472931016633,
+          "write_tokens_s": 49.63869658710563,
+          "second_repetition": {
+            "samples": 1,
+            "read_tokens_s": 2743.2702182207895,
+            "write_tokens_s": 47.210169103684365
+          }
+        },
+        {
+          "concurrency": 1,
+          "depth": 32768,
+          "recorded": 2,
+          "valid": 2,
+          "read_tokens_s": 3105.4193316400456,
+          "write_tokens_s": 46.659745471088904,
+          "second_repetition": {
+            "samples": 1,
+            "read_tokens_s": 3086.657979300984,
+            "write_tokens_s": 45.64858972389305
+          }
+        },
+        {
+          "concurrency": 2,
+          "depth": 4096,
+          "recorded": 4,
+          "valid": 4,
+          "read_tokens_s": 2617.481019782746,
+          "write_tokens_s": 36.73662651548668,
+          "second_repetition": {
+            "samples": 2,
+            "read_tokens_s": 2634.8052360338634,
+            "write_tokens_s": 36.22023285172565
+          }
+        },
+        {
+          "concurrency": 2,
+          "depth": 32768,
+          "recorded": 4,
+          "valid": 4,
+          "read_tokens_s": 2339.6144064785112,
+          "write_tokens_s": 29.055630871806727,
+          "second_repetition": {
+            "samples": 2,
+            "read_tokens_s": 2340.226650951129,
+            "write_tokens_s": 29.444437371440873
+          }
+        }
+      ],
+      "archive": [
+        {
+          "concurrency": 1,
+          "correct": 4,
+          "planned": 4,
+          "elapsed_s": 56.38113590001012,
+          "max_output_tokens": 8192
+        },
+        {
+          "concurrency": 2,
+          "correct": 4,
+          "planned": 4,
+          "elapsed_s": 52.97018950000347,
+          "max_output_tokens": 8192
+        }
+      ],
+      "recovery": {
+        "correct": 23,
+        "planned": 24,
+        "elapsed_s": 51.77979770000093,
+        "thinking": true,
+        "concurrency": 4,
+        "max_output_tokens": 1024,
+        "preemptions": 0.0
+      },
+      "resources": {
+        "peak_gpu_used_mib": 95752,
+        "minimum_gpu_free_mib": 2539,
+        "minimum_host_available_gib": 5.406852722167969
+      },
+      "evidence_sha256": {
+        "host.json": "fe2d5c8631f393828863da29d0382239dc479d79a389c7944282202c28d68444",
+        "quality/completed.json": "7eb42b2598e44be82df9499547ba317a85df351e3260aa469c5b8b6c6dfdefc1",
+        "quality/xhigh-t06/quality/summary.json": "de02229bd3f8350b53aee9d182555531f758b0a1d7df4eecce9146ca9ffb94ef",
+        "quality/xhigh-t06/recovery/summary.json": "a21879229fb30cd54ccd158323dec264e0d3330609c8515aafd01234b10d733a",
+        "speed/comparison.json": "15d64a66a8401cb7588cd466f1327a8785dccd1c901c314e7ae9ccdceb28dcca",
+        "speed/summary.json": "73805cd4cdd27f8a466f127fa45eb084806641e9ddae54c2ef47d3775daa060b",
+        "status.json": "9700e4dd9515efd3265ad65a64361307fe9bced045b5bf8a204dca5e01d826d2"
+      }
+    },
+    {
+      "name": "w4-kv20-batch8k-k5-20261117-averages-r1",
+      "status": {
+        "stage": "finished",
+        "unix_s": 1794947175.6571763,
+        "success": false,
+        "error": "RuntimeError('restore-verify failed (1)')"
+      },
+      "variant": {
+        "flags": {
+          "mamba-ssm-cache-dtype": "bfloat16"
+        },
+        "config": {
+          "Container": "n1x-recipe-trial",
+          "LmcacheNamespace": "qwen-recipe-w4-kv20-batch8k-k5-20261117-averages-r1",
+          "LmcacheVolume": "n1x-recipe-w4-kv20-batch8k-k5-20261117-averages-r1",
+          "KvCacheBytes": "21474836480",
+          "BatchedTokens": 8192,
+          "DFlashTokens": 5
+        }
+      },
+      "config": {
+        "MyllmboxConfig": "profiles/qwen38fn-best.yaml",
+        "DefaultProfile": "qwen38fn-best",
+        "MaxSequences": 8,
+        "LmcacheL2GiB": 160,
+        "MyllmboxDrafter": "Qwen3.8-Flash-Next-DFlash2",
+        "Context": 262144,
+        "CacheBlockTokens": 4096,
+        "MaxOutputTokens": 8192,
+        "Backend": "wslc-myllmbox",
+        "Container": "n1x-recipe-trial",
+        "Port": 8000,
+        "UseLMCache": true,
+        "CacheVolume": "n1x-mbx-w4-dflash-test-cache",
+        "RestoreWaitMs": 0,
+        "Profile": "qwen38fn-best",
+        "MyllmboxEnvironment": "runtime/myllmbox/environment.psd1",
+        "LmcacheChunkTokens": 4096,
+        "RequiredPartitionMiB": 98304,
+        "LmcacheVolume": "n1x-recipe-w4-kv20-batch8k-k5-20261117-averages-r1",
+        "KvCacheBytes": "21474836480",
+        "Mtp": false,
+        "LmcacheL1GiB": 4,
+        "LmcacheNamespace": "qwen-recipe-w4-kv20-batch8k-k5-20261117-averages-r1",
+        "Image": "n1x-ai:mbx-setup-1447755d89af469f894bfa8dcb51506d",
+        "MyllmboxWSLCVersion": "3.0.5.0",
+        "MyllmboxModel": "Qwen3.8-Flash-Next-W4A16-AutoRound-hybrid",
+        "ImageId": "sha256:819970fd46a90c1e70b7cd06aeb15d5ce3c75b02b62892a8322f42de225566bc",
+        "ModelRoot": "C:\\Users\\michael\\models",
+        "DFlashTokens": 5,
+        "DFlash": true,
+        "WindowsMinimumGiB": 4,
+        "PleWorkers": 8,
+        "LanAccess": false,
+        "PleVolume": "n1x-ple-native",
+        "BatchedTokens": 8192,
+        "KvCacheDtype": "fp8"
+      },
+      "failure": {
+        "error": "RuntimeError('restore-verify failed (1)')",
+        "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\michael\\source\\github\\mycall\\n1x-ai\\benchmarks\\recipe_trial.py\", line 158, in run\n    command(['wslc','run','--rm','--network',f'container:{CONTAINER}',\n    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n        '--volume',f'{ROOT}/benchmarks:/benchmarks:ro','--volume',f'{restore}:/results',\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n        '--entrypoint','python3',config['ImageId'],'/benchmarks/restart_restore_probe.py',stage],\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n        'restore-'+stage,timeout=1800)\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\michael\\source\\github\\mycall\\n1x-ai\\benchmarks\\recipe_trial.py\", line 46, in command\n    raise RuntimeError(f'{name} failed ({result.returncode})')\nRuntimeError: restore-verify failed (1)\n"
+      },
+      "measurement-plan": {
+        "quality_seeds": [
+          45
+        ],
+        "continue_after_quality_failure": true,
+        "skip_screen": false,
+        "long": true,
+        "long_concurrency": [
+          "4"
+        ],
+        "restore": true
+      },
+      "quality-screens": [
+        {
+          "seed": 45,
+          "folder": "quality",
+          "passed": true,
+          "failures": [],
+          "archive": [
+            {
+              "concurrency": 1,
+              "correct": 4,
+              "planned": 4,
+              "elapsed_s": 55.482464400003664,
+              "max_output_tokens": 8192
+            },
+            {
+              "concurrency": 2,
+              "correct": 4,
+              "planned": 4,
+              "elapsed_s": 51.90646650000417,
+              "max_output_tokens": 8192
+            }
+          ],
+          "recovery": {
+            "correct": 24,
+            "planned": 24,
+            "elapsed_s": 52.526849600006244,
+            "thinking": true,
+            "concurrency": 4,
+            "max_output_tokens": 8192,
+            "preemptions": 0.0,
+            "reasoning_effort": "xhigh",
+            "temperature": 0.6,
+            "seed": 45
+          }
+        }
+      ],
+      "recipe.yaml": "gpu-memory-utilization: 0.01\ndtype: bfloat16\nengram-config:\n  cpu_offload: false\nload-format: mbx\nmoe-backend: marlin\ndistributed-executor-backend: mp\nmax-model-len: 262144\nmax-num-seqs: 8\nmax-num-batched-tokens: 8192\nkv-cache-memory-bytes: 16106127360\nkv-cache-dtype: fp8\nkv-cache-dtype-skip-layers:\n- sliding_window\nmamba-ssm-cache-dtype: float32\nmamba-cache-mode: align\nblock-size: 4096\nprefix-match-unit: 64\ncompilation-config:\n  cudagraph_mode: FULL_AND_PIECEWISE\n  cudagraph_capture_sizes: [1, 2, 3, 4, 8, 12, 16, 20, 24, 28, 32]\n  compile_ranges_endpoints: [32]\nenable-prefix-caching: true\nenable-prompt-tokens-details: true\nenable-per-request-metrics: true\nenable-auto-tool-choice: true\ntool-call-parser: qwen3_xml\nreasoning-parser: qwen3\nasync-scheduling: true\nuse-replayssm: false\ndefault-chat-template-kwargs:\n  preserve_thinking: false\nspeculative-config:\n  method: dflash\n  model: /drafter\n  num_speculative_tokens: 3\n  disable_eagle_block_drop: true\n  max_model_len: 262144\n  kv_cache_dtype: auto\n  draft_load_config:\n    load_format: safetensors\n  attention_backend: TRITON_ATTN\n",
+      "environment.psd1": "@{\n    DO_NOT_TRACK = '1'\n    FLASHINFER_CUDA_ARCH_LIST = '12.1a'\n    FLASHINFER_NVCC_THREADS = '1'\n    FLASHINFER_WORKSPACE_BASE = '/cache/wsl305/flashinfer-workspace'\n    HF_HUB_DISABLE_TELEMETRY = '1'\n    HF_HUB_OFFLINE = '1'\n    LMCACHE_TRACK_USAGE = 'false'\n    MALLOC_MMAP_THRESHOLD_ = '65536'\n    MALLOC_TRIM_THRESHOLD_ = '131072'\n    MAX_JOBS = '1'\n    MBX_DEPTH_MODE = 'off'\n    MBX_DRAFT_FP8 = '0'\n    MBX_DRAFT_HEAD = '0'\n    MBX_DRAFT_HEAD2 = ''\n    MBX_LOADER_EMPTY_CACHE = '1'\n    MBX_LOADER_PREPARE = '0'\n    MBX_MARLIN_CSF = '1'\n    MBX_PLE_ASYNC = '1'\n    MBX_PLE_FP8_DIR = '/ple-table-fp8'\n    MBX_PLE_MMAP = '1'\n    MBX_PLE_MMAP_MODE = 'nvme'\n    MBX_PLE_MMAP_PREWARM = '0'\n    MBX_PLE_NVME_DIR = '/cache/ple-nvme-fp8'\n    MBX_PLE_PREFILL_CKPT = '1'\n    PYTHONFAULTHANDLER = '1'\n    PYTHONUNBUFFERED = '1'\n    TOKENIZERS_PARALLELISM = 'false'\n    TORCHINDUCTOR_COMPILE_THREADS = '1'\n    TORCH_CUDA_ARCH_LIST = '12.1a'\n    TRANSFORMERS_OFFLINE = '1'\n    TRITON_CACHE_DIR = '/cache/wsl305/triton'\n    VLLM_CACHE_ROOT = '/cache/wsl305/vllm-cache'\n    VLLM_FP8_HYBRID = '1'\n    VLLM_MARLIN_USE_ATOMIC_ADD = '1'\n    VLLM_NO_USAGE_STATS = '1'\n    VLLM_USE_BREAKABLE_CUDAGRAPH = '1'\n    VLLM_USE_DEEP_GEMM = '0'\n}\n",
+      "speed": [
+        {
+          "concurrency": 1,
+          "depth": 4096,
+          "recorded": 2,
+          "valid": 2,
+          "read_tokens_s": 2760.4586370414895,
+          "write_tokens_s": 50.13036420832792,
+          "second_repetition": {
+            "samples": 1,
+            "read_tokens_s": 2710.4035227560794,
+            "write_tokens_s": 48.92787347799547
+          }
+        },
+        {
+          "concurrency": 1,
+          "depth": 32768,
+          "recorded": 2,
+          "valid": 2,
+          "read_tokens_s": 3096.5495793624095,
+          "write_tokens_s": 48.94567238217058,
+          "second_repetition": {
+            "samples": 1,
+            "read_tokens_s": 3071.293295637739,
+            "write_tokens_s": 49.07690189177691
+          }
+        },
+        {
+          "concurrency": 2,
+          "depth": 4096,
+          "recorded": 4,
+          "valid": 4,
+          "read_tokens_s": 2618.3951961476105,
+          "write_tokens_s": 35.746700336467114,
+          "second_repetition": {
+            "samples": 2,
+            "read_tokens_s": 2647.4986898444276,
+            "write_tokens_s": 34.37331837284529
+          }
+        },
+        {
+          "concurrency": 2,
+          "depth": 32768,
+          "recorded": 4,
+          "valid": 4,
+          "read_tokens_s": 2334.4802132475174,
+          "write_tokens_s": 28.50996476968961,
+          "second_repetition": {
+            "samples": 2,
+            "read_tokens_s": 2326.645354803567,
+            "write_tokens_s": 28.11006306509163
+          }
+        }
+      ],
+      "archive": [
+        {
+          "concurrency": 1,
+          "correct": 4,
+          "planned": 4,
+          "elapsed_s": 55.482464400003664,
+          "max_output_tokens": 8192
+        },
+        {
+          "concurrency": 2,
+          "correct": 4,
+          "planned": 4,
+          "elapsed_s": 51.90646650000417,
+          "max_output_tokens": 8192
+        }
+      ],
+      "recovery": {
+        "correct": 24,
+        "planned": 24,
+        "elapsed_s": 52.526849600006244,
+        "thinking": true,
+        "concurrency": 4,
+        "max_output_tokens": 8192,
+        "preemptions": 0.0,
+        "reasoning_effort": "xhigh",
+        "temperature": 0.6,
+        "seed": 45
+      },
+      "near_full": [
+        {
+          "group": "r0-c4",
+          "concurrency": 4,
+          "repeat": 0,
+          "elapsed_s": 384.54722480000055,
+          "correct_tasks": 12,
+          "planned_tasks": 12,
+          "correct_tasks_s": 0.031205530104244254,
+          "preemptions": 0.0,
+          "cache_evidence": {
+            "cold-selection": {
+              "requests": 4,
+              "requests_with_cached_tokens": 0,
+              "cached_tokens": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            "tool-continuation": {
+              "requests": 12,
+              "requests_with_cached_tokens": 12,
+              "cached_tokens": [
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856
+              ]
+            },
+            "appended-selection": {
+              "requests": 8,
+              "requests_with_cached_tokens": 8,
+              "cached_tokens": [
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856
+              ]
+            }
+          }
+        }
+      ],
+      "restore": {
+        "tokens_each": 130877,
+        "correct": 2,
+        "elapsed_s": 7.60197990000006,
+        "qualified": false,
+        "delta": {
+          "vllm:prefix_cache_hits_total": 0.0,
+          "vllm:external_prefix_cache_hits_total": 245760.0,
+          "vllm:num_preemptions_total": 0.0,
+          "lmcache_mp_num_finished_retrieves_total": 2.0,
+          "lmcache_mp_l2_prefetch_load_completed_chunks_total": 64.0
+        },
+        "verification_requests": [
+          {
+            "prompt_tokens": 130877,
+            "cached_tokens": 122880,
+            "complete_chunk_tokens": 126976,
+            "prompt_coverage": 0.9388968267915676,
+            "complete_chunk_coverage": 0.967741935483871
+          },
+          {
+            "prompt_tokens": 130877,
+            "cached_tokens": 122880,
+            "complete_chunk_tokens": 126976,
+            "prompt_coverage": 0.9388968267915676,
+            "complete_chunk_coverage": 0.967741935483871
+          }
+        ]
+      },
+      "resources": {
+        "peak_gpu_used_mib": 96290,
+        "minimum_gpu_free_mib": 2001,
+        "minimum_host_available_gib": 5.407619476318359
+      },
+      "evidence_sha256": {
+        "host.json": "f84b5d5a18e3b5e8c52592677f8e6e83cf53818bbf9878580732f3a71ddc3586",
+        "near-full/summary.json": "967c2017c8cb2865afbc1bfa66ed484731ba53bcdbb2d68eb299a521c14ce297",
+        "quality/completed.json": "83ea2e451b7bbfe26968c049e7e8739ffe60ec37163dbdc249736758163c003e",
+        "quality/xhigh-t06/quality/summary.json": "241abe19e477f9f85ccaf14d1502f18bd9fef2cebd47cd06fd11a6ebb13afb50",
+        "quality/xhigh-t06/recovery/summary.json": "5c9a2125d6610cb8978c2f2486c7c3f3baeb6ad0f3456bde991a039007d5a34a",
+        "restore/summary.json": "a95ba45ecdd70a769170d8e49162f23fc53e6877cef713418fd0e9d61a646c48",
+        "speed/comparison.json": "ca67799320a0006eaa7a2321cdcf140f51e597139115ed531918bcb79e484b45",
+        "speed/summary.json": "97542dd8335d17c499668a25912c1ab0c947692b8347266747980e5e1aedffb5",
+        "status.json": "3ac0f8e368057338e7b84fe66ea098952575689eae70cf1567c4a396cc64d2d1"
+      }
+    },
+    {
+      "name": "w4-kv20-batch8k-k5-20261117-averages-r2",
+      "status": {
+        "stage": "finished",
+        "unix_s": 1794948997.6904266,
+        "success": false,
+        "error": "RuntimeError('restore-verify failed (1)')"
+      },
+      "variant": {
+        "flags": {
+          "mamba-ssm-cache-dtype": "bfloat16"
+        },
+        "config": {
+          "Container": "n1x-recipe-trial",
+          "LmcacheNamespace": "qwen-recipe-w4-kv20-batch8k-k5-20261117-averages-r2",
+          "LmcacheVolume": "n1x-recipe-w4-kv20-batch8k-k5-20261117-averages-r2",
+          "KvCacheBytes": "21474836480",
+          "BatchedTokens": 8192,
+          "DFlashTokens": 5
+        }
+      },
+      "config": {
+        "RequiredPartitionMiB": 98304,
+        "BatchedTokens": 8192,
+        "LmcacheL2GiB": 160,
+        "KvCacheBytes": "21474836480",
+        "MaxOutputTokens": 8192,
+        "Profile": "qwen38fn-best",
+        "MyllmboxDrafter": "Qwen3.8-Flash-Next-DFlash2",
+        "ModelRoot": "C:\\Users\\michael\\models",
+        "DFlash": true,
+        "LmcacheNamespace": "qwen-recipe-w4-kv20-batch8k-k5-20261117-averages-r2",
+        "Mtp": false,
+        "RestoreWaitMs": 0,
+        "PleVolume": "n1x-ple-native",
+        "LmcacheL1GiB": 4,
+        "DefaultProfile": "qwen38fn-best",
+        "Container": "n1x-recipe-trial",
+        "LmcacheVolume": "n1x-recipe-w4-kv20-batch8k-k5-20261117-averages-r2",
+        "MyllmboxModel": "Qwen3.8-Flash-Next-W4A16-AutoRound-hybrid",
+        "Backend": "wslc-myllmbox",
+        "LanAccess": false,
+        "MyllmboxEnvironment": "runtime/myllmbox/environment.psd1",
+        "UseLMCache": true,
+        "PleWorkers": 8,
+        "CacheBlockTokens": 4096,
+        "Port": 8000,
+        "Context": 262144,
+        "Image": "n1x-ai:mbx-setup-1447755d89af469f894bfa8dcb51506d",
+        "KvCacheDtype": "fp8",
+        "LmcacheChunkTokens": 4096,
+        "MaxSequences": 8,
+        "DFlashTokens": 5,
+        "CacheVolume": "n1x-mbx-w4-dflash-test-cache",
+        "ImageId": "sha256:819970fd46a90c1e70b7cd06aeb15d5ce3c75b02b62892a8322f42de225566bc",
+        "MyllmboxWSLCVersion": "3.0.5.0",
+        "MyllmboxConfig": "profiles/qwen38fn-best.yaml",
+        "WindowsMinimumGiB": 4
+      },
+      "failure": {
+        "error": "RuntimeError('restore-verify failed (1)')",
+        "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\michael\\source\\github\\mycall\\n1x-ai\\benchmarks\\recipe_trial.py\", line 158, in run\n    command(['wslc','run','--rm','--network',f'container:{CONTAINER}',\n    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n        '--volume',f'{ROOT}/benchmarks:/benchmarks:ro','--volume',f'{restore}:/results',\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n        '--entrypoint','python3',config['ImageId'],'/benchmarks/restart_restore_probe.py',stage],\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n        'restore-'+stage,timeout=1800)\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\michael\\source\\github\\mycall\\n1x-ai\\benchmarks\\recipe_trial.py\", line 46, in command\n    raise RuntimeError(f'{name} failed ({result.returncode})')\nRuntimeError: restore-verify failed (1)\n"
+      },
+      "measurement-plan": {
+        "quality_seeds": [
+          46
+        ],
+        "continue_after_quality_failure": true,
+        "skip_screen": false,
+        "long": true,
+        "long_concurrency": [
+          "4"
+        ],
+        "restore": true
+      },
+      "quality-screens": [
+        {
+          "seed": 46,
+          "folder": "quality",
+          "passed": true,
+          "failures": [],
+          "archive": [
+            {
+              "concurrency": 1,
+              "correct": 4,
+              "planned": 4,
+              "elapsed_s": 55.78273370000534,
+              "max_output_tokens": 8192
+            },
+            {
+              "concurrency": 2,
+              "correct": 4,
+              "planned": 4,
+              "elapsed_s": 53.00055650000286,
+              "max_output_tokens": 8192
+            }
+          ],
+          "recovery": {
+            "correct": 24,
+            "planned": 24,
+            "elapsed_s": 50.606520200002706,
+            "thinking": true,
+            "concurrency": 4,
+            "max_output_tokens": 8192,
+            "preemptions": 0.0,
+            "reasoning_effort": "xhigh",
+            "temperature": 0.6,
+            "seed": 46
+          }
+        }
+      ],
+      "recipe.yaml": "gpu-memory-utilization: 0.01\ndtype: bfloat16\nengram-config:\n  cpu_offload: false\nload-format: mbx\nmoe-backend: marlin\ndistributed-executor-backend: mp\nmax-model-len: 262144\nmax-num-seqs: 8\nmax-num-batched-tokens: 8192\nkv-cache-memory-bytes: 16106127360\nkv-cache-dtype: fp8\nkv-cache-dtype-skip-layers:\n- sliding_window\nmamba-ssm-cache-dtype: float32\nmamba-cache-mode: align\nblock-size: 4096\nprefix-match-unit: 64\ncompilation-config:\n  cudagraph_mode: FULL_AND_PIECEWISE\n  cudagraph_capture_sizes: [1, 2, 3, 4, 8, 12, 16, 20, 24, 28, 32]\n  compile_ranges_endpoints: [32]\nenable-prefix-caching: true\nenable-prompt-tokens-details: true\nenable-per-request-metrics: true\nenable-auto-tool-choice: true\ntool-call-parser: qwen3_xml\nreasoning-parser: qwen3\nasync-scheduling: true\nuse-replayssm: false\ndefault-chat-template-kwargs:\n  preserve_thinking: false\nspeculative-config:\n  method: dflash\n  model: /drafter\n  num_speculative_tokens: 3\n  disable_eagle_block_drop: true\n  max_model_len: 262144\n  kv_cache_dtype: auto\n  draft_load_config:\n    load_format: safetensors\n  attention_backend: TRITON_ATTN\n",
+      "environment.psd1": "@{\n    DO_NOT_TRACK = '1'\n    FLASHINFER_CUDA_ARCH_LIST = '12.1a'\n    FLASHINFER_NVCC_THREADS = '1'\n    FLASHINFER_WORKSPACE_BASE = '/cache/wsl305/flashinfer-workspace'\n    HF_HUB_DISABLE_TELEMETRY = '1'\n    HF_HUB_OFFLINE = '1'\n    LMCACHE_TRACK_USAGE = 'false'\n    MALLOC_MMAP_THRESHOLD_ = '65536'\n    MALLOC_TRIM_THRESHOLD_ = '131072'\n    MAX_JOBS = '1'\n    MBX_DEPTH_MODE = 'off'\n    MBX_DRAFT_FP8 = '0'\n    MBX_DRAFT_HEAD = '0'\n    MBX_DRAFT_HEAD2 = ''\n    MBX_LOADER_EMPTY_CACHE = '1'\n    MBX_LOADER_PREPARE = '0'\n    MBX_MARLIN_CSF = '1'\n    MBX_PLE_ASYNC = '1'\n    MBX_PLE_FP8_DIR = '/ple-table-fp8'\n    MBX_PLE_MMAP = '1'\n    MBX_PLE_MMAP_MODE = 'nvme'\n    MBX_PLE_MMAP_PREWARM = '0'\n    MBX_PLE_NVME_DIR = '/cache/ple-nvme-fp8'\n    MBX_PLE_PREFILL_CKPT = '1'\n    PYTHONFAULTHANDLER = '1'\n    PYTHONUNBUFFERED = '1'\n    TOKENIZERS_PARALLELISM = 'false'\n    TORCHINDUCTOR_COMPILE_THREADS = '1'\n    TORCH_CUDA_ARCH_LIST = '12.1a'\n    TRANSFORMERS_OFFLINE = '1'\n    TRITON_CACHE_DIR = '/cache/wsl305/triton'\n    VLLM_CACHE_ROOT = '/cache/wsl305/vllm-cache'\n    VLLM_FP8_HYBRID = '1'\n    VLLM_MARLIN_USE_ATOMIC_ADD = '1'\n    VLLM_NO_USAGE_STATS = '1'\n    VLLM_USE_BREAKABLE_CUDAGRAPH = '1'\n    VLLM_USE_DEEP_GEMM = '0'\n}\n",
+      "speed": [
+        {
+          "concurrency": 1,
+          "depth": 4096,
+          "recorded": 2,
+          "valid": 2,
+          "read_tokens_s": 2784.111044235497,
+          "write_tokens_s": 49.370688929220634,
+          "second_repetition": {
+            "samples": 1,
+            "read_tokens_s": 2745.2979054323446,
+            "write_tokens_s": 50.023177568760104
+          }
+        },
+        {
+          "concurrency": 1,
+          "depth": 32768,
+          "recorded": 2,
+          "valid": 2,
+          "read_tokens_s": 3099.5890291238406,
+          "write_tokens_s": 47.52734676796435,
+          "second_repetition": {
+            "samples": 1,
+            "read_tokens_s": 3070.6733179549856,
+            "write_tokens_s": 50.67180701574004
+          }
+        },
+        {
+          "concurrency": 2,
+          "depth": 4096,
+          "recorded": 4,
+          "valid": 4,
+          "read_tokens_s": 2468.668134829881,
+          "write_tokens_s": 37.68443373041272,
+          "second_repetition": {
+            "samples": 2,
+            "read_tokens_s": 2647.5136852663645,
+            "write_tokens_s": 36.170358979027085
+          }
+        },
+        {
+          "concurrency": 2,
+          "depth": 32768,
+          "recorded": 4,
+          "valid": 4,
+          "read_tokens_s": 2312.1955756934876,
+          "write_tokens_s": 29.39115630172376,
+          "second_repetition": {
+            "samples": 2,
+            "read_tokens_s": 2306.917866784177,
+            "write_tokens_s": 29.342141717950494
+          }
+        }
+      ],
+      "archive": [
+        {
+          "concurrency": 1,
+          "correct": 4,
+          "planned": 4,
+          "elapsed_s": 55.78273370000534,
+          "max_output_tokens": 8192
+        },
+        {
+          "concurrency": 2,
+          "correct": 4,
+          "planned": 4,
+          "elapsed_s": 53.00055650000286,
+          "max_output_tokens": 8192
+        }
+      ],
+      "recovery": {
+        "correct": 24,
+        "planned": 24,
+        "elapsed_s": 50.606520200002706,
+        "thinking": true,
+        "concurrency": 4,
+        "max_output_tokens": 8192,
+        "preemptions": 0.0,
+        "reasoning_effort": "xhigh",
+        "temperature": 0.6,
+        "seed": 46
+      },
+      "near_full": [
+        {
+          "group": "r0-c4",
+          "concurrency": 4,
+          "repeat": 0,
+          "elapsed_s": 383.8994792000012,
+          "correct_tasks": 12,
+          "planned_tasks": 12,
+          "correct_tasks_s": 0.03125818254561456,
+          "preemptions": 0.0,
+          "cache_evidence": {
+            "cold-selection": {
+              "requests": 4,
+              "requests_with_cached_tokens": 0,
+              "cached_tokens": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            "tool-continuation": {
+              "requests": 12,
+              "requests_with_cached_tokens": 12,
+              "cached_tokens": [
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856
+              ]
+            },
+            "appended-selection": {
+              "requests": 8,
+              "requests_with_cached_tokens": 8,
+              "cached_tokens": [
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856
+              ]
+            }
+          }
+        }
+      ],
+      "restore": {
+        "tokens_each": 130877,
+        "correct": 2,
+        "elapsed_s": 7.541095399999904,
+        "qualified": false,
+        "delta": {
+          "vllm:prefix_cache_hits_total": 0.0,
+          "vllm:external_prefix_cache_hits_total": 245760.0,
+          "vllm:num_preemptions_total": 0.0,
+          "lmcache_mp_num_finished_retrieves_total": 2.0,
+          "lmcache_mp_l2_prefetch_load_completed_chunks_total": 64.0
+        },
+        "verification_requests": [
+          {
+            "prompt_tokens": 130877,
+            "cached_tokens": 122880,
+            "complete_chunk_tokens": 126976,
+            "prompt_coverage": 0.9388968267915676,
+            "complete_chunk_coverage": 0.967741935483871
+          },
+          {
+            "prompt_tokens": 130877,
+            "cached_tokens": 122880,
+            "complete_chunk_tokens": 126976,
+            "prompt_coverage": 0.9388968267915676,
+            "complete_chunk_coverage": 0.967741935483871
+          }
+        ]
+      },
+      "resources": {
+        "peak_gpu_used_mib": 96266,
+        "minimum_gpu_free_mib": 2025,
+        "minimum_host_available_gib": 5.420513153076172
+      },
+      "evidence_sha256": {
+        "host.json": "4d656cb555cc9ec74ab49989f9d6df5833f073d591546912ce2e973b23eb8ea1",
+        "near-full/summary.json": "5c5fcbd6a47d5a8d73402890f9c7f8ec71c6dd39c41d8b8af93579f64f2a6b69",
+        "quality/completed.json": "c091bb8ba5aaa3c270ad4d91e51722f8ce7693450e097a0bafb84ede0f06970d",
+        "quality/xhigh-t06/quality/summary.json": "fd5bb1524d9057b2b29fb9a7994fdc20857c2f939b22ab63326ea003ebc514c4",
+        "quality/xhigh-t06/recovery/summary.json": "60a715732e9b72b0bb9f8fda063acf690ac9ba0eb3ba45435a70c44e4754fd28",
+        "restore/summary.json": "8bf49aca579a7187197b68e87d0698f9ae4cf88e58afbb16f1df72a1a29bb2b8",
+        "speed/comparison.json": "afbeefe58e48295898d1d3a1752d2fcdf688f8f0fb39295c07764f49fd7cb6e6",
+        "speed/summary.json": "0abfe73a7bc2db1bb2498e2fe7de09dfd0912e0dc9f319edda6ae2b39bbbdc0b",
+        "status.json": "f19632f19bee9dcde4e6de883aecfe0ceda040fb49847f4344d7414ee6b2ff8e"
+      }
+    },
+    {
+      "name": "w4-kv20-batch8k-k5-20261117-averages-r3",
+      "status": {
+        "stage": "finished",
+        "unix_s": 1794954590.812396,
+        "success": false,
+        "error": "RuntimeError('restore-verify failed (1)')"
+      },
+      "variant": {
+        "flags": {
+          "mamba-ssm-cache-dtype": "bfloat16"
+        },
+        "config": {
+          "Container": "n1x-recipe-trial",
+          "LmcacheNamespace": "qwen-recipe-w4-kv20-batch8k-k5-20261117-averages-r3",
+          "LmcacheVolume": "n1x-recipe-w4-kv20-batch8k-k5-20261117-averages-r3",
+          "KvCacheBytes": "21474836480",
+          "BatchedTokens": 8192,
+          "DFlashTokens": 5
+        }
+      },
+      "config": {
+        "Mtp": false,
+        "RequiredPartitionMiB": 98304,
+        "LmcacheChunkTokens": 4096,
+        "Context": 262144,
+        "Backend": "wslc-myllmbox",
+        "ModelRoot": "C:\\Users\\michael\\models",
+        "DefaultProfile": "qwen38fn-best",
+        "KvCacheDtype": "fp8",
+        "LmcacheL2GiB": 160,
+        "BatchedTokens": 8192,
+        "MaxSequences": 8,
+        "PleVolume": "n1x-ple-native",
+        "LmcacheL1GiB": 4,
+        "MyllmboxConfig": "profiles/qwen38fn-best.yaml",
+        "PleWorkers": 8,
+        "UseLMCache": true,
+        "Image": "n1x-ai:mbx-setup-1447755d89af469f894bfa8dcb51506d",
+        "DFlash": true,
+        "DFlashTokens": 5,
+        "ImageId": "sha256:819970fd46a90c1e70b7cd06aeb15d5ce3c75b02b62892a8322f42de225566bc",
+        "RestoreWaitMs": 0,
+        "LanAccess": false,
+        "Container": "n1x-recipe-trial",
+        "CacheVolume": "n1x-mbx-w4-dflash-test-cache",
+        "MyllmboxDrafter": "Qwen3.8-Flash-Next-DFlash2",
+        "MyllmboxEnvironment": "runtime/myllmbox/environment.psd1",
+        "KvCacheBytes": "21474836480",
+        "CacheBlockTokens": 4096,
+        "MaxOutputTokens": 8192,
+        "Profile": "qwen38fn-best",
+        "LmcacheVolume": "n1x-recipe-w4-kv20-batch8k-k5-20261117-averages-r3",
+        "Port": 8000,
+        "MyllmboxModel": "Qwen3.8-Flash-Next-W4A16-AutoRound-hybrid",
+        "LmcacheNamespace": "qwen-recipe-w4-kv20-batch8k-k5-20261117-averages-r3",
+        "MyllmboxWSLCVersion": "3.0.5.0",
+        "WindowsMinimumGiB": 4
+      },
+      "failure": {
+        "error": "RuntimeError('restore-verify failed (1)')",
+        "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\michael\\source\\github\\mycall\\n1x-ai\\benchmarks\\recipe_trial.py\", line 158, in run\n    command(['wslc','run','--rm','--network',f'container:{CONTAINER}',\n    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n        '--volume',f'{ROOT}/benchmarks:/benchmarks:ro','--volume',f'{restore}:/results',\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n        '--entrypoint','python3',config['ImageId'],'/benchmarks/restart_restore_probe.py',stage],\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n        'restore-'+stage,timeout=1800)\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\michael\\source\\github\\mycall\\n1x-ai\\benchmarks\\recipe_trial.py\", line 46, in command\n    raise RuntimeError(f'{name} failed ({result.returncode})')\nRuntimeError: restore-verify failed (1)\n"
+      },
+      "measurement-plan": {
+        "quality_seeds": [
+          47
+        ],
+        "continue_after_quality_failure": true,
+        "skip_screen": false,
+        "long": true,
+        "long_concurrency": [
+          "4"
+        ],
+        "restore": true
+      },
+      "quality-screens": [
+        {
+          "seed": 47,
+          "folder": "quality",
+          "passed": true,
+          "failures": [],
+          "archive": [
+            {
+              "concurrency": 1,
+              "correct": 4,
+              "planned": 4,
+              "elapsed_s": 58.203386399996816,
+              "max_output_tokens": 8192
+            },
+            {
+              "concurrency": 2,
+              "correct": 4,
+              "planned": 4,
+              "elapsed_s": 59.272531399998115,
+              "max_output_tokens": 8192
+            }
+          ],
+          "recovery": {
+            "correct": 24,
+            "planned": 24,
+            "elapsed_s": 50.26679179999337,
+            "thinking": true,
+            "concurrency": 4,
+            "max_output_tokens": 8192,
+            "preemptions": 0.0,
+            "reasoning_effort": "xhigh",
+            "temperature": 0.6,
+            "seed": 47
+          }
+        }
+      ],
+      "recipe.yaml": "gpu-memory-utilization: 0.01\ndtype: bfloat16\nengram-config:\n  cpu_offload: false\nload-format: mbx\nmoe-backend: marlin\ndistributed-executor-backend: mp\nmax-model-len: 262144\nmax-num-seqs: 8\nmax-num-batched-tokens: 8192\nkv-cache-memory-bytes: 16106127360\nkv-cache-dtype: fp8\nkv-cache-dtype-skip-layers:\n- sliding_window\nmamba-ssm-cache-dtype: float32\nmamba-cache-mode: align\nblock-size: 4096\nprefix-match-unit: 64\ncompilation-config:\n  cudagraph_mode: FULL_AND_PIECEWISE\n  cudagraph_capture_sizes: [1, 2, 3, 4, 8, 12, 16, 20, 24, 28, 32]\n  compile_ranges_endpoints: [32]\nenable-prefix-caching: true\nenable-prompt-tokens-details: true\nenable-per-request-metrics: true\nenable-auto-tool-choice: true\ntool-call-parser: qwen3_xml\nreasoning-parser: qwen3\nasync-scheduling: true\nuse-replayssm: false\ndefault-chat-template-kwargs:\n  preserve_thinking: false\nspeculative-config:\n  method: dflash\n  model: /drafter\n  num_speculative_tokens: 3\n  disable_eagle_block_drop: true\n  max_model_len: 262144\n  kv_cache_dtype: auto\n  draft_load_config:\n    load_format: safetensors\n  attention_backend: TRITON_ATTN\n",
+      "environment.psd1": "@{\n    DO_NOT_TRACK = '1'\n    FLASHINFER_CUDA_ARCH_LIST = '12.1a'\n    FLASHINFER_NVCC_THREADS = '1'\n    FLASHINFER_WORKSPACE_BASE = '/cache/wsl305/flashinfer-workspace'\n    HF_HUB_DISABLE_TELEMETRY = '1'\n    HF_HUB_OFFLINE = '1'\n    LMCACHE_TRACK_USAGE = 'false'\n    MALLOC_MMAP_THRESHOLD_ = '65536'\n    MALLOC_TRIM_THRESHOLD_ = '131072'\n    MAX_JOBS = '1'\n    MBX_DEPTH_MODE = 'off'\n    MBX_DRAFT_FP8 = '0'\n    MBX_DRAFT_HEAD = '0'\n    MBX_DRAFT_HEAD2 = ''\n    MBX_LOADER_EMPTY_CACHE = '1'\n    MBX_LOADER_PREPARE = '0'\n    MBX_MARLIN_CSF = '1'\n    MBX_PLE_ASYNC = '1'\n    MBX_PLE_FP8_DIR = '/ple-table-fp8'\n    MBX_PLE_MMAP = '1'\n    MBX_PLE_MMAP_MODE = 'nvme'\n    MBX_PLE_MMAP_PREWARM = '0'\n    MBX_PLE_NVME_DIR = '/cache/ple-nvme-fp8'\n    MBX_PLE_PREFILL_CKPT = '1'\n    PYTHONFAULTHANDLER = '1'\n    PYTHONUNBUFFERED = '1'\n    TOKENIZERS_PARALLELISM = 'false'\n    TORCHINDUCTOR_COMPILE_THREADS = '1'\n    TORCH_CUDA_ARCH_LIST = '12.1a'\n    TRANSFORMERS_OFFLINE = '1'\n    TRITON_CACHE_DIR = '/cache/wsl305/triton'\n    VLLM_CACHE_ROOT = '/cache/wsl305/vllm-cache'\n    VLLM_FP8_HYBRID = '1'\n    VLLM_MARLIN_USE_ATOMIC_ADD = '1'\n    VLLM_NO_USAGE_STATS = '1'\n    VLLM_USE_BREAKABLE_CUDAGRAPH = '1'\n    VLLM_USE_DEEP_GEMM = '0'\n}\n",
+      "speed": [
+        {
+          "concurrency": 1,
+          "depth": 4096,
+          "recorded": 2,
+          "valid": 2,
+          "read_tokens_s": 2773.5960975415974,
+          "write_tokens_s": 49.87305793970812,
+          "second_repetition": {
+            "samples": 1,
+            "read_tokens_s": 2750.176458446676,
+            "write_tokens_s": 50.23736614789599
+          }
+        },
+        {
+          "concurrency": 1,
+          "depth": 32768,
+          "recorded": 2,
+          "valid": 2,
+          "read_tokens_s": 2911.0974304148594,
+          "write_tokens_s": 47.67225676120483,
+          "second_repetition": {
+            "samples": 1,
+            "read_tokens_s": 2717.0086007341997,
+            "write_tokens_s": 46.76052208058245
+          }
+        },
+        {
+          "concurrency": 2,
+          "depth": 4096,
+          "recorded": 4,
+          "valid": 4,
+          "read_tokens_s": 2631.3280383381716,
+          "write_tokens_s": 35.11134474775517,
+          "second_repetition": {
+            "samples": 2,
+            "read_tokens_s": 2664.389579878733,
+            "write_tokens_s": 35.34628342303336
+          }
+        },
+        {
+          "concurrency": 2,
+          "depth": 32768,
+          "recorded": 4,
+          "valid": 4,
+          "read_tokens_s": 2203.1953208731434,
+          "write_tokens_s": 27.58729050611067,
+          "second_repetition": {
+            "samples": 2,
+            "read_tokens_s": 2130.4001477728402,
+            "write_tokens_s": 27.90207061211262
+          }
+        }
+      ],
+      "archive": [
+        {
+          "concurrency": 1,
+          "correct": 4,
+          "planned": 4,
+          "elapsed_s": 58.203386399996816,
+          "max_output_tokens": 8192
+        },
+        {
+          "concurrency": 2,
+          "correct": 4,
+          "planned": 4,
+          "elapsed_s": 59.272531399998115,
+          "max_output_tokens": 8192
+        }
+      ],
+      "recovery": {
+        "correct": 24,
+        "planned": 24,
+        "elapsed_s": 50.26679179999337,
+        "thinking": true,
+        "concurrency": 4,
+        "max_output_tokens": 8192,
+        "preemptions": 0.0,
+        "reasoning_effort": "xhigh",
+        "temperature": 0.6,
+        "seed": 47
+      },
+      "near_full": [
+        {
+          "group": "r0-c4",
+          "concurrency": 4,
+          "repeat": 0,
+          "elapsed_s": 385.3672687000071,
+          "correct_tasks": 12,
+          "planned_tasks": 12,
+          "correct_tasks_s": 0.03113912616523101,
+          "preemptions": 0.0,
+          "cache_evidence": {
+            "cold-selection": {
+              "requests": 4,
+              "requests_with_cached_tokens": 0,
+              "cached_tokens": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            "tool-continuation": {
+              "requests": 12,
+              "requests_with_cached_tokens": 12,
+              "cached_tokens": [
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856
+              ]
+            },
+            "appended-selection": {
+              "requests": 8,
+              "requests_with_cached_tokens": 8,
+              "cached_tokens": [
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856
+              ]
+            }
+          }
+        }
+      ],
+      "restore": {
+        "tokens_each": 130877,
+        "correct": 2,
+        "elapsed_s": 7.576873399999386,
+        "qualified": false,
+        "delta": {
+          "vllm:prefix_cache_hits_total": 0.0,
+          "vllm:external_prefix_cache_hits_total": 245760.0,
+          "vllm:num_preemptions_total": 0.0,
+          "lmcache_mp_num_finished_retrieves_total": 2.0,
+          "lmcache_mp_l2_prefetch_load_completed_chunks_total": 64.0
+        },
+        "verification_requests": [
+          {
+            "prompt_tokens": 130877,
+            "cached_tokens": 122880,
+            "complete_chunk_tokens": 126976,
+            "prompt_coverage": 0.9388968267915676,
+            "complete_chunk_coverage": 0.967741935483871
+          },
+          {
+            "prompt_tokens": 130877,
+            "cached_tokens": 122880,
+            "complete_chunk_tokens": 126976,
+            "prompt_coverage": 0.9388968267915676,
+            "complete_chunk_coverage": 0.967741935483871
+          }
+        ]
+      },
+      "resources": {
+        "peak_gpu_used_mib": 96305,
+        "minimum_gpu_free_mib": 1986,
+        "minimum_host_available_gib": 5.302562713623047
+      },
+      "evidence_sha256": {
+        "host.json": "08dd9f80715cfbda4889a015dd53833f479199ac5dc977b60626d801955feeb7",
+        "near-full/summary.json": "a6e5d1416185c51b92fad150c9b4c761ebb1b250e5302cc96fd83fee78551310",
+        "quality/completed.json": "c52be2928ca1e8a77ed35894cfb1dc9edd0980cdd7d5c53f137bc714babc0eb8",
+        "quality/xhigh-t06/quality/summary.json": "c6a2e2e1c959dbe990a45c8c7af1e3fe13ca6718cabdfb5637f26f8ecc0cc501",
+        "quality/xhigh-t06/recovery/summary.json": "5c01fe7befd48e52581238110b4f4fa55da68d0cd0fc3a0e1b459dc06c5242a0",
+        "restore/summary.json": "5bf575d04c0b583e8054c0a4cf06fbdbef0e334aa7ca84b447054a350cf5a56e",
+        "speed/comparison.json": "7bd62f52a58783d1197a5041ddfe19424617bb8c090174802b6cbeae3cea6db2",
+        "speed/summary.json": "65c086183d9866bd8792a110dd54063cb9eb191f7a955be1036f940567425c57",
+        "status.json": "2bb3e29da36ffb3b69bed49f5fb8a7483e073084b3fd637cd5c8758edb84c58e"
+      }
+    },
+    {
+      "name": "w4-kv20-batch8k-k5-repeat-20261117",
+      "status": {
+        "stage": "finished",
+        "unix_s": 1794940941.431535,
+        "success": false,
+        "error": "RuntimeError('restore-verify failed (1)')"
+      },
+      "variant": {
+        "flags": {
+          "mamba-ssm-cache-dtype": "bfloat16"
+        },
+        "config": {
+          "Container": "n1x-recipe-trial",
+          "LmcacheNamespace": "qwen-recipe-w4-kv20-batch8k-k5-repeat-20261117",
+          "LmcacheVolume": "n1x-recipe-w4-kv20-batch8k-k5-repeat-20261117",
+          "KvCacheBytes": "21474836480",
+          "BatchedTokens": 8192,
+          "DFlashTokens": 5
+        }
+      },
+      "config": {
+        "LanAccess": false,
+        "Mtp": false,
+        "MaxOutputTokens": 8192,
+        "PleWorkers": 8,
+        "KvCacheBytes": "21474836480",
+        "MyllmboxConfig": "profiles/qwen38fn-best.yaml",
+        "Image": "n1x-ai:mbx-setup-1447755d89af469f894bfa8dcb51506d",
+        "MyllmboxWSLCVersion": "3.0.5.0",
+        "MaxSequences": 8,
+        "ImageId": "sha256:819970fd46a90c1e70b7cd06aeb15d5ce3c75b02b62892a8322f42de225566bc",
+        "WindowsMinimumGiB": 4,
+        "DefaultProfile": "qwen38fn-best",
+        "UseLMCache": true,
+        "MyllmboxModel": "Qwen3.8-Flash-Next-W4A16-AutoRound-hybrid",
+        "Backend": "wslc-myllmbox",
+        "RequiredPartitionMiB": 98304,
+        "PleVolume": "n1x-ple-native",
+        "CacheVolume": "n1x-mbx-w4-dflash-test-cache",
+        "LmcacheVolume": "n1x-recipe-w4-kv20-batch8k-k5-repeat-20261117",
+        "Context": 262144,
+        "ModelRoot": "C:\\Users\\michael\\models",
+        "KvCacheDtype": "fp8",
+        "DFlashTokens": 5,
+        "Port": 8000,
+        "LmcacheChunkTokens": 4096,
+        "Profile": "qwen38fn-best",
+        "MyllmboxDrafter": "Qwen3.8-Flash-Next-DFlash2",
+        "MyllmboxEnvironment": "runtime/myllmbox/environment.psd1",
+        "DFlash": true,
+        "Container": "n1x-recipe-trial",
+        "LmcacheNamespace": "qwen-recipe-w4-kv20-batch8k-k5-repeat-20261117",
+        "LmcacheL1GiB": 4,
+        "CacheBlockTokens": 4096,
+        "BatchedTokens": 8192,
+        "RestoreWaitMs": 0,
+        "LmcacheL2GiB": 160
+      },
+      "failure": {
+        "error": "RuntimeError('restore-verify failed (1)')",
+        "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\michael\\source\\github\\mycall\\n1x-ai\\benchmarks\\recipe_trial.py\", line 158, in run\n    command(['wslc','run','--rm','--network',f'container:{CONTAINER}',\n    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n        '--volume',f'{ROOT}/benchmarks:/benchmarks:ro','--volume',f'{restore}:/results',\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n        '--entrypoint','python3',config['ImageId'],'/benchmarks/restart_restore_probe.py',stage],\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n        'restore-'+stage,timeout=1800)\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\michael\\source\\github\\mycall\\n1x-ai\\benchmarks\\recipe_trial.py\", line 46, in command\n    raise RuntimeError(f'{name} failed ({result.returncode})')\nRuntimeError: restore-verify failed (1)\n"
+      },
+      "measurement-plan": {
+        "quality_seeds": [
+          43,
+          44
+        ],
+        "continue_after_quality_failure": true,
+        "skip_screen": false,
+        "long": true,
+        "long_concurrency": [
+          "4"
+        ],
+        "restore": true
+      },
+      "quality-screens": [
+        {
+          "seed": 43,
+          "folder": "quality",
+          "passed": true,
+          "failures": [],
+          "archive": [
+            {
+              "concurrency": 1,
+              "correct": 4,
+              "planned": 4,
+              "elapsed_s": 54.887345499999356,
+              "max_output_tokens": 8192
+            },
+            {
+              "concurrency": 2,
+              "correct": 4,
+              "planned": 4,
+              "elapsed_s": 52.07066399999894,
+              "max_output_tokens": 8192
+            }
+          ],
+          "recovery": {
+            "correct": 24,
+            "planned": 24,
+            "elapsed_s": 54.092667499993695,
+            "thinking": true,
+            "concurrency": 4,
+            "max_output_tokens": 8192,
+            "preemptions": 0.0,
+            "reasoning_effort": "xhigh",
+            "temperature": 0.6,
+            "seed": 43
+          }
+        },
+        {
+          "seed": 44,
+          "folder": "quality-seed-44",
+          "passed": false,
+          "failures": [
+            {
+              "variant": "xhigh-t06",
+              "phase": "quality",
+              "error": "Archive quality first-attempt failures"
+            }
+          ],
+          "archive": [
+            {
+              "concurrency": 1,
+              "correct": 3,
+              "planned": 4,
+              "elapsed_s": 53.5169876999862,
+              "max_output_tokens": 8192
+            },
+            {
+              "concurrency": 2,
+              "correct": 4,
+              "planned": 4,
+              "elapsed_s": 51.72237479999603,
+              "max_output_tokens": 8192
+            }
+          ],
+          "recovery": {
+            "correct": 24,
+            "planned": 24,
+            "elapsed_s": 51.48204020000412,
+            "thinking": true,
+            "concurrency": 4,
+            "max_output_tokens": 8192,
+            "preemptions": 0.0,
+            "reasoning_effort": "xhigh",
+            "temperature": 0.6,
+            "seed": 44
+          }
+        }
+      ],
+      "recipe.yaml": "gpu-memory-utilization: 0.01\ndtype: bfloat16\nengram-config:\n  cpu_offload: false\nload-format: mbx\nmoe-backend: marlin\ndistributed-executor-backend: mp\nmax-model-len: 262144\nmax-num-seqs: 8\nmax-num-batched-tokens: 8192\nkv-cache-memory-bytes: 16106127360\nkv-cache-dtype: fp8\nkv-cache-dtype-skip-layers:\n- sliding_window\nmamba-ssm-cache-dtype: float32\nmamba-cache-mode: align\nblock-size: 4096\nprefix-match-unit: 64\ncompilation-config:\n  cudagraph_mode: FULL_AND_PIECEWISE\n  cudagraph_capture_sizes: [1, 2, 3, 4, 8, 12, 16, 20, 24, 28, 32]\n  compile_ranges_endpoints: [32]\nenable-prefix-caching: true\nenable-prompt-tokens-details: true\nenable-per-request-metrics: true\nenable-auto-tool-choice: true\ntool-call-parser: qwen3_xml\nreasoning-parser: qwen3\nasync-scheduling: true\nuse-replayssm: false\ndefault-chat-template-kwargs:\n  preserve_thinking: false\nspeculative-config:\n  method: dflash\n  model: /drafter\n  num_speculative_tokens: 3\n  disable_eagle_block_drop: true\n  max_model_len: 262144\n  kv_cache_dtype: auto\n  draft_load_config:\n    load_format: safetensors\n  attention_backend: TRITON_ATTN\n",
+      "environment.psd1": "@{\n    DO_NOT_TRACK = '1'\n    FLASHINFER_CUDA_ARCH_LIST = '12.1a'\n    FLASHINFER_NVCC_THREADS = '1'\n    FLASHINFER_WORKSPACE_BASE = '/cache/wsl305/flashinfer-workspace'\n    HF_HUB_DISABLE_TELEMETRY = '1'\n    HF_HUB_OFFLINE = '1'\n    LMCACHE_TRACK_USAGE = 'false'\n    MALLOC_MMAP_THRESHOLD_ = '65536'\n    MALLOC_TRIM_THRESHOLD_ = '131072'\n    MAX_JOBS = '1'\n    MBX_DEPTH_MODE = 'off'\n    MBX_DRAFT_FP8 = '0'\n    MBX_DRAFT_HEAD = '0'\n    MBX_DRAFT_HEAD2 = ''\n    MBX_LOADER_EMPTY_CACHE = '1'\n    MBX_LOADER_PREPARE = '0'\n    MBX_MARLIN_CSF = '1'\n    MBX_PLE_ASYNC = '1'\n    MBX_PLE_FP8_DIR = '/ple-table-fp8'\n    MBX_PLE_MMAP = '1'\n    MBX_PLE_MMAP_MODE = 'nvme'\n    MBX_PLE_MMAP_PREWARM = '0'\n    MBX_PLE_NVME_DIR = '/cache/ple-nvme-fp8'\n    MBX_PLE_PREFILL_CKPT = '1'\n    PYTHONFAULTHANDLER = '1'\n    PYTHONUNBUFFERED = '1'\n    TOKENIZERS_PARALLELISM = 'false'\n    TORCHINDUCTOR_COMPILE_THREADS = '1'\n    TORCH_CUDA_ARCH_LIST = '12.1a'\n    TRANSFORMERS_OFFLINE = '1'\n    TRITON_CACHE_DIR = '/cache/wsl305/triton'\n    VLLM_CACHE_ROOT = '/cache/wsl305/vllm-cache'\n    VLLM_FP8_HYBRID = '1'\n    VLLM_MARLIN_USE_ATOMIC_ADD = '1'\n    VLLM_NO_USAGE_STATS = '1'\n    VLLM_USE_BREAKABLE_CUDAGRAPH = '1'\n    VLLM_USE_DEEP_GEMM = '0'\n}\n",
+      "speed": [
+        {
+          "concurrency": 1,
+          "depth": 4096,
+          "recorded": 2,
+          "valid": 2,
+          "read_tokens_s": 2766.7366682619704,
+          "write_tokens_s": 45.59802754533075,
+          "second_repetition": {
+            "samples": 1,
+            "read_tokens_s": 2736.075116970434,
+            "write_tokens_s": 44.080010964966036
+          }
+        },
+        {
+          "concurrency": 1,
+          "depth": 32768,
+          "recorded": 2,
+          "valid": 2,
+          "read_tokens_s": 3116.8936740797644,
+          "write_tokens_s": 49.6017142507749,
+          "second_repetition": {
+            "samples": 1,
+            "read_tokens_s": 3109.7885797516033,
+            "write_tokens_s": 48.08159425845048
+          }
+        },
+        {
+          "concurrency": 2,
+          "depth": 4096,
+          "recorded": 4,
+          "valid": 4,
+          "read_tokens_s": 1938.1872056868353,
+          "write_tokens_s": 38.50977720381396,
+          "second_repetition": {
+            "samples": 2,
+            "read_tokens_s": 1549.5729411067362,
+            "write_tokens_s": 38.49028464352821
+          }
+        },
+        {
+          "concurrency": 2,
+          "depth": 32768,
+          "recorded": 4,
+          "valid": 4,
+          "read_tokens_s": 2317.2240462286327,
+          "write_tokens_s": 29.256171012453372,
+          "second_repetition": {
+            "samples": 2,
+            "read_tokens_s": 2298.9477556122674,
+            "write_tokens_s": 29.836562289214847
+          }
+        }
+      ],
+      "archive": [
+        {
+          "concurrency": 1,
+          "correct": 4,
+          "planned": 4,
+          "elapsed_s": 54.887345499999356,
+          "max_output_tokens": 8192
+        },
+        {
+          "concurrency": 2,
+          "correct": 4,
+          "planned": 4,
+          "elapsed_s": 52.07066399999894,
+          "max_output_tokens": 8192
+        }
+      ],
+      "recovery": {
+        "correct": 24,
+        "planned": 24,
+        "elapsed_s": 54.092667499993695,
+        "thinking": true,
+        "concurrency": 4,
+        "max_output_tokens": 8192,
+        "preemptions": 0.0,
+        "reasoning_effort": "xhigh",
+        "temperature": 0.6,
+        "seed": 43
+      },
+      "near_full": [
+        {
+          "group": "r0-c4",
+          "concurrency": 4,
+          "repeat": 0,
+          "elapsed_s": 383.2584590000042,
+          "correct_tasks": 12,
+          "planned_tasks": 12,
+          "correct_tasks_s": 0.03131046352195417,
+          "preemptions": 0.0,
+          "cache_evidence": {
+            "cold-selection": {
+              "requests": 4,
+              "requests_with_cached_tokens": 0,
+              "cached_tokens": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            "tool-continuation": {
+              "requests": 12,
+              "requests_with_cached_tokens": 12,
+              "cached_tokens": [
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856
+              ]
+            },
+            "appended-selection": {
+              "requests": 8,
+              "requests_with_cached_tokens": 8,
+              "cached_tokens": [
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856,
+                249856
+              ]
+            }
+          }
+        }
+      ],
+      "restore": {
+        "tokens_each": 130877,
+        "correct": 2,
+        "elapsed_s": 7.476309399999991,
+        "qualified": false,
+        "delta": {
+          "vllm:prefix_cache_hits_total": 0.0,
+          "vllm:external_prefix_cache_hits_total": 245760.0,
+          "vllm:num_preemptions_total": 0.0,
+          "lmcache_mp_num_finished_retrieves_total": 2.0,
+          "lmcache_mp_l2_prefetch_load_completed_chunks_total": 64.0
+        },
+        "verification_requests": [
+          {
+            "prompt_tokens": 130877,
+            "cached_tokens": 122880,
+            "complete_chunk_tokens": 126976,
+            "prompt_coverage": 0.9388968267915676,
+            "complete_chunk_coverage": 0.967741935483871
+          },
+          {
+            "prompt_tokens": 130877,
+            "cached_tokens": 122880,
+            "complete_chunk_tokens": 126976,
+            "prompt_coverage": 0.9388968267915676,
+            "complete_chunk_coverage": 0.967741935483871
+          }
+        ]
+      },
+      "resources": {
+        "peak_gpu_used_mib": 96382,
+        "minimum_gpu_free_mib": 1909,
+        "minimum_host_available_gib": 4.6824798583984375
+      },
+      "evidence_sha256": {
+        "host.json": "866441ae8de0d597ec522a1a53308d2b02af89be39bc246ab4cf57bda31be981",
+        "near-full/summary.json": "81438030851cb3a5c8d81b11464f6ad0dc21dba80f01ef81297d08c479306cb5",
+        "quality/completed.json": "91918eeaed2e35c0bfef8c0a3f84d51b25857dcf44bbe1fa6a9099bd8dcccb7f",
+        "quality/xhigh-t06/quality/summary.json": "5d6e05b668875d2d88630c09b391ca46fdba2996e4498dda6beda2d58c0624c4",
+        "quality/xhigh-t06/recovery/summary.json": "25a952ea07e8ddcf4c6306f88bd55d3d3be51e51f8d5c6a92d94bc11dfd4d120",
+        "quality-seed-44/completed.json": "b1cd73200da794b0186d4ccb56222af680621776460239d9576f63deb9e5f7f7",
+        "quality-seed-44/xhigh-t06/quality/summary.json": "b9abf924d5989f0c73a91f9e2e79be1596d02e63990506e5a2fac94b7f6f52d8",
+        "quality-seed-44/xhigh-t06/recovery/summary.json": "030f721b4441c5e50ec2a40a240e9c8f90aa5c2389913e7236112c10945fd197",
+        "restore/summary.json": "5afc53e0eabca457edcd17beb623be5eadc7776998802859d002ea093c7463cf",
+        "speed/comparison.json": "97619e85c46ff12e809e2d15d4681de6be9814f1514602f761ee1ef2d7b5cb8e",
+        "speed/summary.json": "3c779a664c90451254517d8b169760e6b65f0ff5080e4b5ece5cbfe36c82def6",
+        "status.json": "92c0a29ce9f2b707b0b54cbbd9bb4698aaa800f820c05ee21819ef076ceee5bb"
+      }
     }
   ]
 }
