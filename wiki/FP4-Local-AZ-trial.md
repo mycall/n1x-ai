@@ -1,24 +1,14 @@
-# Qwen38 profile comparison
+# W4 and FP4-Local-AZ performance on 96 GiB
 
-Measurements: November 16–17, 2026 · RTX Spark N1X · 96 GiB dedicated GPU memory.
+Across three paired runs with W4, five draft tokens, and a 20 GiB KV pool, the 8K prefill batch finished the near-full C4 workload 5.3% sooner on average. The 4K batch restored all complete chunks after restart and had more GPU headroom. The short screens do not establish a quality ranking. [Choose a serving profile](Profile-review.md)
 
-## Recommended profiles
-
-| Priority | Profile | Reason |
-| --- | --- | --- |
-| Long-context throughput | `qwen38fn-w4-kv20-8k-k5` | 384.60 s mean across three new runs; won all three pairs; partial restore and less headroom |
-| Complete cacheable-prefix restoration and more headroom | `qwen38fn-w4-kv20-4k-k5` | 406.03 s mean; all three strict restore checks pass |
-| K3 alternative with more headroom | `qwen38fn-w4-kv19` | 7.71-minute C4 workload; partial restore |
-| K3 alternative with complete cacheable-prefix restoration | `qwen38fn-w4-kv19-4k` | 8.46–9.09-minute C4 runs; strict restore passes |
-| Evaluate FP4-Local-AZ weights | `qwen38fn-az-kv19` | 7.61-minute C4 workload; no established advantage over W4 from one run |
-
-**W4 / K5 / KV20 / batch8K is the measured throughput winner for this workload:** 5.3% less elapsed time on average, winning all three new pairs. Choose batch4K when complete cacheable-chunk restoration and more GPU headroom matter more than that speed gain. The small answer-quality differences do not establish a reliability ranking. The selected default remains `qwen38fn-best`.
+Measurements were collected November 16–17, 2026 on an RTX Spark N1X with a 96 GiB GPU partition.
 
 ## Three-run KV20/K5 averages
 
-Three new full trials per configuration on November 17. Pair order was 4K/8K, 8K/4K, then 4K/8K; short-screen seeds were 45, 46, and 47, matched within each pair. Every trial used a fresh cache namespace and included 12 speed requests, 32 short correctness tasks, four simultaneous 250,002-token conversations with 12 tool tasks, and a two-prompt SSD restore after restart. All settings except batch size were held fixed. Startup time is excluded.
+Each configuration ran three times on November 17. Pair order was 4K/8K, 8K/4K, then 4K/8K; short-screen seeds were 45, 46, and 47, matched within each pair. Every trial used a fresh cache namespace and included 12 speed requests, 32 short correctness tasks, four simultaneous 250,002-token conversations with 12 tool tasks, and a two-prompt SSD restore after restart. All settings except batch size were held fixed. Startup time is excluded.
 
-These are arithmetic means of the three new runs; earlier exploratory runs are excluded from the primary averages. Failed first-attempt scores remain recorded, and completed performance measurements are included even when another check fails. The ± values are sample standard deviations, not confidence intervals.
+These are arithmetic means of the three paired runs; earlier exploratory runs are excluded from the primary averages. Failed first-attempt scores remain recorded, and completed performance measurements are included even when another check fails. The ± values are sample standard deviations, not confidence intervals.
 
 | Measurement | KV20 / batch4K | KV20 / batch8K |
 | --- | --- | --- |
@@ -45,7 +35,7 @@ All six long runs recorded zero preemptions. Every hit reused 249,856 tokens. Th
 
 ### Mean short-request speed
 
-Cells are mean input/output tokens per second across the three new runs. Each run first aggregates its two repetitions by phase time; C2 rates remain per request. Both configurations completed all 36 speed requests. The receipt includes per-run rates, ranges, standard deviations, and second-repetition evidence.
+Cells are mean input/output tokens per second across the three paired runs. Each run first aggregates its two repetitions by phase time; C2 rates remain per request. Both configurations completed all 36 speed requests. The receipt includes per-run rates, ranges, standard deviations, and second-repetition evidence.
 
 | Input / clients | KV20 / batch4K | KV20 / batch8K |
 | --- | --- | --- |
@@ -74,8 +64,7 @@ All profiles below use DFlash2 (K3 unless the profile name specifies K5), 262,14
 
 AZ uses five routed experts and shared-expert width 1,280; W4 uses ten and 640. Both have the same chat template. KV19 reports 924,785 tokens of capacity and KV20 reports 973,330, versus 730,605 for KV15. BF16 SSM pages require padding; changing SSM precision alone does not establish a doubling of capacity.
 
-
-## Earlier K3/AZ correctness and long-context performance
+## K3 and AZ tool correctness
 
 The short screen consists of eight 32K archive cases and 24 concurrent tool-recovery tasks. The long workload consists of four conversations starting at 250,002 tokens, with three tool tasks per conversation. All scored results are first attempts. All completed long runs recorded zero preemptions.
 
@@ -106,7 +95,7 @@ The three K3/AZ restores above recorded zero GPU-prefix hits, two completed exte
 
 In SSM `align` mode, recurrent-state checkpoints are captured at scheduler-step boundaries; skipped intermediate blocks can be null. Restoring requires a compatible recurrent-state endpoint as well as the attention cache. Changing only the prefill batch from 8K to 4K recovered the predicted missing checkpoint. The installed implementation is documented in `validate_mamba_step_alignment`, `MambaManager.allocate_new_blocks`, and LMCache's `GetStoreMetadata`.
 
-## Earlier K3/AZ short-request speed
+## K3 and AZ short-request speed
 
 Cells are **input / output tokens per second**, weighted per-request phase rates across two repetitions. C2 rates are per request, not aggregate throughput. Each configuration completed all 12 speed requests with a fixed 512-token output budget.
 
@@ -132,8 +121,7 @@ Minimum sampled headroom through the speed, correctness, and long-context tests,
 
 **Keep the 96 GiB dedicated allocation.** No tested recommendation requires more. Task Manager's shared-memory allowance is not additional dedicated GPU capacity. Resource figures use the active trial's telemetry; the near-full probe's embedded original-container host-memory field is stale for these isolated runs and is excluded.
 
-
-## Earlier DFlash2 depth and KV/batch comparisons
+## Exploratory depth and KV comparisons
 
 These are sequential exploratory runs, separate from the new paired averages. K3 and K5 below both use W4, BF16 SSM, KV19, and batch4K with fresh cache namespaces. Each completed 12/12 speed requests and 44/44 short-plus-long tasks.
 
@@ -167,7 +155,7 @@ KV20 gives 3.71 times the 262,144-token context limit in reported KV capacity, v
 
 The first KV19/batch8K attempt stopped after 4/4 C1 archive cases with Windows connection timeouts. The server remained running and a later health request succeeded; the transport root cause is unresolved. The separate retry passed all short and long tasks. Both attempts remain in the evidence.
 
-### Earlier exploratory correctness and variability
+### Exploratory correctness and variability
 
 | KV20 / K5 batch | Seed 42 | Seed 43 | Seed 44 | Total first-attempt correct |
 | --- | --- | --- | --- | --- |
@@ -178,7 +166,7 @@ The earlier screens used temperature 0.6, xhigh thinking, an 8,192-token allowan
 
 The two earlier 8K failures were premature stops: seed 42 returned an empty final after a successful inventory-tool retry (20 completion tokens, 19 reasoning tokens); seed 44 returned only `CASE-` instead of `CASE-6:106:BIRCH-1754` (65 completion tokens, 60 reasoning tokens). Both had `finish_reason=stop`, far below the output allowance. The empty-final diagnostic retry answered correctly and remains excluded from first-attempt scores. The runner supports explicit quality seeds and continuing later measurements while retaining failed scores and an unsuccessful overall status.
 
-### Earlier exploratory short-request speed
+### Exploratory short-request speed
 
 Input/output tokens per second from the second independent KV20 run, with the same two-repetition per-request aggregation. Each completed 12/12 speed requests; all earlier samples remain in the receipt.
 
@@ -203,7 +191,6 @@ The [historical depth comparison](DFlash-depth-trial.md) used 88 GiB, KV11, FP32
 
 The AZ/MTP trial used BF16 KV15, RecoverSSM on, and LMCache off. Its 32K input/output rates were 2,619.58/48.26 at C1 and 2,378.32/27.34 at C2. The successful configuration disables expandable segments and uses an explicit KV budget with `gpu-memory-utilization: 0.01`. The upstream 0.88 availability check and expandable-segment configuration did not start successfully on this setup. Failed and interrupted attempts remain in the evidence receipt.
 
-
 ## Reproducibility and scope
 
 | Item | Value |
@@ -219,8 +206,7 @@ The AZ/MTP trial used BF16 KV15, RecoverSSM on, and LMCache off. Its 32K input/o
 | Compact evidence | [Settings, results, and hashes](data/recipe-mix-20261116.json) |
 | Raw evidence | `results/benchmarks/recipe-mix-20261116/` |
 
-These are bounded archive and tool workloads, not general coding or vision qualification. Three paired trials support the measured throughput choice, not a universal optimum. K5 with AZ, AZ with batch4K, and a broader parameter sweep are unmeasured. The retained evidence includes a K5 launch that stopped before inference because of a stale host-memory snapshot; the launcher now seeds a fresh operating-system sample before startup without weakening the memory guard. Local checks passed; trial servers are stopped, disposable cache volumes are removed, raw evidence is retained, and the original default remains unchanged.
-
+These are bounded archive and tool workloads, not general coding or vision qualification. Three paired trials support the measured throughput choice, not a universal optimum. K5 with AZ, AZ with batch4K, and a broader parameter sweep are unmeasured. The retained evidence includes a K5 launch that stopped before inference because of a stale host-memory snapshot; the launcher now seeds a fresh operating-system sample before startup without weakening the memory guard.
 
 ## Launch
 

@@ -1,12 +1,15 @@
 # Speed and capacity benchmarks
 
-The reusable `speed` suite renders configurations by context depth in one table segmented by client concurrency, with separate **(read, write) tk/s** values and visible gaps. Cold/incremental, thinking effort, output plans and timing sources remain separate comparison groups. [Existing measured results](Benchmarks.md) were collected by other protocols and are not silently converted into speed-grid cells.
+Use the `speed` suite for fixed-output prefill and decode measurements. Use the `capacity` suite for scored tasks near the context limit. The appended-history probe exercises tool calls and continuations against a running service.
 
-Use explicit depths for nearly full 262K comparisons; the default grid also supports shorter-context applications. [Test coverage](Test-plan.md) distinguishes completed work from open questions.
+| Task | Procedure |
+| --- | --- |
+| Inspect a planned grid without starting the server | [Preview the matrix](#preview-the-matrix-without-serving) |
+| Time cold prompts and reused prefixes | [Run a speed comparison](#run-a-speed-comparison) |
+| Compare completed runs | [Offline reporting](#compare-saved-runs-offline) |
+| Score retrieval, structured output, or tool use near 262K | [Near-full quality workloads](#nearly-full-262k-quality-workload) |
 
-## Completed common-benchmark matrix
-
-See the [historical 88 GiB/KV11 matrix](Qwen38fn-speed-matrix.md) for all 32 C1–C8 × 4K/8K/64K/262K cells, collected with installed `vllm bench serve`. It includes interactive charts, exact request counts and commands, three cold bursts per cell, 512-token outputs, client TTFT, queue times and aggregate throughput. The 262K window reserves 512 output tokens. This protocol remains separate from the reusable `n1x-speed-v1` suite described below and does not measure the current 96 GiB/KV15 profile.
+For published results, see the [benchmark index](Benchmarks.md). The [88 GiB fixed-length matrix](Qwen38fn-speed-matrix.md) uses `vllm bench serve` with 512-token outputs. Its cold bursts use a different protocol from the `speed` suite below.
 
 ## Preview the matrix without serving
 

@@ -2,12 +2,6 @@
 
 LMCache stores reusable prompt KV state in RAM and on SSD. Cache profiles run it alongside vLLM in one container; vLLM also maintains its GPU prefix cache. Prepared PLE serves model embeddings and is separate from prompt caching. See [profiles](Configuration.md#profiles) for serving settings and [model assets](Model-assets.md) for exact storage dependencies.
 
-## Compatibility
-
-Local patches provide exportable CUDA VMM allocations, physical segments capped at 512 MiB, alias-safe sharing, staged transfers, bounded admission, and an optional restore queue for WSLC. Smaller physical segments preserve the full KV pool while reducing individual driver allocation sizes. These are experimental platform adaptations, not an upstream support guarantee. See [Development](Development.md#builds) for pinned builds and patch validation.
-
-The local descriptor broker recovers abandoned socket paths when container restarts reuse process IDs. It preserves live listeners and refuses to replace ordinary files or sockets owned by another user.
-
 ## Memory budget
 
 Use the [recommended hardware partition](Installation.md#requirements) with the supplied cache settings. Leave at least 4 GiB Windows memory available; aim for 6 GiB for browsing and a harness.
@@ -39,7 +33,7 @@ There is no configured age-based expiry (TTL). Cold entries are removed when cap
 
 Set `LmcacheL2GiB = 8` for a smaller cache, or `0` to disable new SSD caching while retaining RAM caching. Disabling SSD caching does not remove existing files. Rebuild the cache image after patch changes, and recreate the service after configuration changes.
 
-The budget is a working-set choice, not a fixed context-length guarantee. DFlash2 and MTP produce different entry sizes; see [historical sizing](Benchmarks.md#ssd-budget-validation) and [restore qualification](Benchmarks.md#feature-and-cache-validation). Additional entries compete for space, and eviction can reduce prefix hits or require recomputation.
+The budget is a working-set choice, not a fixed context-length guarantee. DFlash2 and MTP produce different entry sizes; see [historical sizing](Reference-benchmarks.md#ssd-budget-validation) and [restore qualification](Reference-benchmarks.md#feature-and-cache-validation). Additional entries compete for space, and eviction can reduce prefix hits or require recomputation.
 
 ### Prompt reuse
 
@@ -52,3 +46,9 @@ Named volumes surviving a restart does not prove a successful restore. Check cac
 Only the model API is published, according to [LAN access settings](Configuration.md#lan-access). LMCache TCP 5555 and its HTTP/metrics port 8080 bind to container loopback and need no separate Windows ports.
 
 Outbound usage telemetry is disabled with `LMCACHE_TRACK_USAGE=false`, `DO_NOT_TRACK=1`, `VLLM_NO_USAGE_STATS=1`, and `HF_HUB_DISABLE_TELEMETRY=1`. Internal cache counters remain available for verification. The filesystem cache contains application data; protect its storage accordingly.
+
+## Compatibility
+
+Local patches provide exportable CUDA VMM allocations, physical segments capped at 512 MiB, alias-safe sharing, staged transfers, bounded admission, and an optional restore queue for WSLC. Smaller physical segments preserve the full KV pool while reducing individual driver allocation sizes. These are experimental platform adaptations, not an upstream support guarantee. See [Development](Development.md#builds) for pinned builds and patch validation.
+
+The local descriptor broker recovers abandoned socket paths when container restarts reuse process IDs. It preserves live listeners and refuses to replace ordinary files or sockets owned by another user.

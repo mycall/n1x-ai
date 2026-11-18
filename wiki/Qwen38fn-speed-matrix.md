@@ -1,4 +1,4 @@
-# qwen38fn-best read/write speed matrix
+# Read and write speed on the 88 GiB runtime
 
 These November 8 results describe the historical 88 GiB/KV11 profile. The [current best](Profile-review.md) uses 96 GiB/KV15 and a different runtime image; this matrix has not been rerun for it.
 
@@ -111,11 +111,9 @@ A local aiohttp forwarding proxy leaves response bytes unchanged while retaining
 
 The measured historical profile used DFlash2 **K3**, standard FP32 SSM, BF16 indexer, FP8 target KV, 11 GiB KV, eight server slots, 8K prefill batch, and LMCache RAM4/SSD160. Image and configuration identities, exact commands, request timings, wave ranges, GPU telemetry summaries and source hashes are retained in the JSON. Eight clients do not imply eight resident near-full histories. Results describe this host, corpus, fixed output window and recorded clock/power conditions.
 
-The missing pandas benchmark-client dependency was installed in a separate `/cache/n1x-bench-deps` directory (about 12 MB plus small date/time dependencies). No serving packages or model weights changed. The service was initially stopped and is stopped again after successful completion.
+The last four of 96 bursts followed a host restart with the same image, weights, and configuration. Burst timings exclude service startup. The first C1/262K request after reload may have different model/OS cache conditions. The JSON identifies the affected bursts.
 
-The user paused the sweep after 92 of 96 measured bursts on November 9. The host restarted during the pause; the last four bursts ran after reloading the same image, configuration and existing weights. The original checkpoint and run ID were preserved. Burst timings exclude the pause and service startup. The resumed C1/262K cell includes the first measured request after reload, so normal model/OS caching can differ from earlier rounds. Pause/resume timestamps and the resumed burst names are retained in the JSON.
-
-To reproduce against the running best container with the same client dependencies available:
+To run the same protocol on the active best container, make the benchmark-client dependencies available first. The measured installation placed pandas and its date/time dependencies in `/cache/n1x-bench-deps`. Record the effective profile before comparing with the 88 GiB results.
 
 ```powershell
 Copy-Item benchmarks/vllm_speed_matrix.py .state/n1x-qwen38fn-best/vllm_speed_matrix.py

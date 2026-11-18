@@ -1,15 +1,15 @@
 # MyLLMBox Linux runtime
 
-The selected profiles use a pinned MyLLMBox v5.4 image with the project's LMCache and DFlash2 adapters. This page covers runtime prerequisites, reproducible builds, and dependency upgrades. See [Configuration](Configuration.md#profiles) for serving settings, [Model assets](Model-assets.md) for files and volumes, and [Component review](Profile-review.md) for the selection rationale.
+The default W4 profile and the 96 GiB W4 and AZ alternatives run in a pinned MyLLMBox v5.4 Linux image with the project’s LMCache and DFlash2 adapters. Use this guide to identify the image, rebuild it, or select a candidate. For first launch, follow [Installation](Installation.md#prepared-best-profile).
 
 ## Existing installation
 
-`qwen38fn-best` pins the image tested in the 96 GiB campaign. `qwen38fn-lmcache-4k` retains the historical 88 GiB image. Both use the same model assets and load offline.
+The launcher checks both image tag and immutable ID. The 88 GiB alternate uses its own image. The W4 profiles share model assets, while AZ requires the FP4-Local-AZ checkpoint. [Model assets](Model-assets.md)
 
 | Profile | Image tag | Immutable image ID | GPU partition |
 | --- | --- | --- | --- |
-| Best | `n1x-ai:mbx-setup-1447755d89af469f894bfa8dcb51506d` | `sha256:819970fd46a90c1e70b7cd06aeb15d5ce3c75b02b62892a8322f42de225566bc` | 96 GiB |
-| 4K alternate | `n1x-ai:mbx-cache-test` | `sha256:de420cb63cedf084f8838e1e11a7db611e43418c04b3cebc756bc4a5955571aa` | 88 GiB |
+| 96 GiB W4 and AZ profiles | `n1x-ai:mbx-setup-1447755d89af469f894bfa8dcb51506d` | `sha256:819970fd46a90c1e70b7cd06aeb15d5ce3c75b02b62892a8322f42de225566bc` | 96 GiB |
+| 88 GiB `qwen38fn-lmcache-4k` | `n1x-ai:mbx-cache-test` | `sha256:de420cb63cedf084f8838e1e11a7db611e43418c04b3cebc756bc4a5955571aa` | 88 GiB |
 
 The following software measurements describe the historical image; use image provenance for the exact contents of another build.
 
@@ -24,7 +24,7 @@ The following software measurements describe the historical image; use image pro
 
 The host toolkit does not replace the guest toolkit. Rebuilding can produce a different image identity; the launcher rejects a tag whose ID differs from the profile.
 
-The [prepared-installation setup](Installation.md#prepared-best-profile), also run automatically by `start` and `recreate`, validates the weights and host settings, prepares missing FP8 PLE storage, and creates missing runtime-cache and LMCache volumes. A missing image tag is restored from its immutable ID if available. Otherwise setup builds the pinned repository recipe under a unique tag and records its new ID in local configuration. Existing image identity mismatches still fail. Missing target/drafter weights require separate preparation; the scripts do not bootstrap the entire best installation from an empty machine. The FP8 PLE source is downloaded at its pinned revision when needed and copied with checksum verification. The loader generates its map in the runtime cache on first startup, as described by the [upstream launcher](https://github.com/myllmbox/qwen38-flash-next-recipe/blob/main/run.sh). Locally built images need serving validation after startup and do not inherit the measured qualification of the image listed above.
+Setup, start, and recreate can restore a missing image tag from its immutable ID or build the pinned recipe and save a new local image identity. A locally built image needs serving validation. For the W4 profiles, the loader generates the FP8 PLE map on first startup. The AZ profiles use PLE from their checkpoint. [Setup and verification](Installation.md#prepared-best-profile) · [Upstream loader](https://github.com/myllmbox/qwen38-flash-next-recipe/blob/main/run.sh)
 
 ## Rebuild LMCache and the runtime
 

@@ -1,6 +1,6 @@
 # DFlash2 request parameter trial
 
-On November 8, 2026, the existing `qwen38fn-best` weights and DFlash2 K3 were tested with **xhigh/medium reasoning and temperature 1.0/0.6**. No model files were downloaded. **Xhigh at 0.6 passed 72/72 scored tasks** and is the candidate for further application testing. Service defaults remain unchanged.
+The 88 GiB W4/KV11 reference was tested on November 8, 2026 with DFlash2 K3, **xhigh/medium reasoning and temperature 1.0/0.6**. **Xhigh at 0.6 passed 72/72 scored tasks** and is the candidate for further application testing. Service defaults remain unchanged.
 
 The later [50% background GPU repeat](GPU-priority-trial.md) reproduced xhigh/0.6 at 72/72 and adds measured C2/C8 scaling. It also records why the timing changes do not establish a uniform slider benefit or WSLC's foreground/background GPU classification.
 
@@ -50,7 +50,7 @@ Temperature 0.6 with xhigh is the useful candidate from this trial. Medium was s
 
 The final temperature-1.0 run slowed substantially in both prefill and decode: its repeated recovery took 134.43 seconds versus 66.65 seconds initially, while both 0.6 recovery runs took about 63 seconds. Continuous power/clock telemetry was not collected, so that larger late timing difference cannot confidently be attributed to temperature. Do not promote it as a general speedup. Fixed seed also does not guarantee identical concurrent generation.
 
-Near-262K parameter comparisons, general coding tasks, and parameter-specific SSD restore/restart tests remain unmeasured. DFlash2 depth, runtime kernels, KV geometry, expert routing, quantization, and server defaults were held fixed. The setup recreated the previously removed LMCache volume, and the existing prepared PLE map was reused.
+Near-262K parameter comparisons, general coding tasks, and parameter-specific SSD restore/restart tests remain unmeasured. DFlash2 depth, runtime kernels, KV geometry, expert routing, quantization, and server defaults were held fixed.
 
 ## Retained evidence
 

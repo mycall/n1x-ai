@@ -1,6 +1,6 @@
 # Native Windows vLLM test profile
 
-`qwen38fn-myllmbox` is the historical Windows ARM64 reference using the separately installed [devjeonghwan RTX Spark runtime](https://github.com/devjeonghwan/vllm-for-rtx-spark/tree/5d6ca18458673405663c25f2f6353dd55a176d5e). It is distinct from the selected [MyLLMBox Linux runtime](MyLLMBox.md), despite the similar profile name. This page preserves its installation requirements and comparison results. Locally retired assets must be restored before use; see the [retirement record](Model-assets.md#local-retirement-record).
+`qwen38fn-myllmbox` is the historical Windows ARM64 reference using the separately installed [devjeonghwan RTX Spark runtime](https://github.com/devjeonghwan/vllm-for-rtx-spark/tree/5d6ca18458673405663c25f2f6353dd55a176d5e). It is distinct from the selected [MyLLMBox Linux runtime](MyLLMBox.md), despite the similar profile name. This page preserves its installation requirements and comparison results.
 
 The checked-in YAML copies upstream's 90 GB profile at that revision: NVFP4 local weights, 12,000,000,000 bytes of target FP8 KV, BF16 draft KV, FP8 drafter projections, HEAD2, dynamic MTP depth 3–7, NVMe PLE, decode graphs, 409,600-token context and 16 sequence slots. It does not use this project's LMCache adapter or WSLC volumes. Capacity is shared across requests; the context limit does not guarantee 16 simultaneous full contexts.
 
@@ -16,7 +16,7 @@ Use the upstream release installer with native ARM64 Python **3.13** and its pin
 
 Follow the upstream README for the CUDA 13.4-compatible driver, 96 GB dedicated GPU / 32 GB Windows allocation, paging file (98,304 MB initial / 131,072 MB maximum), and at least 32 GB free NVMe space for PLE. Obtain `nvidia/Qwen3.8-Flash-Next-FP4-Local` separately; the existing AutoRound model is not interchangeable with it.
 
-The WSLC cache profiles have different [partition and memory requirements](LMCache.md#memory-budget). Their 88 GiB requirement belongs to those configurations; it is not an inherent DFlash2 limit. Record and manually set the appropriate partition when comparing runtimes.
+The WSLC cache profiles have different [partition and memory requirements](LMCache.md#memory-budget). The original cache reference uses 88 GiB. The default MyLLMBox Linux profile uses 96 GiB. Record and manually set the appropriate partition when comparing runtimes.
 
 The runtime defaults to `../../vllm-for-rtx-spark` relative to this checkout. Override `NativeRuntimeRoot` in ignored `config.local.psd1` for another location; the expected executable is `.venv/Scripts/python.exe` inside it. `ModelRoot` retains its usual meaning and must contain `Qwen3.8-Flash-Next-FP4-Local`. For example:
 
@@ -48,7 +48,7 @@ Cleanup refuses to remove local process state while a native server is running. 
 
 ## Matched agent comparison
 
-The default API serves `qwen38fn-best`; reference profiles use the same client-facing alias when explicitly launched. Use identical benchmark options for both profiles:
+The default API serves `qwen/qwen38fn-best`; reference profiles use the same client-facing alias when explicitly launched. Use identical benchmark options for both profiles:
 
 ```powershell
 # Run after starting and waiting for each profile, one at a time.
@@ -59,10 +59,10 @@ The default API serves `qwen38fn-best`; reference profiles use the same client-f
 
 The Windows client is selected automatically for the native profile. It supports `agents`, `recovery`, `mixed`, `scheduler`, and `speculation` without `-Build` or `-Smoke`, preserves the existing prompts and scoring, and defaults to thinking enabled. An agent run measures 72 inventory-tool tasks (four conversations, three turns, concurrency 1/2/4 followed by 4/2/1). It saves raw evidence, vLLM metrics, profile settings and server identity under `results/benchmarks/<timestamp>-<profile>-<suite>`. LMCache metrics are explicitly omitted for this client on both profiles; these runs do not qualify external-cache restores. The vLLM serving, AIPerf and RULER suites still use the WSLC client.
 
-`-Python` selects the local client interpreter (default `python`). The mixed workload requires Pillow and scheduling requires aiohttp; both are already included in the tested native runtime environment. Reuse that environment for those probes:
+`-Python` selects the local client interpreter (default `python`). The mixed workload requires Pillow and scheduling requires aiohttp; both are already included in the tested native runtime environment. Run from the repository root. Adjust the interpreter path if you set `NativeRuntimeRoot`.
 
 ```powershell
-$clientPython = 'C:\Users\michael\source\github\vllm-for-rtx-spark\.venv\Scripts\python.exe'
+$clientPython = '..\..\vllm-for-rtx-spark\.venv\Scripts\python.exe'
 .\n1x.ps1 test -Profile qwen38fn-myllmbox -Suite features
 .\benchmark.ps1 -Profile qwen38fn-myllmbox -Suite recovery -LocalClient -Python $clientPython
 .\benchmark.ps1 -Profile qwen38fn-myllmbox -Suite scheduler -LocalClient -Python $clientPython
@@ -75,18 +75,16 @@ These commands retain each existing suite's output limits: 1,024 for recovery/mi
 
 Compare total correct tasks divided by total measured seconds for each concurrency, and inspect truncations and failures. These are whole-profile comparisons: weights, quantization, runtime, KV budget, context, sequence slots and speculation differ. Record the GPU partition explicitly: the supplied native profile uses 96 GiB, whereas the supplied LMCache baseline uses 88 GiB. Keep power mode and client workload consistent, and avoid unrelated model traffic. Testing both at one partition requires separately qualified memory settings.
 
-## Integration results: November 1, 2026
+## Measured agent throughput
 
 The native profile passed the three API smoke checks and **72/72 thinking-enabled inventory-tool tasks**, with zero output-limit truncations across 168 requests and zero measured preemptions. GPU allocation was 96 GiB; `nvidia-smi` reported 89,174 MiB (87.08 GiB) used before the agent run. Windows power-scheme information is saved in `host.json`; MSI mode was not independently recorded.
 
 Rates below aggregate both sweep directions as total correct tasks / total timed seconds, excluding conversation warmup:
 
-| Concurrency | Native MTP, new run at 96 GiB | DFlash2 + LMCache, previously recorded at 88 GiB |
+| Concurrency | Native MTP at 96 GiB | DFlash2 + LMCache, previously recorded at 88 GiB |
 | ---: | ---: | ---: |
 | 1 | 0.296 correct tasks/s | 0.453 correct tasks/s |
 | 2 | 0.411 correct tasks/s | 0.622 correct tasks/s |
 | 4 | 0.537 correct tasks/s | 0.811 correct tasks/s |
 
-The DFlash2 column is the [existing benchmark](Benchmarks.md#warm-agent-throughput), which also passed 72/72; it is **not a fresh matched run**. A new baseline attempt at the current 96 GiB partition was stopped by the existing host-memory guard at 3.87 GiB available. An idle-WSLC reset and retry was cancelled after confirming the documented 88 GiB requirement. No partition changes or reductions to the 4 GiB guard were made. Both services were stopped afterward. The historical DFlash2 rates are roughly 1.5 times the new native rates on this workload, but different run dates, client placement, memory partitions and power conditions prevent treating this as a controlled speedup measurement.
-
-The original case `20261101-125850-qwen38fn-devjeonghwan-agents` and later renamed-profile experiments are preserved in the [local benchmark archive](Benchmarks.md#retained-evidence). The original name is historical; launch with `qwen38fn-myllmbox`.
+The native run was measured on November 1, 2026. The DFlash2 reference used a separate run at 88 GiB and scored 72/72. A baseline attempt at 96 GiB stopped at the 4 GiB Windows memory guard (3.87 GiB available). Different partitions, power conditions, and client placement limit direct comparison. [Reference agent timings](Reference-benchmarks.md#warm-agent-throughput) · [Raw evidence archive](Benchmarks.md#retained-evidence)

@@ -4,7 +4,7 @@ This guide covers runtime changes and validation. Use [Configuration](Configurat
 
 ## Builds
 
-For best and its 4K alternate, follow the [MyLLMBox build and upgrade procedure](MyLLMBox.md#rebuild-lmcache-and-the-runtime). The commands below build the **original WSLC reference stack**:
+For the MyLLMBox Linux profiles, follow the [MyLLMBox build and upgrade procedure](MyLLMBox.md#rebuild-lmcache-and-the-runtime). The commands below build the **original WSLC reference stack**:
 
 ```powershell
 .\build.ps1 -PrintOnly
@@ -95,4 +95,4 @@ Context checks use bounded default lengths. Use the [capacity suite](Speed-bench
 
 ## Documentation maintenance
 
-Keep the README focused on purpose and first use. Put operational settings in Configuration, runtime builds in MyLLMBox, exact assets in Model assets, and cache behavior in LMCache. Link to those pages instead of copying their procedures. Keep measured workload settings with their results so comparisons remain interpretable; label local cleanup history separately from general instructions.
+Keep the README focused on purpose and first use. Put operational settings in Configuration, runtime builds in MyLLMBox, exact assets in Model assets, and cache behavior in LMCache. Link to those pages instead of copying their procedures. Keep profile choices in [Serving profiles](Profile-review.md). Link measurements from [Benchmark results](Benchmarks.md) with their runtime, workload, first-attempt scores, and limitations. Keep machine-specific state out of setup and operating instructions.

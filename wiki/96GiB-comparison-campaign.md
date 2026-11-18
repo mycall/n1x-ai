@@ -1,14 +1,13 @@
-# 96 GiB comparison campaign
+# KV cache sizing on the 96 GiB runtime
 
-This campaign tests speed opportunities after the [initial 96 GiB tool qualification](Near-full-tools-96GiB.md). It is a screening comparison on the existing local runtime image, with no matched 88 GiB control. Results must be read from the output artifacts; launching the campaign does not establish a speed improvement.
+The default profile uses a 15 GiB KV pool and an 8,192-token prefill batch. At four clients, KV15 delivered about 31% more correct tool tasks per second than KV11 on the same 24 near-full tasks. Both configurations used eight slots, DFlash2 K3, and LMCache with 4 GiB RAM and a 160 GiB SSD budget.
 
-## Completed campaign and deployment selection
+| GPU KV pool | Two clients | Four clients |
+| --- | --- | --- |
+| 11 GiB | 21/24 planned tasks correct (incomplete) | 24/24 correct in 3,249.41 s |
+| 15 GiB | 24/24 correct in 1,046.20 s | 24/24 correct in 2,484.56 s |
 
-[Compact comparison results and source hashes](data/campaign96-summary.json) retain the completed and partial controls, cache-hit evidence, and comparison limits without requiring the local raw archive.
-
-On November 13, 2026, `qwen38fn-best` was promoted to the tested 96 GiB runtime, batch8K/KV15, slots8, and LMCache RAM4/SSD160. The retained KV15 report (`results/benchmarks/campaign96-20261112-105009/kv15-on-8k-attempt1-report.json`) records 24/24 correct tasks at C2 in 1,046.20 seconds and 24/24 at C4 in 2,484.56 seconds. KV11/batch8K C4 completed 24/24 in 3,249.41 seconds, giving KV15 about 31% higher correct-work throughput. Its C2 control was incomplete, so that comparison does not establish a C2 speed winner.
-
-The final controller receipt is `results/benchmarks/campaign96-finish-20261113-164038/status.json`; its comparison retains completed earlier stages. Completion does not make incomplete controls valid. The cache-off batch8K control remained partial; displaced replay showed external hits for only one of two replay selections per repeat, and restart restore was not measured. Earlier runtime and transport failures remain part of the evidence. Promotion is a practical deployment decision, not proof that 96 GiB beats 88 GiB or that LMCache always improves speed. This campaign is closed; the gaps remain documented rather than scheduled for another round.
+The cache-off control was partial. Displaced replay showed external hits for one of two selections per repeat. Restart recovery and a matched 88 GiB partition comparison were outside the completed measurements. Source hashes, partial controls, and the controller’s original reports are indexed in the [comparison results](data/campaign96-summary.json). For the separate KV11 C1/C2 test, see [appended tool histories](Near-full-tools-96GiB.md).
 
 ## Workload and order
 
@@ -32,10 +31,10 @@ python benchmarks/campaign96.py --out results/benchmarks/<new-campaign>
 
 `status.json` identifies the current stage and process IDs; `heartbeat.json` records command progress. Each stage has its own log, host record and raw probe directory. `decisions.json` records provisional comparison choices. `summary.json` and `comparison.md` are written when the campaign finishes or fails. A lock at `.state/campaign96.lock` prevents concurrent campaigns.
 
-The controller now checks API health during probes. Three consecutive failures terminate the interrupted probe. When the server is unhealthy, it can recreate the same configuration and restart the whole stage in a fresh `attemptN` directory, with at most two recovery retries. Healthy-server correctness failures are not retried this way. Failure records remain separate and are listed in the campaign summary; a recovered speed measurement does not establish failure-free reliability. On November 12, a retained failure showed a vLLM scheduler assertion while processing completed external KV transfers (`assert req_id in self.requests`). Controller recovery does not repair that runtime defect.
+The controller checks API health during probes. Three consecutive failures terminate the interrupted probe. When the server is unhealthy, it can recreate the same configuration and restart the whole stage in a fresh `attemptN` directory, with at most two recovery retries. Healthy-server correctness failures are not retried this way. Failure records remain separate and are listed in the campaign summary; a recovered speed measurement does not establish failure-free reliability. One retained failure showed a vLLM scheduler assertion while processing completed external KV transfers (`assert req_id in self.requests`). Controller recovery does not repair that runtime defect.
 
 Create an empty `STOP` file in the campaign output directory to stop after the current command and restore settings. Do not kill the controller if normal restoration is desired. The runner saves the exact original `config.local.psd1`, changes only `KvCacheBytes`, `UseLMCache` and `BatchedTokens`, and restores the original bytes and running profile in its finalization path. It refuses to overwrite configuration edited externally while it owns the service. Existing cache volumes are retained.
 
 The campaign verifies the 96 GiB partition, runtime identity, at least 4 GiB host physical/commit headroom and 2 GiB GPU headroom before each workload. The existing runtime memory monitor remains active. These checks do not guarantee that every later workload peak will fit; failures remain recorded and can stop the campaign.
 
-On November 11, the first setup attempt in `results/benchmarks/campaign96-20261111/kv11-on-8k` hit a localhost timeout during token calibration, before scored generation. The server remained healthy. That attempt is preserved separately from the fresh campaign run.
+The evidence includes a localhost timeout during token calibration before scored generation, as well as the runtime failure during external KV transfer. The failed attempts remain separate from completed scores.

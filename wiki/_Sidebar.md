@@ -1,22 +1,24 @@
-[Home](Home.md)
+[Server guide](Home.md)
 
 **Use the server**
 
 - [Installation](Installation.md)
-- [Configuration and cleanup](Configuration.md)
-- [Model assets](Model-assets.md)
+- [Serving profiles](Profile-review.md)
+- [Configuration](Configuration.md)
+- [API and clients](Configuration.md#agent-clients)
 - [Troubleshooting](Troubleshooting.md)
 
 **Maintain the runtime**
 
+- [Model assets](Model-assets.md)
+- [Cache and memory](LMCache.md)
+- [Disk cleanup](Configuration.md#cleanup-and-disk-reclamation)
 - [MyLLMBox Linux](MyLLMBox.md)
-- [LMCache](LMCache.md)
 - [Native Windows reference](Native-vLLM.md)
 - [Development](Development.md)
 
-**Evaluate profiles**
+**Evaluate performance**
 
-- [Component review and top ten](Profile-review.md)
 - [Benchmark results](Benchmarks.md)
-- [Speed and capacity tools](Speed-benchmarks.md)
+- [Benchmark procedures](Speed-benchmarks.md)
 - [Test coverage](Test-plan.md)

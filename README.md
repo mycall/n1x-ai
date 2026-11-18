@@ -6,7 +6,7 @@ The default profile is `qwen38fn-best`, using the MyLLMBox Linux runtime through
 
 ## Quick start
 
-Read [Installation](wiki/Installation.md) first. The default profile requires a prepared runtime, model files, PLE data, and the documented GPU partition. Its `setup` command validates those assets and creates an empty LMCache volume if needed; it does not bootstrap a fresh installation.
+Follow [Installation](wiki/Installation.md) to check the GPU partition and place the pinned W4 target and DFlash2 drafter under your model directory. Setup validates those weights, restores or builds the runtime, prepares missing PLE data, and creates the cache volumes.
 
 From a non-administrator PowerShell in this repository:
 
@@ -31,12 +31,9 @@ Set local paths and the default profile in `config.local.psd1`; see [Configurati
 
 ## Documentation
 
-- [Install and prepare the runtime](wiki/Installation.md)
-- [Configure profiles, clients, networking, and cleanup](wiki/Configuration.md)
-- [Review benchmark results and the top ten combinations](wiki/Profile-review.md)
-- [Review the current 96 GiB best-profile selection](wiki/96GiB-comparison-campaign.md)
-- [Compare historical 88 GiB read/write speed across C1–C8 and 4K–262K](wiki/Qwen38fn-speed-matrix.md)
-- [Browse the documentation](wiki/Home.md), including builds, model files, cache limits, and troubleshooting
+- [Server guide](wiki/Home.md) for installation, daily operation, and troubleshooting
+- [Serving profiles](wiki/Profile-review.md) for the default and workload-specific choices
+- [Benchmark results](wiki/Benchmarks.md) for measured throughput, correctness, and cache recovery
 
 ## License
 

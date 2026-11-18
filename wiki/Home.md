@@ -1,37 +1,33 @@
-# n1x-ai documentation
+# n1x-ai server guide
 
-Use this guide to install, operate, evaluate, and maintain the local model server. For an overview and first launch, start with the [README](../README.md).
+Run Qwen3.8 Flash Next on a Windows ARM64 machine with an NVIDIA RTX N1X. The default serving profile, `qwen38fn-best`, runs MyLLMBox Linux under WSLC and requires a 96 GiB GPU partition.
 
-## Setup and operation
+## First launch
 
-| Task | Guide |
+1. Check the [installation requirements](Installation.md#requirements) and put the [W4 target and DFlash2 drafter](Model-assets.md#pinned-sources) under your model directory.
+2. Follow [setup and verification](Installation.md#prepared-best-profile) in a non-administrator PowerShell. Setup prepares the runtime and storage. Start waits for API readiness.
+3. Connect a client to `http://127.0.0.1:8000/v1` and select `qwen/qwen38fn-best`. See the [request example and client settings](Configuration.md#agent-clients).
+
+## Use the server
+
+| I want to… | Guide |
 | --- | --- |
-| Check requirements and choose an installation path | [Installation](Installation.md) |
-| Select profiles, change settings, connect clients, or manage storage | [Configuration](Configuration.md) |
-| Identify every model file and volume needed by best and the top ten | [Model assets](Model-assets.md) |
-| Diagnose startup, memory, or connection problems | [Troubleshooting](Troubleshooting.md) |
-| Integrate an application or agent harness | [API guidance](../AGENTS.md) |
+| Start, stop, inspect, or switch a running profile | [Service commands](Configuration.md#lifecycle) |
+| Choose a profile for throughput, restart recovery, or another GPU partition | [Serving profiles](Profile-review.md) |
+| Set the model path, port, context, or output allowance | [Configuration](Configuration.md) |
+| Connect from another computer | [LAN access](Configuration.md#lan-access) |
+| Integrate reasoning and tool calls into an application | [API guidance](../AGENTS.md) |
+| Resolve a startup, memory, or connection failure | [Troubleshooting](Troubleshooting.md) |
+| Reclaim disk space | [Cleanup and disk reclamation](Configuration.md#cleanup-and-disk-reclamation) |
 
-## Runtime maintenance
+## Maintain and evaluate
 
-| Task | Guide |
+| I want to… | Guide |
 | --- | --- |
-| Inspect or rebuild the selected runtime; plan dependency upgrades | [MyLLMBox Linux](MyLLMBox.md) |
-| Understand cache budgets, eviction, and restore behavior | [LMCache](LMCache.md) |
-| Work with the separate Windows reference runtime | [Native vLLM](Native-vLLM.md) |
-| Change code, validate patches, or run local checks | [Development](Development.md) |
-
-## Evaluation
-
-| Task | Guide |
-| --- | --- |
-| Understand the current recommendation and historical alternatives | [Component review and top ten](Profile-review.md) |
-| Review the completed 96 GiB campaign and current best selection | [96 GiB comparison campaign](96GiB-comparison-campaign.md) |
-| Inspect measured results and retained evidence | [Benchmarks](Benchmarks.md) |
-| Review the historical 88 GiB C1–C8 speed measurements | [Completed speed matrix](Qwen38fn-speed-matrix.md) |
-| Review DFlash2 reasoning and temperature trials using the existing weights | [Request parameter trials](Parameter-trials.md) |
-| Compare 20%/50% GPU sharing observations and C2/C8 scaling | [GPU priority repeat](GPU-priority-trial.md) |
-| Review Spark recipe ideas that can reuse the installed model weights | [Spark recipe review](Spark-recipe-review.md) |
-| Compare DFlash2 draft depths and the QSA ring fix using installed weights | [DFlash2 depth trial](DFlash-depth-trial.md) |
-| Plan or run speed/depth and near-full quality comparisons | [Speed and capacity benchmarks](Speed-benchmarks.md) |
-| See measured coverage and remaining gaps | [Test coverage](Test-plan.md) |
+| Identify required model files and volumes | [Model assets](Model-assets.md) |
+| Size the prompt cache or verify reuse | [LMCache](LMCache.md) |
+| Rebuild or upgrade the Linux runtime | [MyLLMBox](MyLLMBox.md) |
+| Use the separate native Windows installation | [Native vLLM reference](Native-vLLM.md) |
+| Change code and validate the service | [Development](Development.md) |
+| Look up measured performance, correctness, or cache coverage | [Benchmark results](Benchmarks.md) |
+| Run a speed or capacity comparison | [Benchmark procedures](Speed-benchmarks.md) |

@@ -1,8 +1,6 @@
-# TensorFold feasibility trial
+# TensorFold runtime compatibility
 
-`qwen38-cache-tensorfold-dflash` records the requested engine replacement for
-`qwen38fn-best`. It is a feasibility profile, not a working serving profile.
-The default remains `qwen38fn-best`.
+The `qwen38-cache-tensorfold-dflash` profile checks whether TensorFold 1.2.9 can load the W4 checkpoint with DFlash2. The tested release failed the loading checks. Use this profile to reproduce the compatibility result. Use [Serving profiles](Profile-review.md) to choose a working server.
 
 The profile preserves the requested W4 AutoRound target, external DFlash2, 262,144
 context, eight slots, 8,192 output cap, FP8 KV allocation, and LMCache budgets.
@@ -38,7 +36,7 @@ precision/allocation or draft depth. Those omissions are recorded in `result.jso
 They test the earlier loader/drafter prerequisites only. `start`, full lifecycle
 actions and benchmarking refuse this experimental backend until it is integrated.
 
-## Observed on 2026-11-15
+## Loader and drafter results
 
 TensorFold **1.2.9**, NVIDIA RTX Spark N1X, 96 GiB GPU partition. Archive SHA-256:
 `91e90c489bef3d217c2d3d51ce34d2a9a160ffc46b36e8b25026016b90f32f04`.
@@ -58,7 +56,7 @@ generation, task-quality, cache or throughput benchmark ran.
 
 Original scripted evidence: `results/tensorfold-trial-20261115-130203-fcba3558/`.
 
-## What would make the exact replacement feasible?
+## Integration requirements
 
 1. Implement and validate loading of the existing AutoRound/GPTQ layout, potentially
    through a lossless repacking adapter. Renaming configuration fields is insufficient.

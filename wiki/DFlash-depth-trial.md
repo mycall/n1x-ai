@@ -1,8 +1,8 @@
-# DFlash2 draft-depth trial
+# DFlash2 draft depth on the 88 GiB runtime
 
-**Retain K3 as the default.** On November 8, 2026, K1/K3/K5/K7 passed **160/160 first-attempt tasks** across five correctness runs, including an initial and later K3 run. Larger depths did not establish a consistent decode-speed improvement. The trial also found and fixed a QSA cache-ring startup failure at K5. [Numeric results, source hashes, and evidence receipt](data/dflash-depth-trial-20261108.json).
+**K3 was the baseline on this 88 GiB image.** On November 8, 2026, K1/K3/K5/K7 passed **160/160 first-attempt tasks** across five correctness runs, including an initial and later K3 run. Larger depths did not establish a consistent decode-speed improvement. The trial also found and fixed a QSA cache-ring startup failure at K5. [Numeric results, source hashes, and evidence receipt](data/dflash-depth-trial-20261108.json).
 
-K counts speculative draft tokens per verification. All runs reused the installed W4 AutoRound target, DFlash2 checkpoint, and prepared PLE map. No models or base images were downloaded. The regular profile remains on its original image and K3 settings; its existing configuration fingerprint is preserved.
+K counts speculative draft tokens per verification. All runs reused the installed W4 AutoRound target, DFlash2 checkpoint, and prepared PLE map. No models or base images were downloaded. For measured K5 serving profiles on the 96 GiB runtime, see the [K5 batch comparison](FP4-Local-AZ-trial.md#three-run-kv20k5-averages).
 
 ## Implementation
 
@@ -60,20 +60,10 @@ K1's initial write rates were 40.26/40.26 tokens/s at C1 and 30.82/25.54 at C2 f
 
 The same 11 GiB pool holds fewer tokens at larger depths. Startup capacity is a planning estimate; it does not qualify simultaneous full-window histories. More accepted tokens per verification also did not guarantee faster requests: K5/K7's tool-recovery batches stayed near the initial K3 time despite greater acceptance lengths. Evaluate completed correct work and latency alongside acceptance.
 
-K3 remains selected. K5/K7 are available for further experiments through the patched candidate. To try K5 locally, merge these keys into the existing `config.local.psd1`, then use `setup` and `recreate`:
-
-```powershell
-Image = 'n1x-ai:dflash-depth-qsa-v1'
-ImageId = 'sha256:e92aec21c8beb0e696729420729c7bbf4ef0b34dc5a22bf2143048db39414c3f'
-DFlashTokens = 5
-```
-
-The candidate is already present on this machine. A fresh build can produce a different image ID; follow [candidate selection](MyLLMBox.md#select-a-candidate). Remove all three overrides and recreate to return to the selected original K3 image. Benchmark entrypoints and timing definitions are in [Speed and capacity benchmarks](Speed-benchmarks.md).
+The 88 GiB depth experiment used candidate image `n1x-ai:dflash-depth-qsa-v1` with ID `sha256:e92aec21c8beb0e696729420729c7bbf4ef0b34dc5a22bf2143048db39414c3f`. To choose a checked-in K5 profile for the 96 GiB runtime, see [Serving profiles](Profile-review.md). To test a different build, use [candidate image selection](MyLLMBox.md#select-a-candidate).
 
 ## Evidence and limits
 
 Raw requests/responses, counter snapshots, GPU telemetry, effective container arguments, failed-start logs, and experiment source remain under ignored `results/benchmarks/dflash-depth-20261108/`. The receipt retains their hashes, exact numbers, runtime identities, and request audits. Model configuration/index hashes were unchanged. Full weight files were not rehashed.
 
-Local checks passed: 87 Python tests with five skips, plus the PowerShell suite. The trial container and its generated cache volume were removed; the candidate image, regular model assets, and regular cache volumes were retained. Serving ended stopped, matching the initial state.
-
-C8, 128K/near-full quality, SSD restore/restart, vision, and GPU tests at K2/K4/K6 remain unmeasured. The fixture passes do not establish universal application reliability. The candidate was not promoted to the default image.
+This trial covered bounded short workloads at K1, K3, K5, and K7. It leaves C8, near-full quality, restart restoration, vision, and K2/K4/K6 unmeasured on this image.

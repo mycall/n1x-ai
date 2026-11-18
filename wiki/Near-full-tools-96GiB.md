@@ -1,6 +1,6 @@
-# Near-full tool histories on 96 GiB
+# Near-full tool histories with an 11 GiB KV pool
 
-On November 11, 2026, the locally configured `qwen38fn-best` passed **24/24 first-attempt tool tasks** at C1/C2 on a 96 GiB GPU partition. All 48 generation requests completed normally, with zero preemptions, truncations, or diagnostic retries. The API returned HTTP 200 after the run. This qualifies the bounded synthetic workload below, not arbitrary agent tasks.
+On November 11, 2026, the 96 GiB W4/KV11 configuration passed **24/24 first-attempt tool tasks** at C1/C2 on a 96 GiB GPU partition. All 48 generation requests completed normally, with zero preemptions, truncations, or diagnostic retries. The API returned HTTP 200 after the run. This qualifies the bounded synthetic workload below, not arbitrary agent tasks.
 
 ## Configuration and method
 
@@ -39,4 +39,4 @@ Sampled GPU allocation during the run was 86,125–87,081 MiB out of 98,304 MiB,
 python benchmarks/near_full_tools_report.py results/benchmarks/near-full-tools-96g-20261111
 ```
 
-This measures the November 11 KV11 configuration on the 96 GiB runtime. The subsequent [campaign](96GiB-comparison-campaign.md) selected KV15 for today's best profile. The original 88 GiB runtime's matched C2 prefill comparison and tool transfer, C8 displaced replay/restart, and the matched 1K/2K/8K output-quality comparison remain open. This run held KV allocation fixed and does not establish a partition-speed benefit.
+This measures the November 11 KV11 configuration on the 96 GiB runtime. The subsequent [campaign](96GiB-comparison-campaign.md) compares this allocation with the 15 GiB pool used by the default profile. The original 88 GiB runtime's matched C2 prefill comparison and tool transfer, C8 displaced replay/restart, and the matched 1K/2K/8K output-quality comparison remain open. This run held KV allocation fixed and does not establish a partition-speed benefit.
