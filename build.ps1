@@ -22,6 +22,18 @@ if($Myllmbox){
     Update-N1xProxyEnvironment
     $resetSession=Sync-N1xWslcProxy
     try{
+        # WSLC's buildx client can bypass the daemon proxy for registry tokens.
+        # Resolve the pinned base through the synchronized Docker daemon first.
+        if($env:HTTPS_PROXY -or $env:HTTP_PROXY){
+            $from=Select-String -LiteralPath "$root/Dockerfile.myllmbox-lmcache" -Pattern '^FROM\s+(\S+@sha256:[a-f0-9]{64})\s*$'
+            if(@($from).Count -ne 1){throw 'Expected one digest-pinned MyLLMBox base image'}
+            $baseImage=$from.Matches[0].Groups[1].Value
+            & wslc image inspect $baseImage 2>$null | Out-Null
+            if($LASTEXITCODE -ne 0){
+                & wslc pull $baseImage
+                if($LASTEXITCODE -ne 0){throw 'Could not pull the pinned MyLLMBox base through the WSLC daemon proxy'}
+            }
+        }
         $arguments=@('build')+@(Get-N1xProxyBuildArguments)+@($arguments[1..($arguments.Count-1)])
         foreach($entry in @(@('https_proxy','HTTPS_PROXY'),@('http_proxy','HTTP_PROXY'))){
             if([Environment]::GetEnvironmentVariable($entry[1])){$arguments+=@('--secret',"id=$($entry[0]),env=$($entry[1])")}
