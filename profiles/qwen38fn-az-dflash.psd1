@@ -29,6 +29,6 @@
     LmcacheL1GiB = 4
     LmcacheL2GiB = 160
     LmcacheVolume = 'n1x-az-dflash-lmc-v1'
-    LmcacheNamespace = 'qwen-az-dflash-fp32-kv15-b4k-v1'
+    LmcacheNamespace = 'qwen-az-fp4-compute-bf16-ssm-fp32-ple-checkpoint-{settings}-v2'
     RestoreWaitMs = 0
 }

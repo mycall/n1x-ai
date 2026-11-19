@@ -27,6 +27,6 @@
     LmcacheL1GiB = 4
     LmcacheL2GiB = 160
     LmcacheVolume = 'n1x-c8-lmc4-ssd160-v1'
-    LmcacheNamespace = 'qwen-c8-w4-std-fp32-idxbf16-kv11-b4k-v1'
+    LmcacheNamespace = 'qwen-w4a16-compute-bf16-ssm-fp32-index-bf16-ple-fp8-{settings}-v2'
     RestoreWaitMs = 0
 }

@@ -11,16 +11,17 @@ param(
     [switch]$NoThinking,
     [switch]$LocalClient,
     [string]$Python='python',
+    [string]$DotNet='dotnet',
     [ValidateRange(1,16)][int[]]$AgentConcurrency=@(),
     [ValidateRange(0,65536)][int]$AgentOutputTokens=0,
     [ValidateRange(1,16)][int]$AgentSessions=4,
     [ValidateRange(1,100)][int]$AgentTurns=3,
-    [ValidateRange(0,262144)][int[]]$SpeedDepths=@(0,4096,16384,32768,65536,131072),
+    [ValidateRange(0,262144)][int[]]$SpeedDepths=@(4096),
     [ValidateRange(1,16)][int[]]$SpeedConcurrency=@(1),
     [ValidateRange(1,100)][int]$SpeedRepeats=3,
     [ValidateRange(128,65536)][int]$SpeedExtensionTokens=2048,
-    [ValidateRange(2,8192)][int]$SpeedOutputTokens=256,
-    [ValidateSet('incremental','cold','both')][string]$SpeedMode='incremental',
+    [ValidateRange(2,8192)][int]$SpeedOutputTokens=128,
+    [ValidateSet('incremental','cold','both')][string]$SpeedMode='cold',
     [ValidateSet('xhigh','medium','low')][string]$SpeedReasoningEffort='xhigh',
     [switch]$SpeedPlanOnly,
     [string[]]$SpeedRuns=@(),
@@ -47,7 +48,7 @@ if($SpeedRuns.Count){
     }
     if(-not $ReportOut){$ReportOut=Join-Path $PSScriptRoot ('results/benchmarks/speed-comparison-'+(Get-Date -Format 'yyyyMMdd-HHmmss')+'-'+[guid]::NewGuid().ToString('N').Substring(0,8))}
     # Deliberately before configuration, partition prompts, WSLC or API access.
-    & $Python "$PSScriptRoot/benchmarks/speed_report.py" --out $ReportOut --runs @SpeedRuns
+    & $DotNet run --project "$PSScriptRoot/benchmarks/Client" -- speed-report --out $ReportOut --runs @SpeedRuns
     if($LASTEXITCODE -ne 0){throw 'Offline speed report failed.'}
     return
 }
@@ -67,7 +68,7 @@ if($config.ContainsKey('Backend') -and $config.Backend -eq 'tensorfold-trial'){
 }
 if($SpeedPlanOnly){
     $planOut=Join-Path $PSScriptRoot ('results/benchmarks/speed-plan-'+(Get-Date -Format 'yyyyMMdd-HHmmss')+'-'+[guid]::NewGuid().ToString('N').Substring(0,8))
-    $planArgs=@("$PSScriptRoot/benchmarks/speed_probe.py",'--plan-only','--out',$planOut,
+    $planArgs=@('run','--project',"$PSScriptRoot/benchmarks/Client",'--','speed','--plan-only','--out',$planOut,
         '--profile',$config.Profile,'--context-limit',[string]$config.Context,'--mode',$SpeedMode,
         '--repeats',[string]$SpeedRepeats,'--extension-tokens',[string]$SpeedExtensionTokens,
         '--output-tokens',[string]$SpeedOutputTokens,'--depths')+
@@ -75,7 +76,7 @@ if($SpeedPlanOnly){
         @($SpeedConcurrency | ForEach-Object {[string]$_})
     if($NoThinking){$planArgs+='--no-thinking'}
     else {$planArgs+=@('--reasoning-effort',$SpeedReasoningEffort)}
-    & $Python @planArgs
+    & $DotNet @planArgs
     if($LASTEXITCODE -ne 0){throw 'Speed matrix planning failed.'}
     return
 }
@@ -111,24 +112,24 @@ if($native -or $LocalClient -or $Suite -in @('speed','capacity')){
     $clientArgs=@('--out',"$destination/$Suite",'--url',"http://127.0.0.1:$($config.Port)")
     switch($Suite){
         'agents' {
-            $clientArgs=@("$PSScriptRoot/benchmarks/agent_cache_probe.py",'--phase','agents')+$clientArgs+@('--no-lmcache-metrics',
+            $clientArgs=@('run','--project',"$PSScriptRoot/benchmarks/Client",'--','agent','--phase','agents')+$clientArgs+@('--no-lmcache-metrics',
                 '--agent-sessions',[string]$AgentSessions,'--agent-turns',[string]$AgentTurns)
             if(-not $NoThinking){$clientArgs+='--agent-thinking'}
             if($AgentConcurrency.Count){$clientArgs+=@('--agent-concurrency')+@($AgentConcurrency | ForEach-Object {[string]$_})}
             if($AgentOutputTokens){$clientArgs+=@('--agent-output-tokens',[string]$AgentOutputTokens)}
         }
-        'recovery' {$clientArgs=@("$PSScriptRoot/benchmarks/tool_recovery_probe.py")+$clientArgs+'--no-lmcache-metrics'}
-        'mixed' {$clientArgs=@("$PSScriptRoot/benchmarks/mixed_probe.py")+$clientArgs+'--no-lmcache-metrics'}
+        'recovery' {$clientArgs=@('run','--project',"$PSScriptRoot/benchmarks/Client",'--','recovery')+$clientArgs+'--no-lmcache-metrics'}
+        'mixed' {$clientArgs=@('run','--project',"$PSScriptRoot/benchmarks/Client",'--','mixed')+$clientArgs+'--no-lmcache-metrics'}
         'speculation' {
-            $clientArgs=@("$PSScriptRoot/benchmarks/speculation_probe.py")+$clientArgs
+            $clientArgs=@('run','--project',"$PSScriptRoot/benchmarks/Client",'--','speculation')+$clientArgs
             if($NoThinking){$clientArgs+='--no-thinking'}
         }
         'scheduler' {
-            $clientArgs=@("$PSScriptRoot/benchmarks/scheduler_probe.py")+$clientArgs+@('--concurrency',[string]$SchedulerConcurrency,'--output-tokens',[string]$SchedulerOutputTokens)
+            $clientArgs=@('run','--project',"$PSScriptRoot/benchmarks/Client",'--','scheduler')+$clientArgs+@('--concurrency',[string]$SchedulerConcurrency,'--output-tokens',[string]$SchedulerOutputTokens)
             if($NoThinking){$clientArgs+='--no-thinking'}
         }
         'speed' {
-            $clientArgs=@("$PSScriptRoot/benchmarks/speed_probe.py")+$clientArgs+@(
+            $clientArgs=@('run','--project',"$PSScriptRoot/benchmarks/Client",'--','speed')+$clientArgs+@(
                 '--profile',$config.Profile,'--context-limit',[string]$config.Context,
                 '--host-record',"$destination/host.json",'--mode',$SpeedMode,
                 '--repeats',[string]$SpeedRepeats,'--extension-tokens',[string]$SpeedExtensionTokens,
@@ -139,18 +140,20 @@ if($native -or $LocalClient -or $Suite -in @('speed','capacity')){
             else {$clientArgs+=@('--reasoning-effort',$SpeedReasoningEffort)}
         }
         'capacity' {
-            $clientArgs=@("$PSScriptRoot/benchmarks/context_capacity_probe.py")+$clientArgs+@(
+            $clientArgs=@('run','--project',"$PSScriptRoot/benchmarks/Client",'--','capacity')+$clientArgs+@(
                 '--profile',$config.Profile,'--context-limit',[string]$config.Context,
                 '--host-record',"$destination/host.json",'--repeats',[string]$CapacityRepeats,
                 '--output-tokens',[string]$CapacityOutputTokens,'--concurrency')+
                 @($CapacityConcurrency | ForEach-Object {[string]$_})
         }
     }
-    & $Python --version | Set-Content "$destination/client-python.txt"
-    if($LASTEXITCODE -ne 0){throw 'Cannot run benchmark Python'}
+    $executable=if($Suite -in @('speed','scheduler','speculation','agents','recovery','mixed','capacity')){$DotNet}else{$Python}
+    $versionFile=if($Suite -in @('speed','scheduler','speculation','agents','recovery','mixed','capacity')){'client-dotnet.txt'}else{'client-python.txt'}
+    & $executable --version | Set-Content "$destination/$versionFile"
+    if($LASTEXITCODE -ne 0){throw 'Cannot run benchmark client'}
     $clientArgs | ConvertTo-Json | Set-Content "$destination/client-arguments.json" -Encoding UTF8
     Write-Host "Results: $destination"
-    & $Python @clientArgs
+    & $executable @clientArgs
     if($LASTEXITCODE -ne 0){throw "Benchmark failed; inspect $destination"}
     Write-Host "Completed. Raw results: $destination"
     return

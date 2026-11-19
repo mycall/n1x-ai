@@ -30,7 +30,16 @@ if($Myllmbox){
             $baseImage=$from.Matches[0].Groups[1].Value
             & wslc image inspect $baseImage 2>$null | Out-Null
             if($LASTEXITCODE -ne 0){
-                & wslc pull $baseImage
+                # Docker reports layer IDs. The pinned image's COPY history names
+                # the source files for layers where that information is available.
+                $inventory=Get-Content "$root/runtime/myllmbox/pull-filenames.json" -Raw | ConvertFrom-Json
+                $entry=$inventory.PSObject.Properties[($baseImage -split '@')[-1]]
+                & wslc pull $baseImage | ForEach-Object {
+                    $name=if($entry -and $_ -match '^([0-9a-f]{12}):'){$entry.Value.PSObject.Properties[$Matches[1]]}
+                    if($name){
+                        Write-Host "$_  [$($name.Value)]"
+                    }else{Write-Host $_}
+                }
                 if($LASTEXITCODE -ne 0){throw 'Could not pull the pinned MyLLMBox base through the WSLC daemon proxy'}
             }
         }

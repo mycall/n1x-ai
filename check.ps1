@@ -10,6 +10,8 @@ foreach($file in $files){
     [void][Management.Automation.Language.Parser]::ParseFile($file.FullName,[ref]$null,[ref]$errors)
     if($errors){throw ($errors|Out-String)}
 }
+& dotnet run --project "$root/tests/BenchmarkTests"
+if($LASTEXITCODE -ne 0){throw 'C# benchmark tests failed'}
 & python -m unittest discover -s "$root/tests" -p 'test_*.py'
 if($LASTEXITCODE -ne 0){throw 'Python tests failed'}
 & "$root/tests/test_configuration.ps1"

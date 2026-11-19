@@ -30,10 +30,15 @@ function Get-N1xMyllmboxEnvironment {
         $environment.N1X_LMCACHE_L2_GIB=[string]$Config.LmcacheL2GiB
         $environment.N1X_LMCACHE_STAGED_TRANSFER='1'
         $environment.N1X_RESTORE_WAIT_MS=[string]$Config.RestoreWaitMs
-        $environment.N1X_CACHE_NAMESPACE=$Config.LmcacheNamespace
-        # K3 keeps its qualified namespace. Other depths have different SSM
-        # state shapes and must never restore K3 (or each other's) entries.
-        if($Config.DFlashTokens -ne 3){$environment.N1X_CACHE_NAMESPACE+="-dflash-k$($Config.DFlashTokens)"}
+        $namespace=$Config.LmcacheNamespace
+        if($namespace.Contains('{settings}')){
+            $settings="$(Get-N1xCacheGeometry $Config)-dflash2-k$($Config.DFlashTokens)"
+            $namespace=$namespace.Replace('{settings}',$settings)
+        }elseif($Config.DFlashTokens -ne 3){
+            # Preserve explicit trial/local namespaces and their existing depth isolation.
+            $namespace+="-dflash-k$($Config.DFlashTokens)"
+        }
+        $environment.N1X_CACHE_NAMESPACE=$namespace
     }
     $environment.N1X_WINDOWS_MINIMUM_GIB=[string]$Config.WindowsMinimumGiB
     $environment.N1X_CACHE_BLOCK_TOKENS=[string]$Config.CacheBlockTokens
@@ -162,7 +167,7 @@ function Confirm-N1xMyllmboxStorage {
     $checkpointPle=$Config.ContainsKey('MyllmboxCheckpointPle') -and $Config.MyllmboxCheckpointPle
     $ready=$checkpointPle
     if(-not $checkpointPle -and $Config.PleVolume -in $volumes){
-        & wslc run --rm --entrypoint python3 --volume "$($Config.PleVolume):/table:ro" --volume "${Root}/scripts:/checks:ro" $Config.ImageId /checks/check-ple.py | Out-Host
+        & wslc run --rm --entrypoint dotnet --volume "$($Config.PleVolume):/table:ro" --volume "${Root}/scripts:/checks:ro" mcr.microsoft.com/dotnet/sdk:10.0 run --file /checks/PleTable.cs -- check /table | Out-Host
         $ready=$LASTEXITCODE -eq 0
     }
     if(-not $ready){
@@ -175,8 +180,8 @@ function Confirm-N1xMyllmboxStorage {
             . "$Root/scripts/models.ps1"
             Get-N1xModelDownload 'Saren/Qwen3.8-Flash-Next-ple-table-fp8' '50511b0a41aa1d34b8beb7e5d4bb06a0b650dc14' (Join-Path $Config.ModelRoot 'ple-table-fp8') 'ple'
         }
-        & "$Root/prepare-native-ple.ps1" -Volume $Config.PleVolume -ModelRoot $Config.ModelRoot -Image $Config.ImageId -PythonExecutable python3
-        & wslc run --rm --entrypoint python3 --volume "$($Config.PleVolume):/table:ro" --volume "${Root}/scripts:/checks:ro" $Config.ImageId /checks/check-ple.py | Out-Host
+        & "$Root/prepare-native-ple.ps1" -Volume $Config.PleVolume -ModelRoot $Config.ModelRoot -Image $Config.ImageId
+        & wslc run --rm --entrypoint dotnet --volume "$($Config.PleVolume):/table:ro" --volume "${Root}/scripts:/checks:ro" mcr.microsoft.com/dotnet/sdk:10.0 run --file /checks/PleTable.cs -- check /table | Out-Host
         if($LASTEXITCODE -ne 0){throw 'Prepared FP8 PLE volume failed verification; rerun setup to resume'}
     }
     if($Config.CacheVolume -notin $volumes){

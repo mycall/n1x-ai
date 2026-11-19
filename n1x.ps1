@@ -200,9 +200,17 @@ function Get-ConfigFingerprint([string]$LegacyDefault='') {
             $canonical['__'+$setting+'Sha256']=if(Test-Path -LiteralPath $file -PathType Leaf){(Get-FileHash -LiteralPath $file -Algorithm SHA256).Hash.ToLowerInvariant()}else{'missing'}
         }
     }
+    if(-not $myllmbox -and $config.ContainsKey('UseLMCache') -and $config.UseLMCache){
+        $canonical['__CacheNamespace']=$referenceNamespace
+    }
     $sha=[Security.Cryptography.SHA256]::Create()
     try {return ([BitConverter]::ToString($sha.ComputeHash([Text.Encoding]::UTF8.GetBytes(($canonical|ConvertTo-Json -Compress))))).Replace('-','').ToLowerInvariant()}
     finally {$sha.Dispose()}
+}
+if(-not $myllmbox -and -not $native -and $config.UseLMCache){
+    $spec=if($config.DFlash){'dflash2-k3-a22a'}elseif($config.Mtp){'mtp'}else{'nospec'}
+    $index=if($config.ContainsKey('IndexerFP8') -and $config.IndexerFP8){'fp8'}else{'default'}
+    $referenceNamespace="qwen-8b82-v032-lmc056-w4a16-ssm-bf16-index-$index-ple-fp8-$(Get-N1xCacheGeometry $config)-$spec-v2"
 }
 $fingerprint=Get-ConfigFingerprint
 $name = $config.Container
@@ -468,14 +476,8 @@ switch ($Action) {
         if($config.UseLMCache){
             $stateDirectory=Join-Path $PSScriptRoot ".state/$name"
             if(-not $PrintOnly){Write-Headroom}
-            $namespace=if($config.Mtp){'qwen-8b82-v032-lmc056-fp8-mtp'}else{'qwen-8b82-v032-lmc056-fp8'}
-            if($config.DFlash){$namespace='qwen-8b82-v032-lmc056-fp8-dflash-a22a'}
-            if($config.ContainsKey('IndexerFP8') -and $config.IndexerFP8){$namespace+='-idxfp8'}
-            if($config.CacheBlockTokens -ne 2048 -or $config.LmcacheChunkTokens -ne 2048){
-                $namespace+="-b$($config.CacheBlockTokens)-c$($config.LmcacheChunkTokens)"
-            }
             $run+=@('--volume',"${stateDirectory}:/state:ro",'--volume',"$($config.LmcacheVolume):/lmcache",
-                '--env',"N1X_CACHE_NAMESPACE=$namespace",'--env',"N1X_LMCACHE_L1_GIB=$($config.LmcacheL1GiB)",
+                '--env',"N1X_CACHE_NAMESPACE=$referenceNamespace",'--env',"N1X_LMCACHE_L1_GIB=$($config.LmcacheL1GiB)",
                 '--env',"N1X_LMCACHE_L2_GIB=$($config.LmcacheL2GiB)",
                 '--env',"N1X_CACHE_BLOCK_TOKENS=$($config.CacheBlockTokens)",'--env',"N1X_LMCACHE_CHUNK_TOKENS=$($config.LmcacheChunkTokens)",
                 '--env',"N1X_RESTORE_WAIT_MS=$($config.RestoreWaitMs)",'--env',"N1X_WINDOWS_MINIMUM_GIB=$($config.WindowsMinimumGiB)")

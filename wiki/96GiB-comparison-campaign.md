@@ -26,7 +26,7 @@ All stages keep the model, drafter, thinking/xhigh, seed, temperature, context, 
 The runner owns the model service during the campaign and can take several hours. Start only one campaign and avoid unrelated API traffic:
 
 ```powershell
-python benchmarks/campaign96.py --out results/benchmarks/<new-campaign>
+dotnet run --project benchmarks/Client -- campaign96 --out results/benchmarks/<new-campaign>
 ```
 
 `status.json` identifies the current stage and process IDs; `heartbeat.json` records command progress. Each stage has its own log, host record and raw probe directory. `decisions.json` records provisional comparison choices. `summary.json` and `comparison.md` are written when the campaign finishes or fails. A lock at `.state/campaign96.lock` prevents concurrent campaigns.

@@ -33,7 +33,7 @@ if(-not $SkipPleCopy){
     $volumes=@($raw | Where-Object {$_.Trim()} | ForEach-Object {($_|ConvertFrom-Json).Name})
     $ready=$false
     if($config.PleVolume -in $volumes){
-        & wslc run --rm --entrypoint python --volume "$($config.PleVolume):/table:ro" --volume "${PSScriptRoot}/scripts:/checks:ro" $config.Image /checks/check-ple.py
+        & wslc run --rm --entrypoint dotnet --volume "$($config.PleVolume):/table:ro" --volume "${PSScriptRoot}/scripts:/checks:ro" mcr.microsoft.com/dotnet/sdk:10.0 run --file /checks/PleTable.cs -- check /table
         $ready=$LASTEXITCODE -eq 0
     }
     if(-not $ready){& "$PSScriptRoot/prepare-native-ple.ps1" -ModelRoot $config.ModelRoot -Volume $config.PleVolume}

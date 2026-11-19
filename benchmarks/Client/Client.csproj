@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup><EmbeddedResource Include="*.cs" LogicalName="source/%(Filename)%(Extension)" /></ItemGroup>
+  <ItemGroup><InternalsVisibleTo Include="BenchmarkTests" /></ItemGroup>
+  <ItemGroup><EmbeddedResource Include="vision-fixture.png" LogicalName="vision-fixture.png" /></ItemGroup>
+  <ItemGroup><EmbeddedResource Include="MatrixChart.html" LogicalName="matrix.html" /></ItemGroup>
+</Project>
+
+

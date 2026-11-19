@@ -1,6 +1,6 @@
 # Speed and capacity benchmarks
 
-Use the `speed` suite for fixed-output prefill and decode measurements. Use the `capacity` suite for scored tasks near the context limit. The appended-history probe exercises tool calls and continuations against a running service.
+The standard speed workload is **pp4096 / tg128**: a cold 4,096-token rendered prompt followed by exactly 128 generated tokens. The `speed` suite times both phases of the same request. Use the `capacity` suite for scored tasks near the context limit. The appended-history probe exercises tool calls and continuations against a running service.
 
 | Task | Procedure |
 | --- | --- |
@@ -28,16 +28,16 @@ Default settings:
 
 | Control | Default | Definition |
 | --- | --- | --- |
-| `-SpeedDepths` | `0,4096,16384,32768,65536,131072` | Primed history depth in incremental mode; full rendered input target in cold mode |
+| `-SpeedDepths` | `4096` | Primed history depth in incremental mode; full rendered input target in cold mode |
 | `-SpeedConcurrency` | `1` | Independent simultaneous client streams, distinct from the server's sequence-slot limit |
 | `-SpeedRepeats` | `3` | Fresh independent trials per point; grid order reverses on alternate repeats |
 | `-SpeedExtensionTokens` | `2048` | New rendered tokens appended after the primed history |
-| `-SpeedOutputTokens` | `256` | Fixed generated tokens, including reasoning; EOS ignored |
-| `-SpeedMode` | `incremental` | `incremental`, `cold` or `both`; separate rate definitions |
+| `-SpeedOutputTokens` | `128` | Fixed generated tokens, including reasoning; EOS ignored |
+| `-SpeedMode` | `cold` | `incremental`, `cold` or `both`; separate rate definitions |
 | Thinking | On | Explicitly sent to the API; `-NoThinking` creates a separate comparison group |
 | `-SpeedReasoningEffort` | `xhigh` | Explicit `chat_template_kwargs.reasoning_effort`; also accepts `medium` and `low`; requires thinking on |
 
-The default plan has 18 measured requests and 15 one-token prefix primes. Token-calibration API calls are additional when a live run is eventually requested. Higher concurrency requires proportionately more live histories and KV capacity; an advertised maximum context does not guarantee that every concurrent depth will fit.
+The default plan has three measured requests and no prefix primes. Token-calibration API calls are additional when a live run is eventually requested. Higher concurrency requires proportionately more live histories and KV capacity; an advertised maximum context does not guarantee that every concurrent depth will fit.
 
 The installed model template explicitly defaults to **xhigh**, as recorded in the [local template audit](data/thinking-template-evidence.json). New speed requests send both `enable_thinking=true` and `reasoning_effort=xhigh`; token calibration, prefix primes and measured requests use the same effort. `medium` and `low` produce separate report groups. Thinking-off runs omit effort and remain diagnostics. An older run with no recorded effort stays **unspecified**; the current template audit does not retroactively prove its historical serving configuration.
 
@@ -58,15 +58,15 @@ Start and verify the chosen profile through the [service lifecycle](Configuratio
     -SpeedMode both -SpeedConcurrency 1,8 -NoThinking
 ```
 
-The speed client uses Python's standard library on Windows for every backend. `-Build` and `-Smoke` are rejected; use explicit matrix controls. Existing LMCache partition confirmation still applies to **live** LMCache profile tests. Planning and offline reporting bypass that confirmation because they do not touch the service.
+The speed client and offline comparison run on Windows with the .NET 10 SDK for every backend. `-Build` and `-Smoke` are rejected; use explicit matrix controls. Existing LMCache partition confirmation still applies to **live** LMCache profile tests. Planning and offline reporting bypass that confirmation because they do not touch the service.
 
 Each live run records the effective profile, server/container identity, model listing, GPU partition, power setting when available, Git revision/dirty state and source hashes through the existing launcher. Run one selected profile at a time with no unrelated API requests. Server sequence slots are recorded alongside client concurrency. A deliberate four-slot versus eight-slot comparison is a complete-configuration comparison unless other differences are controlled.
 
 ## Workload and measurement
 
-The server's `/tokenize` endpoint calibrates deterministic reference prose using the actual chat template and explicit thinking setting. Target lengths allow ±8 tokens; every response must report the **exact calibrated rendered input count**. Actual history, full input, newly added tokens, completion counts and cache coverage are retained. Reserve output space within the configured context; an oversized point is marked skipped rather than silently shortened. Cold depth zero is not applicable.
+The server's `/tokenize` endpoint calibrates deterministic reference prose using the actual chat template and explicit thinking setting. The standard cold 4096 prompt requires an exact match. Other depth grids and modes allow ±8 tokens by default; every response must report the **exact calibrated rendered input count**. Actual history, full input, newly added tokens, completion counts and cache coverage are retained. Reserve output space within the configured context; an oversized point is marked skipped rather than silently shortened. Cold depth zero is not applicable.
 
-The 256-token speed sample is a fixed-work generation window with EOS ignored. It measures throughput under xhigh prompting but **does not measure completion of an xhigh reasoning task**. The service's normal 8,192-token output cap and existing quality suites remain separate; the planned 1K/2K/8K accuracy-budget comparison has not been performed.
+The 128-token speed sample is a fixed-work generation window with EOS ignored. It measures throughput under xhigh prompting but **does not measure completion of an xhigh reasoning task**. The service's normal 8,192-token output cap and existing quality suites remain separate; the planned 1K/2K/8K accuracy-budget comparison has not been performed.
 
 **Incremental:** each positive-depth stream first primes its independent history using a one-token generation. All streams finish priming before the measured wave starts. The measured prompt preserves that prefix and adds approximately the configured extension. Read speed is **actual added rendered tokens / PP seconds**. Depth zero measures the extension without a prime. Cache hits are measured rather than assumed: eviction or recomputation remains a cost in the phase duration. The one-token prime output is not appended to the measured prompt and is excluded from speed scores.
 
@@ -102,15 +102,15 @@ Old recovery, scheduler, archive, and agent logs are not interchangeable with `n
 
 The [96 GiB comparison campaign](96GiB-comparison-campaign.md) adds C2/C4 KV-capacity, cache-on/off, displaced-replay and prefill-batch comparisons. Its controller records each runtime and restores the original settings afterward.
 
-`benchmarks/near_full_tools_probe.py` measures real tool selection and tool-result continuations against an already verified service. Its default initial input is 250,000 rendered tokens (±8), leaving room for three growing tool round trips and an unchanged 8,192-token output allowance within 262,144. Every request is token-counted before generation; an overfull history fails rather than reducing the allowance.
+`benchmarks/Client/LongTools.cs` measures real tool selection and tool-result continuations against an already verified service. Its default initial input is 250,000 rendered tokens (±8), leaving room for three growing tool round trips and an unchanged 8,192-token output allowance within 262,144. Every request is token-counted before generation; an overfull history fails rather than reducing the allowance.
 
 The workload alternates inventory and price lookup, validates exact tool names, SKU arguments and call IDs, and requires a final answer combining the returned value with archive facts at 10% and 90% of the initial history. Returned reasoning and tool calls are preserved. Each session keeps its salt and appends messages. Two sessions run at C1 and C2, repeated in reverse order: 24 planned tasks and 48 generation requests. Initial selections are cold; appended selections and continuations report actual cache coverage. Empty-final diagnostic retries do not replace first scores; a failed session leaves later tasks incomplete.
 
 After checking `/health`, runtime identity and the hardware partition, save a host record containing the effective configuration, container/image identity, GPU, Git state and power setting, then run:
 
 ```powershell
-python benchmarks/near_full_tools_probe.py --host <host.json> --out results/benchmarks/<new-run>
-python benchmarks/near_full_tools_report.py results/benchmarks/<new-run>
+dotnet run --project benchmarks/Client -- near-full --host <host.json> --out results/benchmarks/<new-run>
+dotnet run --file benchmarks/NearFullToolsReport.cs -- results/benchmarks/<new-run>
 ```
 
 The output directory must be new. A short harness pilot can use `--target 2048 --sessions 1 --concurrency 1 --repeats 1`; keep it separate from near-full results. Raw requests/responses, exact rendered input counts, first scores, cache usage, direct server phase timings when available, and before/after metrics are retained. Cold selection and warm phases generate different work, so their latency ratio is not a matched cache speedup. This suite does not qualify displaced replay or SSD restart.

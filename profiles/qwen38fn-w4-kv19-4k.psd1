@@ -30,6 +30,6 @@
     LmcacheL1GiB = 4
     LmcacheL2GiB = 160
     LmcacheVolume = 'n1x-w4-kv19-4k-lmc-v1'
-    LmcacheNamespace = 'qwen-w4-dflash-bf16-kv19-batch4k-v1'
+    LmcacheNamespace = 'qwen-w4a16-compute-bf16-ssm-bf16-index-bf16-ple-fp8-{settings}-v2'
     RestoreWaitMs = 0
 }

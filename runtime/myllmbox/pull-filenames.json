@@ -1,0 +1,25 @@
+{
+  "sha256:bc42593a5bbfd1a07e295b503d7685d951e587ed7ac50fa0c26adb57614f005f": {
+    "526d5438c009": "NGC-DL-CONTAINER-LICENSE",
+    "81dd2960a718": "tools/install_snapshot_runtime.sh",
+    "26caf069e4cd": "docker/entrypoints/vllm-nonroot-entrypoint.sh",
+    "99d85ab807eb": "requirements/common.txt",
+    "e633260c0642": "requirements/cuda.txt",
+    "1f6a2c9e327e": "tools/install_gdrcopy.sh",
+    "cffbeffd04be": "/workspace/torch_lib_versions.txt",
+    "ad536cb32508": "/workspace/dist/wheel.sha256",
+    "2ce1f27063d9": "/tmp/ep_kernels_workspace/dist/wheels.sha256",
+    "d0b38dd25aa5": "examples",
+    "8f251facf64c": "benchmarks",
+    "209e276719bc": "./vllm/collect_env.py",
+    "890fe54f2434": "/tmp/triton_from_source_workspace/dist/wheel.sha256",
+    "734263becef9": "tools/install_triton_from_source.sh",
+    "6c3214dabe27": "docker/loader/libmbx_loader.so docker/mtp/libmbx_mtp.so docker/marlin_csf/libmbx_marlin_csf.so",
+    "fe9efce2d45c": "/out/libmbx_ple_nvme.so /out/libmbx_ple_async.so",
+    "b745cf53bf11": "/out/mbx_*.so",
+    "7a8fa47030e6": "docker/mbx_opt_quant.py docker/mbx_draft_head2.py docker/vllm_fp8_hybrid.py",
+    "0c255e59a50e": "docker/draft/",
+    "8e13e9b86e3a": "docker/b12x/",
+    "adbed2075797": "docker/mbx_ple_ckpt.py"
+  }
+}

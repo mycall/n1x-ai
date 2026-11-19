@@ -34,6 +34,28 @@ foreach($name in @('N1X_LMCACHE_L1_GIB','N1X_LMCACHE_L2_GIB','N1X_CACHE_NAMESPAC
     if(-not $environment[$name]){throw "Missing cache setting $name"}
 }
 if($environment.N1X_LMCACHE_L1_GIB -ne '4' -or $environment.N1X_LMCACHE_L2_GIB -ne '160' -or $arguments -notcontains 'n1x-c8-lmc4-ssd160-v1:/lmcache'){throw 'Promoted cache geometry/mount changed'}
+# Compare the precision labels against each checked-in recipe. Use its own
+# model settings so a machine-local trial override cannot redefine this fixture.
+foreach($profileFile in (Get-ChildItem "$root/profiles/*.psd1")){
+    $profile=Import-PowerShellDataFile $profileFile.FullName
+    if(-not $profile.ContainsKey('Backend') -or $profile.Backend -ne 'wslc-myllmbox' -or -not $profile.UseLMCache){continue}
+    $profile.ModelRoot=$root
+    $profile.Profile=$profileFile.BaseName
+    $defaults=Import-PowerShellDataFile "$root/config.psd1"
+    foreach($key in $defaults.Keys){if(-not $profile.ContainsKey($key)){$profile[$key]=$defaults[$key]}}
+    $recipe=Get-Content (Join-Path $root $profile.MyllmboxConfig) -Raw
+    $ssm=if($recipe -match '(?m)^mamba-ssm-cache-dtype: float32\s*$'){'fp32'}elseif($recipe -match '(?m)^mamba-ssm-cache-dtype: bfloat16\s*$'){'bf16'}else{throw "Missing SSM dtype in $profileFile"}
+    $name=(Get-N1xMyllmboxEnvironment $root $profile).N1X_CACHE_NAMESPACE
+    if($recipe -notmatch '(?m)^dtype: bfloat16\s*$' -or -not $name.Contains("-compute-bf16-ssm-$ssm-")){throw "Incorrect precision labels in $name"}
+    $profile.KvCacheBytes='12884901888'
+    $profile.KvCacheDtype='auto'
+    $profile.BatchedTokens=3072
+    $profile.CacheBlockTokens=1024
+    $profile.LmcacheChunkTokens=2048
+    $profile.DFlashTokens=4
+    $override=(Get-N1xMyllmboxEnvironment $root $profile).N1X_CACHE_NAMESPACE
+    if($override -notlike '*-kv-auto-pool-12gib-slots-*-batch-3072-block-1024-chunk-2048-dflash2-k4-v2'){throw "Override retained old cache geometry: $override"}
+}
 $config.UseLMCache=$false
 $off=@(Get-N1xMyllmboxArguments $root $config 'cache-off-fixture')
 if($off -notcontains 'N1X_LMCACHE_ENABLED=0' -or @($off|Where-Object {$_.EndsWith(':/lmcache')}).Count){throw 'Cache-off launch inherited cache storage'}
@@ -57,7 +79,7 @@ foreach($depth in 1..7){
         if($depth -eq 3 -and $slots -eq 8 -and ($graphs.cudagraph_capture_sizes -join ',') -ne '1,2,3,4,8,12,16,20,24,28,32'){throw 'K3 graph coverage changed'}
     }
     $namespace=(Get-N1xMyllmboxEnvironment $root $config).N1X_CACHE_NAMESPACE
-    if($depth -eq 3 -and $namespace -ne $originalNamespace){throw 'K3 cache namespace changed'}
+    if($namespace -notlike "*-slots-8-batch-$($config.BatchedTokens)-block-4096-chunk-4096-dflash2-k$depth-v2"){throw 'Effective cache settings missing from namespace'}
     $depthNamespaces+=$namespace
 }
 if(@($depthNamespaces|Sort-Object -Unique).Count -ne 7 -or $config.LmcacheNamespace -ne $originalNamespace){throw 'Depth cache namespaces collide or mutate configuration'}

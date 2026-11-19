@@ -50,7 +50,7 @@ Start waits for readiness. Cold loading, PLE map generation, and kernel compilat
 
 This runs `setup.ps1 -WithLMCache`, downloads the pinned weights, builds missing reference images, prepares native PLE, and **sets this reference as the local default**. Start it with `n1x.ps1 start`. For the smaller baseline, use `setup.ps1` without `-WithLMCache`.
 
-The model path defaults to `~\Models`. Reference setup retains an existing local path or accepts `-ModelRoot`. It reuses downloads when file and revision metadata match. Missing files resume through `hf download`. The PLE fast check uses the revision, manifest, and file sizes. Use `prepare-native-ple.ps1` for full source/destination verification.
+The model path defaults to `~\Models`. Reference setup retains an existing local path or accepts `-ModelRoot`. It reuses downloads when file and revision metadata match. Missing files resume through `hf download`. PLE copy and verification run the C# tool with the `mcr.microsoft.com/dotnet/sdk:10.0` WSLC image. Pull it before offline setup with `wslc pull mcr.microsoft.com/dotnet/sdk:10.0`. The PLE fast check uses the revision, manifest, and file sizes. Use `prepare-native-ple.ps1` for full source/destination verification.
 
 Stop serving before building images or preparing a new PLE copy. After changing image sources or patches, pass `-Rebuild` to reference setup. Existing tags are otherwise reused. Use `-SkipDownload`, `-SkipBuild`, or `-SkipPleCopy` only for assets already verified on this installation.
 

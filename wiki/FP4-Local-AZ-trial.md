@@ -46,7 +46,7 @@ Cells are mean input/output tokens per second across the three paired runs. Each
 
 8K had higher mean decode rates at all four measured points. Its C2/32K prefill rate was lower, so the long-workload advantage is not a universal win at every phase. Three paired runs support this bounded throughput choice; they do not establish broad model-quality superiority.
 
-[Paired-run settings, scores, statistics, and hashes](data/k5-batch-repeats-20261117.json). Reproduce with `python benchmarks/recipe_repeats.py --directory results/benchmarks/recipe-mix-20261116 --out wiki/data/k5-batch-repeats-20261117.json`; an existing completed campaign is summarized without rerunning it. Use a new `--tag` and output path for an independent campaign. Disposable caches are removed after each stopped trial; raw evidence is retained.
+[Paired-run settings, scores, statistics, and hashes](data/k5-batch-repeats-20261117.json). Reproduce with `dotnet run --project benchmarks/Client -- recipe-repeats --directory results/benchmarks/recipe-mix-20261116 --out wiki/data/k5-batch-repeats-20261117.json`; an existing completed campaign is summarized without rerunning it. Use a new `--tag` and output path for an independent campaign. Disposable caches are removed after each stopped trial; raw evidence is retained.
 
 ## Configuration
 

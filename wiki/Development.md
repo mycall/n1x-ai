@@ -23,7 +23,7 @@ The cache image build runs `verify_patches.py` after all patches. It compiles th
 
 ## Local checks
 
-With Python on PATH:
+With the .NET 10 SDK and Python on PATH:
 
 ```powershell
 .\check.ps1

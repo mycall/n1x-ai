@@ -12,9 +12,9 @@ $destination=Join-Path $PSScriptRoot ('results/restores/'+(Get-Date -Format 'yyy
 New-Item -ItemType Directory -Force $destination | Out-Null
 $partition | ConvertTo-Json | Set-Content (Join-Path $destination 'partition.json') -Encoding UTF8
 function Run-Probe([string]$Stage) {
-    & wslc run --rm --network "container:$($config.Container)" --entrypoint python `
-        -v "${PSScriptRoot}/benchmarks:/probe:ro" -v "${destination}:/results" `
-        n1x-ai:benchmarks /probe/restart_restore_probe.py $Stage
+    & wslc run --rm --network "container:$($config.Container)" --entrypoint /opt/n1x-dotnet/dotnet `
+        -v "${destination}:/results" `
+        n1x-ai:benchmarks /opt/n1x-client/Client.dll restart --out /results --stage $Stage
     if($LASTEXITCODE -ne 0){throw "Restore probe failed at $Stage; inspect $destination"}
 }
 & "$PSScriptRoot/n1x.ps1" wait -Profile $Profile -TimeoutSeconds 1800

@@ -30,11 +30,13 @@ try {
     $config=Get-N1xConfig -Root $temporary -Port 8002
     if($config.Port -ne 8002){throw 'CLI override failed'}
     try{Get-N1xConfig -Root $temporary -Profile '../escape';throw 'Traversal accepted'}catch{if($_.Exception.Message -ne 'Invalid profile name'){throw}}
-    $preview=& "$root/n1x.ps1" start -Profile qwen38fn-cache-mtp -ModelRoot $overrideRoot -PrintOnly
+    Copy-Item "$root/n1x.ps1" $temporary
+    Copy-Item "$root/scripts" $temporary -Recurse
+    $preview=& "$temporary/n1x.ps1" start -Profile qwen38fn-cache-mtp -ModelRoot $overrideRoot -PrintOnly
     if($preview -notmatch 'n1x-ai:lmcache' -or $preview -notmatch 'fp8_e4m3' -or $preview -notmatch '/profiles/qwen38fn-mtp.yaml'){throw 'Portable launch preview failed'}
-    $draftPreview=& "$root/n1x.ps1" start -Profile qwen38fn-cache-dflash -ModelRoot $overrideRoot -PrintOnly
+    $draftPreview=& "$temporary/n1x.ps1" start -Profile qwen38fn-cache-dflash -ModelRoot $overrideRoot -PrintOnly
     if($draftPreview -notmatch '--override-generation-config' -or $draftPreview -notmatch 'max_new_tokens.*8192'){throw 'Server output allowance missing from container launch'}
-    foreach($required in @('/drafter:ro','/profiles/qwen38fn-dflash.yaml','sliding_window','fp8-dflash-a22a','VLLM_INDEXER_FP8=1','-idxfp8')){
+    foreach($required in @('/drafter:ro','/profiles/qwen38fn-dflash.yaml','sliding_window','kv-fp8_e4m3-pool-8gib-slots-4-batch-4096-block-1664-chunk-1664-dflash2-k3-a22a','VLLM_INDEXER_FP8=1','-index-fp8-')){
         if(-not $draftPreview.Contains($required)){throw "DFlash launch missing $required"}
     }
     if($draftPreview.Contains('/profiles/qwen38fn-mtp.yaml')){throw 'DFlash launch also enables MTP'}

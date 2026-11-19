@@ -11,8 +11,7 @@ function Get-N1xModelDownload($Repository,$Revision,$Directory,$Kind){
 }
 '@ | Set-Content (Join-Path $fixture 'scripts/models.ps1')
 @'
-param($Volume,$ModelRoot,$Image,$PythonExecutable)
-if($PythonExecutable -ne 'python3'){throw 'MyLLMBox preparation must use python3'}
+param($Volume,$ModelRoot,$Image)
 if($Volume -ne 'fixture-ple' -or $Image -ne ('sha256:'+('a'*64)) -or $ModelRoot -ne 'C:\fixture models'){throw 'Wrong PLE preparation parameters'}
 $global:n1xStorageFixture.copies++
 $global:n1xStorageFixture.ready=-not $global:n1xStorageFixture.failCopy
@@ -38,8 +37,8 @@ function wslc {
         }
         'list' {if($state.running){'{}'}}
         'run' {
-            if($Arguments[[array]::IndexOf($Arguments,'--entrypoint')+1] -ne 'python3'){throw 'MyLLMBox verification must use python3'}
-            if($Arguments -notcontains $config.ImageId -or $Arguments[-1] -ne '/checks/check-ple.py'){throw 'Wrong verification image/command'}
+            if($Arguments[[array]::IndexOf($Arguments,'--entrypoint')+1] -ne 'dotnet'){throw 'PLE verification must use dotnet'}
+            if($Arguments -notcontains '/checks/PleTable.cs' -or $Arguments[-1] -ne '/table'){throw 'Wrong verification image/command'}
             $global:LASTEXITCODE=if($state.ready){0}else{1}
         }
         default {throw 'Unexpected WSLC command'}

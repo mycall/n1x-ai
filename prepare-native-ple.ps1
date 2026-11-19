@@ -1,5 +1,4 @@
-param([string]$Volume = 'n1x-ple-native',[string]$ModelRoot='',[string]$Image='',
-    [ValidateSet('python','python3')][string]$PythonExecutable='python')
+param([string]$Volume = 'n1x-ple-native',[string]$ModelRoot='',[string]$Image='')
 $ErrorActionPreference='Stop'
 if ($Volume -notmatch '^[a-zA-Z0-9][a-zA-Z0-9_-]+$') { throw 'Invalid volume name' }
 $running=@(& wslc list --filter 'label=n1x-ai.managed=true' --format json)
@@ -9,9 +8,9 @@ if (@($running | Where-Object { $_.Trim() }).Count) { throw 'Stop managed contai
 $config=Get-N1xConfig -Root $PSScriptRoot -Profile qwen38fn-baseline -ModelRoot $ModelRoot
 if(-not $Image){$Image=$config.Image}
 $table=Join-Path $config.ModelRoot 'ple-table-fp8'
-$run=@('run','--rm','--name','n1x-prepare-ple','--label','n1x-ai.managed=true','--entrypoint',$PythonExecutable,
+$run=@('run','--rm','--name','n1x-prepare-ple','--label','n1x-ai.managed=true','--entrypoint','dotnet',
     '--volume',"${table}:/source-table:ro",'--volume',"${Volume}:/native-table",'--volume',"${PSScriptRoot}:/workspace:ro",
-    $Image,'/workspace/prepare-native-ple.py')
+    'mcr.microsoft.com/dotnet/sdk:10.0','run','--file','/workspace/scripts/PleTable.cs','--','copy','/source-table','/native-table')
 & wslc @run
 if ($LASTEXITCODE -ne 0) { throw 'Native PLE preparation failed' }
 $raw=& wslc run --rm --entrypoint cat --volume "${Volume}:/native-table:ro" $Image /native-table/n1x-copy-manifest.json

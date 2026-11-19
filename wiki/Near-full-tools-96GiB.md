@@ -36,7 +36,7 @@ Sampled GPU allocation during the run was 86,125–87,081 MiB out of 98,304 MiB,
 [Compact results, effective configuration, source hashes and raw-artifact SHA-256 hashes](data/near-full-tools-96g.json) retain the audit record. Local raw files are in `results/benchmarks/near-full-tools-96g-20261111`: request/response JSONL, task scores, calibration, group summaries, before/after metrics, memory observations and server logs. Recompute the summary with:
 
 ```powershell
-python benchmarks/near_full_tools_report.py results/benchmarks/near-full-tools-96g-20261111
+dotnet run --file benchmarks/NearFullToolsReport.cs -- results/benchmarks/near-full-tools-96g-20261111
 ```
 
 This measures the November 11 KV11 configuration on the 96 GiB runtime. The subsequent [campaign](96GiB-comparison-campaign.md) compares this allocation with the 15 GiB pool used by the default profile. The original 88 GiB runtime's matched C2 prefill comparison and tool transfer, C8 displaced replay/restart, and the matched 1K/2K/8K output-quality comparison remain open. This run held KV allocation fixed and does not establish a partition-speed benefit.

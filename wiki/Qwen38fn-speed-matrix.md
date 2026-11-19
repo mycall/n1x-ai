@@ -116,11 +116,11 @@ The last four of 96 bursts followed a host restart with the same image, weights,
 To run the same protocol on the active best container, make the benchmark-client dependencies available first. The measured installation placed pandas and its date/time dependencies in `/cache/n1x-bench-deps`. Record the effective profile before comparing with the 88 GiB results.
 
 ```powershell
-Copy-Item benchmarks/vllm_speed_matrix.py .state/n1x-qwen38fn-best/vllm_speed_matrix.py
-wslc exec n1x-qwen38fn-best env PYTHONPATH=/cache/n1x-bench-deps python3 /state/vllm_speed_matrix.py --out /cache/my-fresh-speed-matrix
+dotnet publish benchmarks/Client -c Release -r linux-arm64 --self-contained -o .state/n1x-qwen38fn-best/matrix-client
+wslc exec n1x-qwen38fn-best env PYTHONPATH=/cache/n1x-bench-deps /state/matrix-client/Client matrix --out /cache/my-fresh-speed-matrix
 # Copy the completed directory out; the destination needs a trailing separator.
 wslc cp n1x-qwen38fn-best:/cache/my-fresh-speed-matrix results/benchmarks/
-python benchmarks/vllm_speed_matrix_report.py results/benchmarks/my-fresh-speed-matrix --output results/benchmarks/my-speed-report
+dotnet run --project benchmarks/Client -- matrix-report results/benchmarks/my-fresh-speed-matrix --output results/benchmarks/my-speed-report
 ```
 
 The harness checks `/health` before submitting work, checkpoints each burst, and stops on invalid responses. The reporter rejects missing bursts, wrong output lengths, cache hits and missing server timings. Raw common benchmark JSON/logs, response records, before/after Prometheus snapshots and host telemetry remain under `results/benchmarks/qwen38fn-best-matrix-20261108/` locally; compact evidence is published above. No failed measured request is silently replaced.

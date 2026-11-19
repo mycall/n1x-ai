@@ -1,3 +1,15 @@
+# Encode the effective KV allocation and token geometry supplied to vLLM and LMCache.
+function Get-N1xCacheGeometry {
+    param([hashtable]$Config)
+    $size=[string]$Config.KvCacheBytes
+    [long]$bytes=0
+    if([long]::TryParse($size,[ref]$bytes)){
+        $size=if($bytes % 1GB -eq 0){"$([long]($bytes / 1GB))gib"}else{"${bytes}bytes"}
+    }
+    if($size -notmatch '^[0-9]+(?:[.][0-9]+)?[A-Za-z]*$' -or $Config.KvCacheDtype -notmatch '^[A-Za-z0-9_]+$'){throw 'Invalid cache geometry for LMCache namespace'}
+    "kv-$($Config.KvCacheDtype)-pool-$size-slots-$($Config.MaxSequences)-batch-$($Config.BatchedTokens)-block-$($Config.CacheBlockTokens)-chunk-$($Config.LmcacheChunkTokens)"
+}
+
 function Get-N1xProfileList {
     param([Parameter(Mandatory)][string]$Root)
     $names=@('qwen38fn-baseline')+@(Get-ChildItem (Join-Path $Root 'profiles') -Filter '*.psd1' -File | ForEach-Object BaseName)
@@ -61,7 +73,7 @@ function Get-N1xConfig {
             if($config.ImageId -notmatch '^sha256:[a-f0-9]{64}$'){throw 'MyLLMBox requires an immutable ImageId'}
             if($config.Mtp -or -not $config.DFlash){throw 'The MyLLMBox recipe requires DFlash2'}
             if($config.UseLMCache){
-                if(-not $config.ContainsKey('LmcacheNamespace') -or $config.LmcacheNamespace -notmatch '^qwen-[A-Za-z0-9._-]+$'){throw 'MyLLMBox LMCache requires a qwen- namespace without path separators'}
+                if(-not $config.ContainsKey('LmcacheNamespace') -or ([string]$config.LmcacheNamespace).Replace('{settings}','settings') -notmatch '^qwen-[A-Za-z0-9._-]+$'){throw 'MyLLMBox LMCache requires a qwen- namespace without path separators'}
                 if($config.LmcacheVolume -notmatch '^[a-zA-Z0-9][a-zA-Z0-9_.-]+$' -or $config.LmcacheL1GiB -le 0 -or $config.LmcacheL2GiB -le 0 -or $config.RestoreWaitMs -lt 0){throw 'MyLLMBox LMCache requires bounded positive RAM/SSD budgets, a named volume and a nonnegative restore wait'}
             }
             if($config.MaxSequences -isnot [int] -or $config.MaxSequences -lt 1 -or $config.MaxSequences -gt 8){throw 'MyLLMBox sequence slots must be an integer from 1 through 8'}

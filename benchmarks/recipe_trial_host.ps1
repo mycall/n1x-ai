@@ -54,7 +54,7 @@ foreach($volume in @($c.CacheVolume)+$(if($c.UseLMCache){@($c.LmcacheVolume)}els
 }
 if($v.ContainsKey('prepare_mtp10') -and $v.prepare_mtp10){
     $paths=Get-N1xMyllmboxPaths $root $c
-    & wslc run --rm --entrypoint python3 --volume "$($paths.Model):/model:ro" --volume "$($c.CacheVolume):/cache" --volume "${root}/benchmarks:/benchmarks:ro" $c.ImageId /benchmarks/prepare_mtp_draft.py /model /cache/draft-k10
+    & wslc run --rm --entrypoint dotnet --volume "$($paths.Model):/model:ro" --volume "$($c.CacheVolume):/cache" --volume "${root}/benchmarks:/benchmarks:ro" mcr.microsoft.com/dotnet/sdk:10.0 run --file /benchmarks/PrepareMtpDraft.cs -- /model /cache/draft-k10
     if($LASTEXITCODE){throw 'Cannot prepare ten-expert MTP view'}
 }
 Start-N1xMyllmboxMonitor $root $c

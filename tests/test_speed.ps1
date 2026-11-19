@@ -13,10 +13,10 @@ try {
         $speedCalls.Add($Arguments)
         $global:LASTEXITCODE=0
     }
-    & "$temporary/benchmark.ps1" -Suite speed -SpeedRuns 'saved run one','saved-run-two' -ReportOut 'saved comparison' -Python Invoke-SpeedFixturePython
+    & "$temporary/benchmark.ps1" -Suite speed -SpeedRuns 'saved run one','saved-run-two' -ReportOut 'saved comparison' -DotNet Invoke-SpeedFixturePython
     if($speedCalls.Count -ne 1){throw 'Offline report did not invoke the report client once'}
     $arguments=$speedCalls[0]
-    if($arguments[0] -notlike '*speed_report.py' -or $arguments -notcontains 'saved run one' -or
+    if($arguments -notcontains 'speed-report' -or $arguments -notcontains 'saved run one' -or
         $arguments -notcontains 'saved-run-two' -or $arguments -notcontains 'saved comparison'){
         throw 'Offline report arguments were not preserved'
     }
@@ -59,10 +59,10 @@ function Get-N1xConfig {
     function Invoke-RestMethod {return @{data=@()}}
     foreach($explicit in @($false,$true)){
         $speedCalls.Clear()
-        $options=@{Suite='capacity';Python='Invoke-SpeedFixturePython'}
+        $options=@{Suite='capacity';DotNet='Invoke-SpeedFixturePython'}
         if($explicit){$options.CapacityConcurrency=@(1,8)}
         & "$temporary/benchmark.ps1" @options
-        $call=@($speedCalls|Where-Object {$_[0] -like '*context_capacity_probe.py'})
+        $call=@($speedCalls|Where-Object {$_ -contains 'capacity'})
         if($call.Count -ne 1){throw 'Capacity client was not routed exactly once'}
         $arguments=[string[]]$call[0]
         $index=[Array]::IndexOf($arguments,'--concurrency')

@@ -7,3 +7,5 @@ __pycache__/
 .state/
 config.local.psd1
 .venv/
+**/bin/
+**/obj/

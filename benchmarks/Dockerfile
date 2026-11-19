@@ -1,5 +1,13 @@
 ARG BASE_IMAGE=n1x-ai:magi-v5
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS benchbuild
+WORKDIR /src
+COPY Client/*.csproj Client/*.cs Client/vision-fixture.png Client/MatrixChart.html ./
+RUN dotnet publish Client.csproj -o /app --no-self-contained
 FROM ${BASE_IMAGE}
+COPY --from=benchbuild /usr/share/dotnet/dotnet /opt/n1x-dotnet/dotnet
+COPY --from=benchbuild /usr/share/dotnet/host /opt/n1x-dotnet/host
+COPY --from=benchbuild /usr/share/dotnet/shared/Microsoft.NETCore.App /opt/n1x-dotnet/shared/Microsoft.NETCore.App
+COPY --from=benchbuild /app /opt/n1x-client
 USER root
 ENV HF_HUB_DISABLE_TELEMETRY=1 DO_NOT_TRACK=1 VLLM_NO_USAGE_STATS=1 \
     TOKENIZERS_PARALLELISM=false OMP_NUM_THREADS=2
@@ -19,5 +27,4 @@ RUN --mount=type=secret,id=https_proxy --mount=type=secret,id=http_proxy \
 COPY patch_aiperf.py /benchmarks/patch_aiperf.py
 RUN /opt/aiperf/bin/python /benchmarks/patch_aiperf.py && \
     /opt/aiperf/bin/python -c "from aiperf.common.tokenizer import Tokenizer; assert Tokenizer._resolve_local_snapshot('/tmp', 'main') == '/tmp'"
-COPY run.py timing.py empty_final.py scheduler_probe.py speculation_probe.py agent_cache_probe.py tool_recovery_probe.py mixed_probe.py /benchmarks/
-ENTRYPOINT ["/opt/venv/bin/python", "/benchmarks/run.py"]
+ENTRYPOINT ["/opt/n1x-dotnet/dotnet", "/opt/n1x-client/Client.dll", "suite"]
