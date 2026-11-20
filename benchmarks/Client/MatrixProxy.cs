@@ -64,7 +64,9 @@ sealed class MatrixProxy : IAsyncDisposable
                         int end = Array.IndexOf(buffer, (byte)10, offset, count - offset);
                         if (end < 0) { line.Write(buffer, offset, count - offset); break; }
                         line.Write(buffer, offset, end - offset);
-                        string text = Encoding.UTF8.GetString(line.GetBuffer(), 0, (int)line.Length); line.SetLength(0);
+                        string text = Encoding.UTF8.GetString(line.GetBuffer(), 0, (int)line.Length);
+                        line.SetLength(0);
+                        line.Position = 0;
                         ReadEvent(row, text); offset = end + 1;
                     }
                 await ctx.Response.OutputStream.WriteAsync(buffer.AsMemory(0, count));
