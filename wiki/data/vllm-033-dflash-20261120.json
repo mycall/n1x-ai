@@ -1,0 +1,271 @@
+{
+  "date": "2026-11-20",
+  "platform": "WSLC Linux ARM64, RTX Spark N1X, 96 GiB partition",
+  "upstream_image": "vllm/vllm-openai@sha256:e3481489818d3e563cae517b84ab959cc8b69f85a9fbb771c189140131ffc65c",
+  "patched_image": "sha256:0a2bc300b0ec23b7ee35cf0c6aaffd7dcdfe85fa625668ef8c3b2db4bdb91e7b",
+  "vllm": "0.33.0",
+  "runner": 2,
+  "context_tokens": 2048,
+  "gpu_kv_bytes": 4294967296,
+  "target": "Qwen3.8-Flash-Next-W4A16-AutoRound-hybrid",
+  "draft": "Qwen3.8-Flash-Next-DFlash2",
+  "capture_layers": [
+    5,
+    15,
+    25,
+    35,
+    45
+  ],
+  "hyper_connection_streams": 4,
+  "draft_depth": 3,
+  "mode": "eager, text, greedy, thinking disabled, single GPU",
+  "configuration_switch": {
+    "off": "upstream validator rejected DFlash for Qwen4Exp",
+    "on": "accepted dflash K3"
+  },
+  "ple_parity": {
+    "rows_checked": [
+      0,
+      1,
+      2500011,
+      2500012,
+      320001535,
+      0
+    ],
+    "fp8_source_and_dequantized_bf16_equal": true
+  },
+  "output_head_scales": {
+    "count": 4966400,
+    "source": "float16",
+    "runtime": "bfloat16",
+    "values_changed_by_cast": 0
+  },
+  "dflash": {
+    "arm": "dflash2_k3",
+    "attempts": [
+      {
+        "attempt": 1,
+        "answers": [
+          {
+            "case": "copy",
+            "content": "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20",
+            "finish_reason": "stop",
+            "correct": true
+          },
+          {
+            "case": "recall",
+            "content": "41",
+            "finish_reason": "stop",
+            "correct": true
+          },
+          {
+            "case": "arithmetic",
+            "content": "91",
+            "finish_reason": "stop",
+            "correct": true
+          },
+          {
+            "case": "json",
+            "content": "{\"color\": \"blue\"}",
+            "finish_reason": "stop",
+            "correct": true
+          }
+        ],
+        "correct": 4,
+        "draft_tokens": 51,
+        "accepted_tokens": 47,
+        "passed": true
+      },
+      {
+        "attempt": 2,
+        "answers": [
+          {
+            "case": "copy",
+            "content": "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20",
+            "finish_reason": "stop",
+            "correct": true
+          },
+          {
+            "case": "recall",
+            "content": "41",
+            "finish_reason": "stop",
+            "correct": true
+          },
+          {
+            "case": "arithmetic",
+            "content": "91",
+            "finish_reason": "stop",
+            "correct": true
+          },
+          {
+            "case": "json",
+            "content": "{\"color\": \"blue\"}",
+            "finish_reason": "stop",
+            "correct": true
+          }
+        ],
+        "correct": 4,
+        "draft_tokens": 51,
+        "accepted_tokens": 47,
+        "passed": true
+      },
+      {
+        "attempt": 3,
+        "answers": [
+          {
+            "case": "copy",
+            "content": "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20",
+            "finish_reason": "stop",
+            "correct": true
+          },
+          {
+            "case": "recall",
+            "content": "41",
+            "finish_reason": "stop",
+            "correct": true
+          },
+          {
+            "case": "arithmetic",
+            "content": "91",
+            "finish_reason": "stop",
+            "correct": true
+          },
+          {
+            "case": "json",
+            "content": "{\"color\": \"blue\"}",
+            "finish_reason": "stop",
+            "correct": true
+          }
+        ],
+        "correct": 4,
+        "draft_tokens": 51,
+        "accepted_tokens": 47,
+        "passed": true
+      }
+    ],
+    "correct": 12,
+    "requests": 12,
+    "draft_tokens": 153,
+    "accepted_tokens": 141,
+    "acceptance_rate": 0.9215686274509803,
+    "passed_attempts": 3
+  },
+  "target_only": {
+    "arm": "target_only",
+    "attempts": [
+      {
+        "attempt": 1,
+        "answers": [
+          {
+            "case": "copy",
+            "content": "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20",
+            "finish_reason": "stop",
+            "correct": true
+          },
+          {
+            "case": "recall",
+            "content": "41",
+            "finish_reason": "stop",
+            "correct": true
+          },
+          {
+            "case": "arithmetic",
+            "content": "91",
+            "finish_reason": "stop",
+            "correct": true
+          },
+          {
+            "case": "json",
+            "content": "{\"color\": \"blue\"}",
+            "finish_reason": "stop",
+            "correct": true
+          }
+        ],
+        "correct": 4,
+        "draft_tokens": null,
+        "accepted_tokens": null,
+        "passed": true
+      },
+      {
+        "attempt": 2,
+        "answers": [
+          {
+            "case": "copy",
+            "content": "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20",
+            "finish_reason": "stop",
+            "correct": true
+          },
+          {
+            "case": "recall",
+            "content": "41",
+            "finish_reason": "stop",
+            "correct": true
+          },
+          {
+            "case": "arithmetic",
+            "content": "91",
+            "finish_reason": "stop",
+            "correct": true
+          },
+          {
+            "case": "json",
+            "content": "{\"color\": \"blue\"}",
+            "finish_reason": "stop",
+            "correct": true
+          }
+        ],
+        "correct": 4,
+        "draft_tokens": null,
+        "accepted_tokens": null,
+        "passed": true
+      },
+      {
+        "attempt": 3,
+        "answers": [
+          {
+            "case": "copy",
+            "content": "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20",
+            "finish_reason": "stop",
+            "correct": true
+          },
+          {
+            "case": "recall",
+            "content": "41",
+            "finish_reason": "stop",
+            "correct": true
+          },
+          {
+            "case": "arithmetic",
+            "content": "91",
+            "finish_reason": "stop",
+            "correct": true
+          },
+          {
+            "case": "json",
+            "content": "{\"color\": \"blue\"}",
+            "finish_reason": "stop",
+            "correct": true
+          }
+        ],
+        "correct": 4,
+        "draft_tokens": null,
+        "accepted_tokens": null,
+        "passed": true
+      }
+    ],
+    "correct": 12,
+    "requests": 12,
+    "draft_tokens": null,
+    "accepted_tokens": null,
+    "acceptance_rate": null,
+    "passed_attempts": 3
+  },
+  "matched_responses": 12,
+  "greedy_requests": {
+    "seed": 4321,
+    "max_tokens": 96,
+    "temperature": 0,
+    "fresh_salt_per_request": true,
+    "prompts": "runtime/vllm033/smoke.py: CASES"
+  }
+}

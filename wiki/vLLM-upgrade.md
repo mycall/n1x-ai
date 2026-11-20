@@ -20,6 +20,28 @@ Our 0.32 build adds `dflash` to this validator and installs an adapter in the ta
 
 Both images passed a BF16 matrix multiply and the vLLM FP8 quantization probe on SM 12.1, with identical relative RMS error of 0.0255. Both packaged LMCache 0.5.6. The patched image registered `MbxModelLoader` and contained the asynchronous PLE library. Stock 0.33 lacked both dependencies of the current W4 recipe. These checks cover configuration and individual GPU operations. The candidate produced no inference or restore timings. [Repeatable image probe](../benchmarks/vllm_compat.py)
 
+## Patched ARM64 candidate
+
+The patched 0.33 image generated correct answers with the real W4 target and DFlash2 on N1X. Across three attempts, DFlash2 and the target-only control each passed 12/12 requests. All 12 paired outputs and finish reasons matched. Each attempt accepted 47 of 51 proposed tokens, giving **141/153 accepted (92.2%)** across the run. Four short tasks covered copying, recall, arithmetic and JSON. This establishes repeatable text generation for those prompts. Longer agent sessions, multimodal input, cached restores and graph-mode decoding require their own trials. [Per-attempt answers, counters and image digest](data/vllm-033-dflash-20261120.json)
+
+Build the isolated 0.33 image from the repository root. The installer verifies the installed vLLM version and the SHA-256 of every upstream source file it patches. It reuses the project's target capture implementation. For the W4 checkpoint it dispatches the FP8 side layers separately from GPTQ, keeps the BF16 indexer separate from FP8 Q/K/V, and reads external FP8 PLE rows from the original safetensors. The PLE implementation supports eager execution on one GPU.
+
+```powershell
+wslc build -f runtime/vllm033/Dockerfile -t n1x-ai:vllm033-dflash-candidate runtime
+./runtime/vllm033/start-trial.ps1
+wslc logs --tail 20 n1x-trial-v033
+# Run after the server reports ready.
+python runtime/vllm033/smoke.py
+wslc stop n1x-trial-v033
+wslc rm n1x-trial-v033
+```
+
+Use an idle N1X and the prepared W4 target, DFlash2 draft and FP8 PLE volume. The launcher mounts all three read-only, binds localhost port 18133, and selects the upstream safetensors loader, Model Runner V2, 2,048 tokens of context and a 4 GiB KV pool. The smoke test runs three sets of four greedy prompts with a fresh KV salt for every request. It keeps every response and finish reason, counts correct answers across all 12 requests, and divides total accepted tokens by total proposed tokens. The production profile also requires LMCache restore, larger contexts and CUDA graphs, which need separate qualification.
+
+The launcher opts into Qwen4Exp DFlash capture with `N1X_QWEN4_DFLASH=1`. This exception is scoped to single-GPU CUDA. The W4 adapter uses `N1X_W4_PLE_DIR` to select checkpoint-specific behavior, including the quantized output head. Its eager PLE lookup copies row IDs to the host and selected FP8 rows back to the device on each call. The stock MyLLMBox reader can overlap this work. Mixing the two paths in a timing comparison would conflate runtime and PLE costs. To compare greedy output with drafting disabled, launch the same W4 recipe with `-TargetOnly` and run the smoke test with `--target-only`.
+
+The FP8 reader matched the source table for six row requests, including a repeated ID, a shard boundary and the last row. The loader reported an FP16-to-BF16 conversion for the output-head scales. Checking all 4,966,400 values in this checkpoint found zero changed by the cast.
+
 ## Other changes worth evaluating
 
 **Next timing comparison.** Resume relative on/off testing when a native AMD64 vLLM 0.33 environment is available. This checkout's Windows host is ARM64 and its Linux candidate is ARM64 under WSLC. Record the native machine, GPU, driver, package build and model hashes. Reuse the same 15 GiB pool, KV salts, cold and restored prefixes, and alternating trial order within each environment. Rebuild or port the PLE adapter to that runner's reader ABI and pass byte parity before timing it.
