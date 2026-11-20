@@ -15,10 +15,15 @@ def external_embedding(default, prefix):
         return default
     from vllm.config import get_current_vllm_config
     config = get_current_vllm_config()
-    if not config.model_config.enforce_eager or config.parallel_config.world_size != 1:
-        raise ValueError("External N1X PLE requires eager execution on one GPU")
+    if config.parallel_config.world_size != 1:
+        raise ValueError("External N1X PLE requires one GPU")
     if not prefix.endswith(".layers.1.ple.ple_embedding.ngram_embedding"):
         raise ValueError(f"Unknown external PLE layer: {prefix}")
+    if os.getenv("N1X_PLE_PREFETCH") == "1":
+        from n1x_prefetch import PrefetchedEmbedding
+        return PrefetchedEmbedding
+    if not config.model_config.enforce_eager:
+        raise ValueError("Graph execution requires N1X_PLE_PREFETCH=1")
     return ExternalEmbedding
 
 

@@ -1,0 +1,18 @@
+--- a/vllm/v1/worker/gpu/spec_decode/dflash/speculator.py
++++ b/vllm/v1/worker/gpu/spec_decode/dflash/speculator.py
+@@ -609,7 +609,14 @@
+                 step=self.num_query_per_req,
+                 causal=self._group_causal,
+             )
+-
++        else:
++            # Refresh the live kernel block table before graph replay.
++            for groups in self.attn_groups:
++                for group in groups:
++                    group.map_to_kernel_block_table(
++                        self.block_tables.input_block_tables[group.kv_cache_group_id]
++                    )
++
+         # DFlash processes all speculative tokens in one forward pass,
+         # so the real token count is num_query_tokens.
+         self._prepare_eplb_forward(num_query_tokens)

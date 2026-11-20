@@ -1,0 +1,14 @@
+FROM n1x-ai:v033-serving-runtime AS extensions
+COPY lmcache-0.5.6.tar.gz /tmp/source.tar.gz
+RUN echo "d6951e60ce8818a76aa42d0866a4ba85f1c95cd919355fff30ff24dcc3243f1e  /tmp/source.tar.gz" | sha256sum -c - && \
+    mkdir /tmp/lmc && tar xf /tmp/source.tar.gz -C /tmp/lmc --strip-components=1 && cd /tmp/lmc && \
+    CPATH=/usr/local/lib/python3.12/dist-packages/nvidia/cu13/include \
+    TORCH_CUDA_ARCH_LIST=12.1a MAX_JOBS=1 FORCE_CUDA=1 python3 setup.py build_ext --inplace
+
+FROM n1x-ai:v033-serving
+COPY --from=extensions /tmp/lmc/lmcache/*.so /usr/local/lib/python3.12/dist-packages/lmcache/
+COPY lmcache/n1x_*.py /usr/local/lib/python3.12/dist-packages/
+COPY lmcache/patch_*.py lmcache/verify_patches.py /opt/n1x/patches/
+RUN cd /opt/n1x/patches && python3 patch_vmm.py && python3 patch_admission.py && \
+    python3 patch_segmented.py && python3 patch_restore_queue_v2.py && python3 patch_disk_cache.py && python3 verify_patches.py
+COPY lmcache/serve.py /opt/n1x/serve.py

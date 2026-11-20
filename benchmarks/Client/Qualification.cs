@@ -108,7 +108,7 @@ sealed partial class Qualification : IDisposable
         using var response = await http.PostAsJsonAsync(url + "/tokenize", new { model = "qwen/qwen38fn-best", messages, chat_template_kwargs = new { enable_thinking = thinking } });
         response.EnsureSuccessStatusCode(); return (int)JsonNode.Parse(await response.Content.ReadAsStringAsync())!["count"]!;
     }
-    async Task<(JsonArray Messages, int Tokens)> Archive(int target)
+    async Task<(JsonArray Messages, int Tokens)> Archive(int target, string? archiveId = null)
     {
         int count = Math.Max(10, target / 18);
         for (int attempt = 0; attempt < 5; attempt++)
@@ -116,7 +116,8 @@ sealed partial class Qualification : IDisposable
             string[] lines = Enumerable.Range(0, count).Select(i => $"Record {i:D6}: warehouse item has batch {(i * 7919L + 137) % 999983:D6} and status archived.").ToArray();
             foreach (var (position, tree, code) in new[] { (.1, "cedar", "CEDAR-5831"), (.5, "maple", "MAPLE-9264"), (.9, "birch", "BIRCH-1748") })
                 lines[(int)(count * position)] = $"SPECIAL RECORD: The {tree} access code is {code}.";
-            JsonArray messages = [Message("user", "Read this archive and answer the question at its end.\n" + string.Join('\n', lines) + "\nQuestion: Return the cedar, maple, and birch access codes, in that order, and nothing else.")];
+            var prefix = archiveId is null ? "" : $"Archive {archiveId}.\n";
+            JsonArray messages = [Message("user", prefix + "Read this archive and answer the question at its end.\n" + string.Join('\n', lines) + "\nQuestion: Return the cedar, maple, and birch access codes, in that order, and nothing else.")];
             int tokens = await Tokenize(messages, false);
             if (tokens >= target * .95 && tokens <= target) return (messages, tokens);
             count = Math.Max(10, (int)Math.Round(count * (target - 128.0) / tokens));

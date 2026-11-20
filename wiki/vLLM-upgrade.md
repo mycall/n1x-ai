@@ -44,6 +44,8 @@ The FP8 reader matched the source table for six row requests, including a repeat
 
 ## Other changes worth evaluating
 
+The follow-up tested full decode graphs, asynchronous external PLE reads, near-full tool calls, vision and the LMCache integration on the same ARM64 machine. See [0.33 serving qualification](vLLM-033-serving.md) for results and reproduction commands.
+
 **Next timing comparison.** Resume relative on/off testing when a native AMD64 vLLM 0.33 environment is available. This checkout's Windows host is ARM64 and its Linux candidate is ARM64 under WSLC. Record the native machine, GPU, driver, package build and model hashes. Reuse the same 15 GiB pool, KV salts, cold and restored prefixes, and alternating trial order within each environment. Rebuild or port the PLE adapter to that runner's reader ABI and pass byte parity before timing it.
 
 **0.34 native PLE disk offload** is the most relevant follow-up. Qwen4Exp on CUDA can read rows from file-backed checkpoint tensors with `--engram-config '{"disk_offload": true}'`. Our local W4 index has 224,454 tensors across 68 shards and zero n-gram embedding table entries. Its FP8 table lives in a separate volume. An isolated combined checkpoint view or an external-table loader port is needed before comparing native disk offload with the MBX reader. Measure repeated and newly appended material with the same 15 GiB pool. [Upstream Engram guide](https://github.com/vllm-project/vllm/blob/v0.34.0/docs/features/engram.md) · [Local PLE findings](Compression.md)

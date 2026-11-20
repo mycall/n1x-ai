@@ -1,0 +1,242 @@
+{
+  "date": "2026-11-20",
+  "platform": "N1X Linux ARM64 WSLC",
+  "python": "3.12.3",
+  "torch": "2.14.0+cu130",
+  "vllm": "0.33.0",
+  "lmcache": "0.5.6",
+  "graph_without_backport": {
+    "image": "sha256:87f09c8519eee0bf3698e51989e5c30b732664d996e8082d06d92927cdc866fd",
+    "parity": {
+      "gpu_replays": 15,
+      "rows_matched": 560,
+      "batch_sizes": [
+        1,
+        2,
+        4
+      ]
+    },
+    "full_decode_capture": {
+      "target_sizes_captured": 2,
+      "drafter_sizes_captured": 2
+    },
+    "short_smoke": [
+      {
+        "attempt": 1,
+        "correct": 4,
+        "draft_tokens": 51,
+        "accepted_tokens": 47
+      },
+      {
+        "attempt": 2,
+        "correct": 4,
+        "draft_tokens": 51,
+        "accepted_tokens": 47
+      },
+      {
+        "attempt": 3,
+        "correct": 4,
+        "draft_tokens": 51,
+        "accepted_tokens": 47
+      }
+    ],
+    "near_full": [
+      {
+        "group": "r0-c1",
+        "phase": "cold-selection",
+        "prompt_tokens": 250002,
+        "cached_tokens": 0,
+        "finish": "tool_calls",
+        "answer": "",
+        "tool": [
+          {
+            "id": "chatcmpl-tool-adf5f956dba48423",
+            "type": "function",
+            "function": {
+              "name": "lookup_inventory",
+              "arguments": "{\"sku\": \"AX-0-0\"}"
+            }
+          }
+        ]
+      },
+      {
+        "group": "r0-c1",
+        "phase": "tool-continuation",
+        "prompt_tokens": 250184,
+        "cached_tokens": 249856,
+        "finish": "stop",
+        "answer": "\n\nSESSION-0000:23:BIRCH-1748",
+        "tool": []
+      },
+      {
+        "group": "r1-c1",
+        "phase": "cold-selection",
+        "prompt_tokens": 250002,
+        "cached_tokens": 0,
+        "finish": "tool_calls",
+        "answer": "",
+        "tool": [
+          {
+            "id": "chatcmpl-tool-9c0e63e3164a2b40",
+            "type": "function",
+            "function": {
+              "name": "lookup_inventory",
+              "arguments": "{\"sku\": \"AX-0-0\"}"
+            }
+          }
+        ]
+      },
+      {
+        "group": "r1-c1",
+        "phase": "tool-continuation",
+        "prompt_tokens": 250198,
+        "cached_tokens": 249856,
+        "finish": "stop",
+        "answer": "\n\nSESSION-0000:23:BIRCH-1748",
+        "tool": []
+      },
+      {
+        "group": "r2-c1",
+        "phase": "cold-selection",
+        "prompt_tokens": 250002,
+        "cached_tokens": 0,
+        "finish": "tool_calls",
+        "answer": "",
+        "tool": [
+          {
+            "id": "chatcmpl-tool-86bc0e8c320bc6a5",
+            "type": "function",
+            "function": {
+              "name": "lookup_inventory",
+              "arguments": "{\"sku\": \"AX-0-0\"}"
+            }
+          }
+        ]
+      },
+      {
+        "group": "r2-c1",
+        "phase": "tool-continuation",
+        "prompt_tokens": 250219,
+        "cached_tokens": 249856,
+        "finish": "stop",
+        "answer": "\n\nSESSION-0000:23:BIRCH-1748",
+        "tool": []
+      }
+    ],
+    "near_full_score": [
+      {
+        "group": "r0-c1",
+        "correct": true,
+        "expected": "SESSION-0000:23:BIRCH-1748",
+        "actual": "\n\nSESSION-0000:23:BIRCH-1748"
+      },
+      {
+        "group": "r1-c1",
+        "correct": true,
+        "expected": "SESSION-0000:23:BIRCH-1748",
+        "actual": "\n\nSESSION-0000:23:BIRCH-1748"
+      },
+      {
+        "group": "r2-c1",
+        "correct": true,
+        "expected": "SESSION-0000:23:BIRCH-1748",
+        "actual": "\n\nSESSION-0000:23:BIRCH-1748"
+      }
+    ],
+    "vision": [
+      {
+        "attempt": 1,
+        "checks": [
+          {
+            "test": "vision_shapes",
+            "passed": true,
+            "evidence": {
+              "fixture": "vision-fixture.png",
+              "content": "Left: red circle. Right: blue square."
+            }
+          },
+          {
+            "test": "vision_ocr",
+            "passed": true,
+            "evidence": {
+              "fixture": "vision-fixture.png",
+              "content": "N1X-742"
+            }
+          }
+        ]
+      },
+      {
+        "attempt": 2,
+        "checks": [
+          {
+            "test": "vision_shapes",
+            "passed": true,
+            "evidence": {
+              "fixture": "vision-fixture.png",
+              "content": "Left: red circle. Right: blue square."
+            }
+          },
+          {
+            "test": "vision_ocr",
+            "passed": true,
+            "evidence": {
+              "fixture": "vision-fixture.png",
+              "content": "N1X-742"
+            }
+          }
+        ]
+      },
+      {
+        "attempt": 3,
+        "checks": [
+          {
+            "test": "vision_shapes",
+            "passed": true,
+            "evidence": {
+              "fixture": "vision-fixture.png",
+              "content": "Left: red circle. Right: blue square."
+            }
+          },
+          {
+            "test": "vision_ocr",
+            "passed": true,
+            "evidence": {
+              "fixture": "vision-fixture.png",
+              "content": "N1X-742"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "cache_with_backport": {
+    "image": "sha256:45dd8e2f49435dd32a92874881a41a6b3464597eb71a2da8c764255d7c83d25a",
+    "gpu_kv_bytes": 16106127360,
+    "cache_block_tokens": 4096,
+    "max_batched_tokens": 4096,
+    "l1_gib": 1,
+    "l2_gib": 16,
+    "flashinfer_autotune": false,
+    "registered_kv_layers": 78,
+    "short_smoke": [
+      {
+        "attempt": 1,
+        "correct": 4,
+        "draft_tokens": 51,
+        "accepted_tokens": 47
+      },
+      {
+        "attempt": 2,
+        "correct": 4,
+        "draft_tokens": 51,
+        "accepted_tokens": 47
+      },
+      {
+        "attempt": 3,
+        "correct": 4,
+        "draft_tokens": 51,
+        "accepted_tokens": 46
+      }
+    ]
+  }
+}
