@@ -1,0 +1,697 @@
+{
+  "runtime_image": "sha256:8dcf4c5c29e92d6379bba9c2eda9e799d0bdce382b776d3c3726884ef161d5a4",
+  "pool_GiB": 15,
+  "cache_block_tokens": 4096,
+  "model": "qwen/qwen38fn-best",
+  "arms": {
+    "fp32": {
+      "capacity_tokens": [
+        730605,
+        730605
+      ],
+      "padding_percent": [
+        "28.32",
+        "28.32"
+      ],
+      "l2": {
+        "files": 18,
+        "stored_bytes": 1140850688,
+        "object_sizes": {
+          "118226944": 4,
+          "53477376": 7,
+          "41943040": 7
+        },
+        "page_lz4": {
+          "118226944": {
+            "objects": 4,
+            "sample_pages": 256,
+            "mean_page_bytes": 4032.39453125
+          },
+          "53477376": {
+            "objects": 7,
+            "sample_pages": 448,
+            "mean_page_bytes": 4096.0
+          },
+          "41943040": {
+            "objects": 7,
+            "sample_pages": 448,
+            "mean_page_bytes": 4096.0
+          }
+        }
+      },
+      "codec": [
+        {
+          "codec": "lz4",
+          "bytes_per_block": 4096,
+          "sample_bytes": 139460608,
+          "stored_bytes": 138335364,
+          "savings": 0.008068543627746116,
+          "encode_MiB_s": 2392.9384924847336,
+          "restore_MiB_s": 4634.808456957266
+        },
+        {
+          "codec": "lz4",
+          "bytes_per_block": 65536,
+          "sample_bytes": 139460608,
+          "stored_bytes": 138342638,
+          "savings": 0.008016385530170589,
+          "encode_MiB_s": 10540.49770169599,
+          "restore_MiB_s": 32013.479359730412
+        },
+        {
+          "codec": "lz4",
+          "bytes_per_block": 1048576,
+          "sample_bytes": 139460608,
+          "stored_bytes": 138410881,
+          "savings": 0.007527050219084064,
+          "encode_MiB_s": 15869.417365676716,
+          "restore_MiB_s": 46799.676272916004
+        },
+        {
+          "codec": "zstd1",
+          "bytes_per_block": 4096,
+          "sample_bytes": 139460608,
+          "stored_bytes": 122158108,
+          "savings": 0.1240672921775875,
+          "encode_MiB_s": 460.6598241942004,
+          "restore_MiB_s": 210.09783924640274
+        },
+        {
+          "codec": "zstd1",
+          "bytes_per_block": 65536,
+          "sample_bytes": 139460608,
+          "stored_bytes": 120231562,
+          "savings": 0.13788155864055895,
+          "encode_MiB_s": 707.273376049809,
+          "restore_MiB_s": 603.4912650311297
+        },
+        {
+          "codec": "zstd1",
+          "bytes_per_block": 1048576,
+          "sample_bytes": 139460608,
+          "stored_bytes": 120153460,
+          "savings": 0.1384415877492804,
+          "encode_MiB_s": 919.7354481255376,
+          "restore_MiB_s": 651.0515461495196
+        }
+      ],
+      "direct": {
+        "logical_bytes": 139460608,
+        "stored_bytes": 120389632,
+        "direct_read_runs": [
+          {
+            "zstd": false,
+            "ms": 92.6227
+          },
+          {
+            "zstd": true,
+            "ms": 288.2462
+          },
+          {
+            "zstd": true,
+            "ms": 273.5704
+          },
+          {
+            "zstd": false,
+            "ms": 97.3478
+          }
+        ]
+      },
+      "groups": [
+        {
+          "prefix": "1e95c4a95340",
+          "raw_bytes": 25165824,
+          "separate_bytes": 21504985,
+          "joined_bytes": 21504965,
+          "median_ms": {
+            "parallel": 15.180699999973513,
+            "joined": 75.38829999998597,
+            "one_separate": 13.05539999998473,
+            "one_joined": 62.117499999885695,
+            "separate": 41.48129999998673
+          }
+        },
+        {
+          "prefix": "2be37790b45a",
+          "raw_bytes": 25165824,
+          "separate_bytes": 21502183,
+          "joined_bytes": 21502163,
+          "median_ms": {
+            "parallel": 15.405699999973876,
+            "joined": 36.1249999998563,
+            "one_separate": 13.370399999985239,
+            "one_joined": 42.96789999989414,
+            "separate": 38.25860000006287
+          }
+        },
+        {
+          "prefix": "55fb436b135c",
+          "raw_bytes": 25165824,
+          "separate_bytes": 21489852,
+          "joined_bytes": 21489832,
+          "median_ms": {
+            "parallel": 16.13709999992352,
+            "joined": 34.19979999989664,
+            "one_separate": 11.368899999979476,
+            "one_joined": 33.57349999987491,
+            "separate": 32.530000000178916
+          }
+        },
+        {
+          "prefix": "85759e3a995e",
+          "raw_bytes": 25165824,
+          "separate_bytes": 21495977,
+          "joined_bytes": 21495957,
+          "median_ms": {
+            "parallel": 13.127200000099037,
+            "joined": 36.2456000000293,
+            "one_separate": 13.395600000194463,
+            "one_joined": 37.58979999997791,
+            "separate": 34.68609999981709
+          }
+        }
+      ],
+      "cold": [
+        {
+          "case": "ASSET0",
+          "correct": true,
+          "first_content_s": 6.138641000000007,
+          "prompt_tokens": 16037,
+          "details": {
+            "cached_tokens": 0,
+            "created_cache_tokens": 0
+          }
+        },
+        {
+          "case": "SHELF0",
+          "correct": true,
+          "first_content_s": 6.034894300000019,
+          "prompt_tokens": 17037,
+          "details": {
+            "cached_tokens": 0,
+            "created_cache_tokens": 16384
+          }
+        }
+      ],
+      "same_process": [
+        {
+          "case": "ASSET1",
+          "correct": true,
+          "first_content_s": 3.1668392999999924,
+          "prompt_tokens": 16042,
+          "details": {
+            "cached_tokens": 8192,
+            "created_cache_tokens": 0
+          }
+        },
+        {
+          "case": "SHELF1",
+          "correct": true,
+          "first_content_s": 0.5208135000000311,
+          "prompt_tokens": 17042,
+          "details": {
+            "cached_tokens": 16384,
+            "created_cache_tokens": 0
+          }
+        }
+      ],
+      "after_restart": [
+        {
+          "case": "ASSET2",
+          "correct": true,
+          "first_content_s": 1.977817499999901,
+          "prompt_tokens": 16042,
+          "details": {
+            "cached_tokens": 12288,
+            "created_cache_tokens": 0
+          }
+        },
+        {
+          "case": "SHELF2",
+          "correct": true,
+          "first_content_s": 0.5602516999999807,
+          "prompt_tokens": 17042,
+          "details": {
+            "cached_tokens": 16384,
+            "created_cache_tokens": 0
+          }
+        }
+      ],
+      "tool_round_trip": {
+        "kind": "tool",
+        "correct": true,
+        "tool_finish": "tool_calls",
+        "final_finish": "stop",
+        "answer": "\n\n37"
+      }
+    },
+    "bf16": {
+      "capacity_tokens": [
+        730605,
+        730605
+      ],
+      "padding_percent": [
+        "147.34",
+        "147.34"
+      ],
+      "l2": {
+        "files": 18,
+        "stored_bytes": 914358272,
+        "object_sizes": {
+          "61603840": 4,
+          "53477376": 7,
+          "41943040": 7
+        },
+        "page_lz4": {
+          "61603840": {
+            "objects": 4,
+            "sample_pages": 256,
+            "mean_page_bytes": 3905.21875
+          },
+          "53477376": {
+            "objects": 7,
+            "sample_pages": 448,
+            "mean_page_bytes": 4096.0
+          },
+          "41943040": {
+            "objects": 7,
+            "sample_pages": 448,
+            "mean_page_bytes": 4096.0
+          }
+        }
+      },
+      "codec": [
+        {
+          "codec": "lz4",
+          "bytes_per_block": 4096,
+          "sample_bytes": 110100480,
+          "stored_bytes": 108918329,
+          "savings": 0.010737019493466282,
+          "encode_MiB_s": 2801.980065913245,
+          "restore_MiB_s": 5363.573672515516
+        },
+        {
+          "codec": "lz4",
+          "bytes_per_block": 65536,
+          "sample_bytes": 110100480,
+          "stored_bytes": 108924275,
+          "savings": 0.010683014279320169,
+          "encode_MiB_s": 10596.10668765705,
+          "restore_MiB_s": 40442.16770018873
+        },
+        {
+          "codec": "lz4",
+          "bytes_per_block": 1048576,
+          "sample_bytes": 110100480,
+          "stored_bytes": 109006911,
+          "savings": 0.009932463509695899,
+          "encode_MiB_s": 17247.043363994744,
+          "restore_MiB_s": 54283.20322597322
+        },
+        {
+          "codec": "zstd1",
+          "bytes_per_block": 4096,
+          "sample_bytes": 110100480,
+          "stored_bytes": 90878927,
+          "savings": 0.17458191826230007,
+          "encode_MiB_s": 482.4487444156558,
+          "restore_MiB_s": 207.50430423213925
+        },
+        {
+          "codec": "zstd1",
+          "bytes_per_block": 65536,
+          "sample_bytes": 110100480,
+          "stored_bytes": 89254117,
+          "savings": 0.18933943793887187,
+          "encode_MiB_s": 755.363621256364,
+          "restore_MiB_s": 601.0822916004761
+        },
+        {
+          "codec": "zstd1",
+          "bytes_per_block": 1048576,
+          "sample_bytes": 110100480,
+          "stored_bytes": 89207093,
+          "savings": 0.18976653871082128,
+          "encode_MiB_s": 1063.8933836977083,
+          "restore_MiB_s": 755.7115600117746
+        }
+      ],
+      "direct": {
+        "logical_bytes": 110100480,
+        "stored_bytes": 89415680,
+        "direct_read_runs": [
+          {
+            "zstd": false,
+            "ms": 86.204
+          },
+          {
+            "zstd": true,
+            "ms": 277.6589
+          },
+          {
+            "zstd": true,
+            "ms": 290.5704
+          },
+          {
+            "zstd": false,
+            "ms": 86.1902
+          }
+        ]
+      },
+      "groups": [
+        {
+          "prefix": "1e95c4a95340",
+          "raw_bytes": 25165824,
+          "separate_bytes": 20341249,
+          "joined_bytes": 20341229,
+          "median_ms": {
+            "parallel": 23.987500000203,
+            "joined": 45.39169999998194,
+            "one_separate": 16.116900000270107,
+            "one_joined": 47.65910000014628,
+            "separate": 43.82979999991221
+          }
+        },
+        {
+          "prefix": "2be37790b45a",
+          "raw_bytes": 25165824,
+          "separate_bytes": 20343770,
+          "joined_bytes": 20343750,
+          "median_ms": {
+            "parallel": 25.580900000022666,
+            "joined": 47.025899999880494,
+            "one_separate": 17.460100000334933,
+            "one_joined": 50.73049999964496,
+            "separate": 44.60930000004737
+          }
+        },
+        {
+          "prefix": "55fb436b135c",
+          "raw_bytes": 25165824,
+          "separate_bytes": 20327196,
+          "joined_bytes": 20327176,
+          "median_ms": {
+            "parallel": 22.362100000009377,
+            "joined": 45.87339999989126,
+            "one_separate": 16.52590000003329,
+            "one_joined": 48.96629999984725,
+            "separate": 42.41199999978562
+          }
+        },
+        {
+          "prefix": "85759e3a995e",
+          "raw_bytes": 25165824,
+          "separate_bytes": 20338304,
+          "joined_bytes": 20338284,
+          "median_ms": {
+            "parallel": 25.598700000045937,
+            "joined": 46.29879999993136,
+            "one_separate": 16.083500000149797,
+            "one_joined": 46.42680000006294,
+            "separate": 45.041500000024826
+          }
+        }
+      ],
+      "cold": [
+        {
+          "case": "ASSET0",
+          "correct": true,
+          "first_content_s": 6.029306500000075,
+          "prompt_tokens": 16037,
+          "details": {
+            "cached_tokens": 0,
+            "created_cache_tokens": 0
+          }
+        },
+        {
+          "case": "SHELF0",
+          "correct": true,
+          "first_content_s": 5.9752895000001445,
+          "prompt_tokens": 17037,
+          "details": {
+            "cached_tokens": 0,
+            "created_cache_tokens": 16384
+          }
+        }
+      ],
+      "same_process": [
+        {
+          "case": "ASSET1",
+          "correct": true,
+          "first_content_s": 3.166091999999935,
+          "prompt_tokens": 16042,
+          "details": {
+            "cached_tokens": 8192,
+            "created_cache_tokens": 0
+          }
+        },
+        {
+          "case": "SHELF1",
+          "correct": true,
+          "first_content_s": 0.4916195000000698,
+          "prompt_tokens": 17042,
+          "details": {
+            "cached_tokens": 16384,
+            "created_cache_tokens": 0
+          }
+        }
+      ],
+      "after_restart": [
+        {
+          "case": "ASSET2",
+          "correct": true,
+          "first_content_s": 1.963872100000117,
+          "prompt_tokens": 16042,
+          "details": {
+            "cached_tokens": 12288,
+            "created_cache_tokens": 0
+          }
+        },
+        {
+          "case": "SHELF2",
+          "correct": true,
+          "first_content_s": 0.5974504999999226,
+          "prompt_tokens": 17042,
+          "details": {
+            "cached_tokens": 16384,
+            "created_cache_tokens": 0
+          }
+        }
+      ],
+      "tool_round_trip": {
+        "kind": "tool",
+        "correct": true,
+        "tool_finish": "tool_calls",
+        "final_finish": "stop",
+        "answer": "\n\n37"
+      }
+    },
+    "nvfp4": {
+      "capacity_tokens": [],
+      "padding_percent": [],
+      "errors": [
+        "Qwen4Exp QSA requires a BF16 or FP8-e4m3 main KV cache"
+      ]
+    }
+  },
+  "ple": {
+    "rows": 131072,
+    "total_rows": 320001536,
+    "fp8_global_scale": 0.00019931793212890625,
+    "relative_rmse": 0.08619168400764465,
+    "row_cosine_p01_median": [
+      0.9950824362039566,
+      0.9963650107383728
+    ],
+    "sample_fp8_bytes": 20971520,
+    "sample_int4_bytes": 13107200,
+    "native_io_uring_status": 1,
+    "fp8_prepare_rc": 5,
+    "fp8_sample_map_bytes": 21475328,
+    "int4_prepare_rc": 5,
+    "int4_sample_map_bytes": 13422592,
+    "16": {
+      "fp8_cpu_gather_unpack_us": [
+        11.55,
+        21.34
+      ],
+      "fp8_native_read_us": [
+        1048.8,
+        1368.4
+      ],
+      "int4_cpu_gather_unpack_us": [
+        24.65,
+        48.37
+      ],
+      "int4_native_read_us": [
+        1003.0,
+        1227.57
+      ]
+    },
+    "256": {
+      "fp8_cpu_gather_unpack_us": [
+        183.3,
+        274.71
+      ],
+      "fp8_native_read_us": [
+        2820.4,
+        3372.59
+      ],
+      "int4_cpu_gather_unpack_us": [
+        327.5,
+        396.99
+      ],
+      "int4_native_read_us": [
+        2891.75,
+        3266.58
+      ]
+    },
+    "4096": {
+      "fp8_cpu_gather_unpack_us": [
+        2206.55,
+        2446.21
+      ],
+      "fp8_native_read_us": [
+        30005.85,
+        32273.12
+      ],
+      "int4_cpu_gather_unpack_us": [
+        3957.45,
+        5376.76
+      ],
+      "int4_native_read_us": [
+        29605.65,
+        32147.15
+      ]
+    }
+  },
+  "row_replay": [
+    {
+      "corpus": "wiki",
+      "files": 26,
+      "tokens": 37721,
+      "batch": 1,
+      "row_payload_MiB": 1,
+      "raw_rows": 603536,
+      "after_dedup": 603536,
+      "avoided_by_LRU": 148991,
+      "hit_fraction_after_dedup": 0.24686348453116302
+    },
+    {
+      "corpus": "wiki",
+      "files": 26,
+      "tokens": 37721,
+      "batch": 1,
+      "row_payload_MiB": 16,
+      "raw_rows": 603536,
+      "after_dedup": 603536,
+      "avoided_by_LRU": 252081,
+      "hit_fraction_after_dedup": 0.41767351077649056
+    },
+    {
+      "corpus": "wiki",
+      "files": 26,
+      "tokens": 37721,
+      "batch": 2048,
+      "row_payload_MiB": 1,
+      "raw_rows": 603536,
+      "after_dedup": 442158,
+      "avoided_by_LRU": 9918,
+      "hit_fraction_after_dedup": 0.022430895743150638
+    },
+    {
+      "corpus": "wiki",
+      "files": 26,
+      "tokens": 37721,
+      "batch": 2048,
+      "row_payload_MiB": 16,
+      "raw_rows": 603536,
+      "after_dedup": 442158,
+      "avoided_by_LRU": 93217,
+      "hit_fraction_after_dedup": 0.21082282803884583
+    },
+    {
+      "corpus": "scripts",
+      "files": 15,
+      "tokens": 19191,
+      "batch": 1,
+      "row_payload_MiB": 1,
+      "raw_rows": 307056,
+      "after_dedup": 307056,
+      "avoided_by_LRU": 105346,
+      "hit_fraction_after_dedup": 0.3430839977072586
+    },
+    {
+      "corpus": "scripts",
+      "files": 15,
+      "tokens": 19191,
+      "batch": 1,
+      "row_payload_MiB": 16,
+      "raw_rows": 307056,
+      "after_dedup": 307056,
+      "avoided_by_LRU": 160297,
+      "hit_fraction_after_dedup": 0.5220448387264863
+    },
+    {
+      "corpus": "scripts",
+      "files": 15,
+      "tokens": 19191,
+      "batch": 2048,
+      "row_payload_MiB": 1,
+      "raw_rows": 307056,
+      "after_dedup": 195207,
+      "avoided_by_LRU": 8670,
+      "hit_fraction_after_dedup": 0.04441439087737632
+    },
+    {
+      "corpus": "scripts",
+      "files": 15,
+      "tokens": 19191,
+      "batch": 2048,
+      "row_payload_MiB": 16,
+      "raw_rows": 307056,
+      "after_dedup": 195207,
+      "avoided_by_LRU": 48729,
+      "hit_fraction_after_dedup": 0.24962731869246493
+    }
+  ],
+  "qsa_support": [
+    "nvfp4 NotImplementedError Qwen4Exp QSA requires a BF16 or FP8-e4m3 main KV cache",
+    "nvfp4_4over6 NotImplementedError Qwen4Exp QSA requires a BF16 or FP8-e4m3 main KV cache",
+    "int4_per_token_head NotImplementedError Qwen4Exp QSA requires a BF16 or FP8-e4m3 main KV cache"
+  ],
+  "hot_rows": [
+    {
+      "corpus": "wiki",
+      "batch": 1,
+      "tokens": 4096,
+      "base_s": 4.849845199997986,
+      "hot_s": 3.9949059500009696,
+      "elapsed_reduction": 0.17628176049771072
+    },
+    {
+      "corpus": "wiki",
+      "batch": 256,
+      "tokens": 4096,
+      "base_s": 0.443893200000133,
+      "hot_s": 0.39671814999991284,
+      "elapsed_reduction": 0.10627567622168133
+    },
+    {
+      "corpus": "scripts",
+      "batch": 1,
+      "tokens": 3813,
+      "base_s": 4.60595585000155,
+      "hot_s": 3.1035829999992472,
+      "elapsed_reduction": 0.32618047131341854
+    },
+    {
+      "corpus": "scripts",
+      "batch": 256,
+      "tokens": 3813,
+      "base_s": 0.3724620999999786,
+      "hot_s": 0.3152564499999926,
+      "elapsed_reduction": 0.15358784155485694
+    }
+  ]
+}

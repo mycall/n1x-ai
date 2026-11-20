@@ -1,0 +1,105 @@
+{
+  "date": "2026-11-20",
+  "platform": "Linux ARM64 under WSLC on Windows ARM64",
+  "gpu_driver": "621.24",
+  "reference_image": "sha256:8dcf4c5c29e92d6379bba9c2eda9e799d0bdce382b776d3c3726884ef161d5a4",
+  "candidate_image": "vllm/vllm-openai@sha256:e3481489818d3e563cae517b84ab959cc8b69f85a9fbb771c189140131ffc65c",
+  "probe": "benchmarks/vllm_compat.py",
+  "reference": {
+    "packages": {
+      "vllm": "0.32.0",
+      "torch": "2.13.0+cu130",
+      "transformers": "5.19.0",
+      "lmcache": "0.5.6"
+    },
+    "cuda_build": "13.0",
+    "mbx_loader": "MbxModelLoader",
+    "async_ple_reader": true,
+    "target": {
+      "architecture": [
+        "Qwen4ExpForConditionalGeneration"
+      ],
+      "width": 2560,
+      "vocab": 248320,
+      "layers": 48,
+      "capture_layers": null
+    },
+    "local_dflash": {
+      "architecture": [
+        "DFlash2DraftModel"
+      ],
+      "width": 2560,
+      "vocab": 248320,
+      "layers": 5,
+      "capture_layers": [
+        5,
+        15,
+        25,
+        35,
+        45
+      ]
+    },
+    "gpu": "NVIDIA RTX Spark N1X (6144-core Blackwell RTX GPU)",
+    "capability": [
+      12,
+      1
+    ],
+    "bf16_matmul_correct": true,
+    "vllm_fp8_relative_rms": 0.02550082840025425,
+    "flash_next_dflash2_config": {
+      "method": "dflash",
+      "draft_tokens": 3
+    }
+  },
+  "candidate": {
+    "packages": {
+      "vllm": "0.33.0",
+      "torch": "2.14.0+cu130",
+      "transformers": "5.20.2",
+      "lmcache": "0.5.6"
+    },
+    "cuda_build": "13.0",
+    "mbx_loader": "ValueError: Load format `mbx` is not supported",
+    "async_ple_reader": false,
+    "target": {
+      "architecture": [
+        "Qwen4ExpForConditionalGeneration"
+      ],
+      "width": 2560,
+      "vocab": 248320,
+      "layers": 48,
+      "capture_layers": null
+    },
+    "local_dflash": {
+      "architecture": [
+        "DFlash2DraftModel"
+      ],
+      "width": 2560,
+      "vocab": 248320,
+      "layers": 5,
+      "capture_layers": [
+        5,
+        15,
+        25,
+        35,
+        45
+      ]
+    },
+    "gpu": "NVIDIA RTX Spark N1X (6144-core Blackwell RTX GPU)",
+    "capability": [
+      12,
+      1
+    ],
+    "bf16_matmul_correct": true,
+    "vllm_fp8_relative_rms": 0.02550082840025425,
+    "flash_next_dflash2_config": {
+      "error": "NotImplementedError: Qwen4Exp speculative decoding supports only its native MTP checkpoint and linear n-gram proposers"
+    }
+  },
+  "candidate_serving_probe": {
+    "command": "vllm serve /model --config /profiles/qwen38fn-best.yaml",
+    "exit_code": 1,
+    "failure": "NotImplementedError: Qwen4Exp speculative decoding supports only its native MTP checkpoint and linear n-gram proposers",
+    "phase": "engine configuration before weight loading"
+  }
+}

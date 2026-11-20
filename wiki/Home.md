@@ -26,6 +26,7 @@ Run Qwen3.8 Flash Next on a Windows ARM64 machine with an NVIDIA RTX N1X. The de
 | --- | --- |
 | Identify required model files and volumes | [Model assets](Model-assets.md) |
 | Size the prompt cache or verify reuse | [LMCache](LMCache.md) |
+| Compare RAM compression, recurrent-state precision, and PLE hot rows | [Compression experiments](Compression.md) |
 | Rebuild or upgrade the Linux runtime | [MyLLMBox](MyLLMBox.md) |
 | Use the separate native Windows installation | [Native vLLM reference](Native-vLLM.md) |
 | Change code and validate the service | [Development](Development.md) |

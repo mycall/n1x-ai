@@ -6,6 +6,7 @@ Start with **`qwen38fn-best`** for the standard 96 GiB installation. It uses the
 
 | When to use it | Profile | What was measured |
 | --- | --- | --- |
+| Host or SSD prefix-cache capacity pressure | `qwen38fn-w4-kv15-bf16` | 19.9% smaller LMCache occupancy at the same GPU capacity on two 16–17K prompts. [Compression trial](Compression.md) |
 | Standard 96 GiB deployment | `qwen38fn-best` | First-attempt tool selection and continuation at about 250K input tokens. Restart coverage was outside this comparison. |
 | Fastest of the two K5 profiles on four concurrent near-full tool histories | `qwen38fn-w4-kv20-8k-k5` | 384.60 s mean across three runs. After restart it restored 30 of 31 complete chunks per prompt. |
 | Full cacheable-prefix recovery after restart | `qwen38fn-w4-kv20-4k-k5` | 406.03 s mean on the same workload. Restored all 31 complete chunks in each of three checks, with more GPU headroom. |

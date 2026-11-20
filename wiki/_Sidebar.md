@@ -12,8 +12,10 @@
 
 - [Model assets](Model-assets.md)
 - [Cache and memory](LMCache.md)
+- [Compression experiments](Compression.md)
 - [Disk cleanup](Configuration.md#cleanup-and-disk-reclamation)
 - [MyLLMBox Linux](MyLLMBox.md)
+- [vLLM upgrade trials](vLLM-upgrade.md)
 - [Native Windows reference](Native-vLLM.md)
 - [Development](Development.md)
 

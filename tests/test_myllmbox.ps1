@@ -3,6 +3,15 @@ Set-StrictMode -Version Latest
 $root=Split-Path $PSScriptRoot -Parent
 . "$root/scripts/config.ps1"
 . "$root/scripts/myllmbox.ps1"
+$fp32=Import-PowerShellDataFile "$root/profiles/qwen38fn-best.psd1"
+$bf16=Import-PowerShellDataFile "$root/profiles/qwen38fn-w4-kv15-bf16.psd1"
+if($bf16.KvCacheBytes -ne $fp32.KvCacheBytes -or $bf16.LmcacheVolume -eq $fp32.LmcacheVolume -or
+    $bf16.LmcacheNamespace -eq $fp32.LmcacheNamespace){
+    throw 'The BF16 precision comparison requires equal GPU pools and isolated persistent caches'
+}
+if(-not (Select-String -LiteralPath (Join-Path $root $bf16.MyllmboxConfig) -Pattern '^mamba-ssm-cache-dtype: bfloat16$' -Quiet)){
+    throw 'The BF16 profile must select BF16 recurrent state'
+}
 $config=Get-N1xConfig -Root $root -Profile qwen38fn-best
 function OptionValue($Arguments,$Name){
     $index=[array]::IndexOf($Arguments,$Name)

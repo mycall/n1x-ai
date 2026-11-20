@@ -46,6 +46,8 @@ Configured serving tags cannot be overwritten by this build path. Source builds 
 
 ### Upgrade dependencies
 
+See the [0.33 runtime compatibility trial](vLLM-upgrade.md) for the tested artifacts and the 0.34 PLE changes.
+
 A fresh build reproduces the pinned stack; it does not automatically select newer libraries. Review these inputs together when upgrading:
 
 - Base image digest in `Dockerfile.myllmbox-lmcache`.
