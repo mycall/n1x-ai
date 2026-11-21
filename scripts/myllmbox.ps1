@@ -26,9 +26,12 @@ function Get-N1xMyllmboxEnvironment {
     }
     $environment.N1X_LMCACHE_ENABLED=if($Config.UseLMCache){'1'}else{'0'}
     if($Config.UseLMCache){
-        $environment.N1X_LMCACHE_L1_GIB=[string]$Config.LmcacheL1GiB
+        $environment.N1X_LMCACHE_L1_GIB=$Config.LmcacheL1GiB.ToString([Globalization.CultureInfo]::InvariantCulture)
         $environment.N1X_LMCACHE_L2_GIB=[string]$Config.LmcacheL2GiB
         $environment.N1X_LMCACHE_STAGED_TRANSFER='1'
+        if($Config.ContainsKey('MyllmboxRuntime') -and $Config.MyllmboxRuntime -eq 'vllm033'){
+            $environment.N1X_LMCACHE_RETRY_WRITES='1'
+        }
         $environment.N1X_RESTORE_WAIT_MS=[string]$Config.RestoreWaitMs
         $namespace=$Config.LmcacheNamespace
         if($namespace.Contains('{settings}')){
@@ -50,6 +53,7 @@ function Get-N1xMyllmboxArguments {
     param([string]$Root,[hashtable]$Config,[string]$Fingerprint)
     $paths=Get-N1xMyllmboxPaths $Root $Config
     $environment=Get-N1xMyllmboxEnvironment $Root $Config
+    $v033=$Config.ContainsKey('MyllmboxRuntime') -and $Config.MyllmboxRuntime -eq 'vllm033'
     $recipeDirectory=Split-Path $paths.Recipe -Parent
     $recipeName=Split-Path $paths.Recipe -Leaf
     $queryTokens=1+$Config.DFlashTokens
@@ -60,6 +64,10 @@ function Get-N1xMyllmboxArguments {
     $compilation=@{cudagraph_mode='FULL_AND_PIECEWISE';cudagraph_capture_sizes=$captures;compile_ranges_endpoints=@($maxCapture)}
     $spec=@{method='dflash';model='/drafter';num_speculative_tokens=$Config.DFlashTokens;disable_eagle_block_drop=$true;
         max_model_len=$Config.Context;kv_cache_dtype='auto';draft_load_config=@{load_format='safetensors'};attention_backend='TRITON_ATTN'}
+    if($v033){
+        $compilation=@{mode=0;cudagraph_mode='FULL_DECODE_ONLY';cudagraph_capture_sizes=@($captures|Where-Object {$_ -ne 3})}
+        foreach($key in @('disable_eagle_block_drop','max_model_len','kv_cache_dtype')){$spec.Remove($key)}
+    }
     $publish=if($Config.LanAccess){'0.0.0.0'}else{'127.0.0.1'}
     $arguments=@('run','-d','--name',$Config.Container,'--label','n1x-ai.managed=true',
         '--label',"n1x-ai.profile=$($Config.Profile)",'--label',"n1x-ai.config-sha=$Fingerprint",
@@ -73,7 +81,9 @@ function Get-N1xMyllmboxArguments {
         '--volume',"$($paths.State):/state:ro")
     if($Config.UseLMCache){$arguments+=@('--volume',"$($Config.LmcacheVolume):/lmcache")}
     foreach($key in @($environment.Keys|Sort-Object)){$arguments+=@('--env',"$key=$($environment[$key])")}
-    $arguments+=@($Config.ImageId,'--model','/model','--config',"/n1x-config/$recipeName",'--host','0.0.0.0',
+    if($v033){$arguments+=@('--entrypoint','python3',$Config.ImageId,'-u','/opt/n1x/serve.py')}
+    else{$arguments+=$Config.ImageId}
+    $arguments+=@('--model','/model','--config',"/n1x-config/$recipeName",'--host','0.0.0.0',
         '--port','8000','--served-model-name','qwen/qwen38fn-best','Qwen/Qwen3.8-Flash-Next',
         '--override-generation-config',(@{max_new_tokens=$Config.MaxOutputTokens}|ConvertTo-Json -Compress),
         '--max-model-len',[string]$Config.Context,'--max-num-seqs',[string]$Config.MaxSequences,
@@ -108,6 +118,7 @@ function Assert-N1xMyllmboxDepthImage {
 
 function Confirm-N1xMyllmboxImage {
     param([string]$Root,[hashtable]$Config,[switch]$PrepareRuntime)
+    $v033=$Config.ContainsKey('MyllmboxRuntime') -and $Config.MyllmboxRuntime -eq 'vllm033'
     $raw=@(& wslc image inspect $Config.Image 2>$null)
     if($LASTEXITCODE -eq 0){
         $image=@(($raw -join "`n")|ConvertFrom-Json)[0]
@@ -129,9 +140,10 @@ function Confirm-N1xMyllmboxImage {
     # Serialize before building so unsupported local settings fail without work.
     $localPath=Join-Path $Root 'config.local.psd1'
     $settings=if(Test-Path -LiteralPath $localPath){Import-PowerShellDataFile $localPath}else{@{}}
+    $imageKeys=if($v033){@('Vllm033Image','Vllm033ImageId')}else{@('Image','ImageId')}
     $lines=@('@{')
     foreach($key in ($settings.Keys|Sort-Object)){
-        if($key -in @('Image','ImageId')){continue}
+        if($key -in $imageKeys){continue}
         $value=$settings[$key]
         if($value -is [bool]){$literal=if($value){'$true'}else{'$false'}}
         elseif($value -is [string]){$literal="'"+$value.Replace("'","''")+"'"}
@@ -139,15 +151,20 @@ function Confirm-N1xMyllmboxImage {
         else{throw "Unsupported local setting type: $key; edit config.local.psd1 manually"}
         $lines+="    '$($key.Replace("'","''"))' = $literal"
     }
-    $tag='n1x-ai:mbx-setup-'+[guid]::NewGuid().ToString('N')
-    Write-Host "MyLLMBox runtime is missing. Running setup to build $tag from the pinned recipe..."
-    & "$Root/build.ps1" -Myllmbox -ImageTag $tag | Out-Host
+    $prefix=if($v033){'n1x-ai:v033-setup-'}else{'n1x-ai:mbx-setup-'}
+    $tag=$prefix+[guid]::NewGuid().ToString('N')
+    Write-Host "The runtime is missing. Running setup to build $tag from the pinned recipe..."
+    if($v033){
+        & "$Root/runtime/vllm033/build-cache.ps1" -ImageTag $tag | Out-Host
+    }else{
+        & "$Root/build.ps1" -Myllmbox -ImageTag $tag | Out-Host
+    }
     $raw=@(& wslc image inspect $tag)
     if($LASTEXITCODE -ne 0){throw 'Cannot inspect the setup image; local configuration was not changed'}
     $image=@(($raw -join "`n")|ConvertFrom-Json)[0]
     if($image.Id -notmatch '^sha256:[a-f0-9]{64}$'){throw 'Invalid setup image identity'}
     Assert-N1xMyllmboxDepthImage $Config $image
-    $lines+=@("    Image = '$tag'","    ImageId = '$($image.Id)'",'}')
+    $lines+=@("    $($imageKeys[0]) = '$tag'","    $($imageKeys[1]) = '$($image.Id)'",'}')
     $temporary=$localPath+'.'+[guid]::NewGuid().ToString('N')+'.tmp'
     try{
         [IO.File]::WriteAllText($temporary,($lines -join "`n"),[Text.UTF8Encoding]::new($false))

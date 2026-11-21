@@ -2,6 +2,28 @@
 
 The opt-in trial runs the W4 target and DFlash2 K3 on Linux ARM64 under WSLC. It uses the upstream 0.33 Model Runner V2, a 262,144-token context, two sequences and a 15 GiB KV pool. The graph-only trial uses a 2,048-token prefill batch. The cache-enabled launcher uses 4,096 because LMCache requires a prefill step to cover at least one complete hybrid KV block. Global KV uses FP8, and sliding-window layers keep their original precision. Prefill runs eagerly. The target and the drafter each captured two full decode graphs. These runs measure correctness. The native AMD64 timing comparison remains pending.
 
+## C8 replacement comparison
+
+The normal launcher offers `qwen38fn-v033` at 15 GiB and `qwen38fn-v033-kv20` at 20 GiB. Both select eight sequence slots, an 8,192-token prefill batch, DFlash2 K3, a 4 GiB host tier and a 160 GiB SSD budget. They share the model and prefill batch of the 0.32 default while using versioned, separate SSD volumes. FlashInfer autotuning stays off on both 0.33 profiles. The runtime changes include the loader, PLE reader, graph mode and cache write retry, so this is a deployment comparison with multiple runtime differences.
+
+Use the normal launcher for the selected profile and wait for health. The comparison sends three batches of eight simultaneous clients with independent cache salts and roughly 32K input tokens each. Each client selects a tool and continues with its result. Add the wall time of all three batches, and keep the peak observed scheduler count and preemption total. A separate case is needed to measure a workload whose live contexts exceed the 15 GiB pool.
+
+Both 0.33 profiles reached eight active requests in each repeat and passed all 24 tasks without preemptions. At 15 GiB, the three batches took 909.47 seconds combined. At 20 GiB, they took 1,001.43 seconds. The larger pool increased vLLM's reported KV capacity from 730,605 to 973,330 tokens. Both pools already held this workload. The 20 GiB arm's Windows monitor sampled 4.27 GiB of available memory during startup, close to the 4 GiB guard. The workload harness's separate host-memory field still read the default profile snapshot, so the comparison uses the trial supervisor for headroom and the workload harness for request and scheduler counters. [Per-repeat evidence](data/vllm-033-c8-20261120.json)
+
+The 20 GiB slowdown showed up on the cold requests. Both 0.33 arms processed 786,624 cold input tokens and reused 786,432 tokens on tool continuation. Summed cold time to first token grew from 3,701.94 to 4,156.27 seconds, while summed warm time to first token fell from 199.62 to 162.91 seconds. The server's cumulative request queue, prefill and decode durations grew about 11%, 8% and 11% respectively. Draft acceptance fell from 77.7% to 76.0% with slightly fewer generated tokens overall. These durations overlap across clients. They locate the slowdown without identifying a hardware or kernel cause. The 15 GiB arm ran first, so run order and memory residency remain possible factors.
+
+The 0.32 default passed 24/24 at the same 15 GiB, with eight active requests and zero preemptions in each repeat. Its three batches took **297.71 seconds**, making the 0.33 15 GiB deployment **3.05 times as long** on this workload. Both runs reused exactly 786,432 tokens, and their generated token totals were within 0.4%. Draft acceptance was 79.1% on 0.32 and 77.7% on 0.33. The cumulative request prefill and decode times grew by factors of 3.56 and 2.98 respectively. The result supports keeping 0.32 as the default for this system. It applies to the full serving recipes and leaves the individual effects of the loader, PLE path, graph mode and runner unresolved. [Per-repeat totals and phase counters](data/vllm-033-c8-20261120.json)
+
+```powershell
+$profile = 'qwen38fn-v033'
+$run = "results/benchmarks/$profile-c8-$(Get-Date -Format yyyyMMdd-HHmmss)"
+$null = New-Item -ItemType Directory -Force (Split-Path $run -Parent)
+./n1x.ps1 start -Profile $profile
+@{profile=$profile} | ConvertTo-Json | Set-Content "$run-host.json"
+dotnet run --project benchmarks/Client -c Release -- near-full --host "$run-host.json" --url http://127.0.0.1:8000 --out $run --target 32768 --repeats 3 --sessions 8 --concurrency 8 --turns 1
+./n1x.ps1 stop -Profile $profile
+```
+
 ## External PLE and graph replay
 
 The original eager reader copies row IDs to the CPU synchronously. The new reader queues that copy, gathers the mapped checkpoint rows in a native CUDA host callback, then copies the FP8 bytes back to the GPU. It can overlap the preceding decoder layer. All transfers for a lookup use the same CUDA stream, and the consuming layer waits on that stream. Across 15 CUDA graph replays at batch sizes 1, 2 and 4, all 560 gathered rows matched the original bytes, including shard boundaries and the last vocabulary row. This checks row selection and ordering. It supplies no estimate of time saved. [Reader](../runtime/vllm033/n1x_prefetch.py) · [Native gather](../runtime/vllm033/ple_prefetch.cpp) · [Parity check](../runtime/vllm033/check_prefetch.py)

@@ -18,6 +18,25 @@ function OptionValue($Arguments,$Name){
     if($index -lt 0){throw "Missing argument $Name"}
     return $Arguments[$index+1]
 }
+$candidate=Get-N1xConfig -Root $root -Profile qwen38fn-v033
+$candidateArguments=@(Get-N1xMyllmboxArguments $root $candidate 'v033-fixture')
+$graphs=OptionValue $candidateArguments '--compilation-config'|ConvertFrom-Json
+$spec=OptionValue $candidateArguments '--speculative-config'|ConvertFrom-Json
+if((Import-PowerShellDataFile "$root/config.psd1").DefaultProfile -ne 'qwen38fn-best' -or $candidate.ImageId -eq $config.ImageId -or
+    $candidate.LmcacheVolume -eq $config.LmcacheVolume -or $candidate.CacheVolume -eq $config.CacheVolume){
+    throw 'The comparison requires separate runtimes and caches with the existing default'
+}
+if((OptionValue $candidateArguments '--entrypoint') -ne 'python3' -or $candidateArguments -notcontains '/opt/n1x/serve.py' -or
+    (OptionValue $candidateArguments '--max-num-seqs') -ne '8' -or (OptionValue $candidateArguments '--max-num-batched-tokens') -ne '8192' -or
+    $graphs.cudagraph_mode -ne 'FULL_DECODE_ONLY' -or $graphs.cudagraph_capture_sizes[-1] -ne 32 -or
+    $spec.num_speculative_tokens -ne 3 -or $candidateArguments -notcontains 'N1X_LMCACHE_RETRY_WRITES=1'){
+    throw 'Invalid 0.33 comparison launch contract'
+}
+$kv20=Get-N1xConfig -Root $root -Profile qwen38fn-v033-kv20
+if($kv20.KvCacheBytes -ne '21474836480' -or $kv20.LmcacheVolume -eq $candidate.LmcacheVolume -or
+    $kv20.MaxSequences -ne $candidate.MaxSequences -or $kv20.BatchedTokens -ne $candidate.BatchedTokens){
+    throw 'KV20 must preserve the 0.33 scheduling shape and isolate SSD state'
+}
 foreach($slots in @(4,8)){
     $config.MaxSequences=$slots
     $arguments=@(Get-N1xMyllmboxArguments $root $config 'fixture-sha')
@@ -48,6 +67,7 @@ if($environment.N1X_LMCACHE_L1_GIB -ne '4' -or $environment.N1X_LMCACHE_L2_GIB -
 foreach($profileFile in (Get-ChildItem "$root/profiles/*.psd1")){
     $profile=Import-PowerShellDataFile $profileFile.FullName
     if(-not $profile.ContainsKey('Backend') -or $profile.Backend -ne 'wslc-myllmbox' -or -not $profile.UseLMCache){continue}
+    if($profile.ContainsKey('MyllmboxRuntime') -and $profile.MyllmboxRuntime -eq 'vllm033'){continue}
     $profile.ModelRoot=$root
     $profile.Profile=$profileFile.BaseName
     $defaults=Import-PowerShellDataFile "$root/config.psd1"

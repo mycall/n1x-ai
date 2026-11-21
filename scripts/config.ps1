@@ -40,7 +40,16 @@ function Get-N1xConfig {
         $overrides=Import-PowerShellDataFile $path
         foreach($key in $overrides.Keys){$config[$key]=$overrides[$key]}
     }
-    foreach($key in $local.Keys){$config[$key]=$local[$key]}
+    $v033=$config.ContainsKey('MyllmboxRuntime') -and $config.MyllmboxRuntime -eq 'vllm033'
+    foreach($key in $local.Keys){
+        if($key -in @('Vllm033Image','Vllm033ImageId') -or ($v033 -and $key -in @('Image','ImageId'))){continue}
+        $config[$key]=$local[$key]
+    }
+    if($v033){
+        foreach($key in @('Image','ImageId')){
+            if($local.ContainsKey("Vllm033$key")){$config[$key]=$local["Vllm033$key"]}
+        }
+    }
     if($ModelRoot){$config.ModelRoot=$ModelRoot}
     if(-not $config.ModelRoot){$config.ModelRoot=Join-Path ([Environment]::GetFolderPath('UserProfile')) 'models'}
     if($config.ModelRoot -match '^~[\\/]'){$config.ModelRoot=Join-Path ([Environment]::GetFolderPath('UserProfile')) $config.ModelRoot.Substring(2)}

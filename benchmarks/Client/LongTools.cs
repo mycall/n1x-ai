@@ -20,7 +20,7 @@ sealed class LongTools : IDisposable
         dir = o.Get("--out"); url = o.Get("--url", "http://127.0.0.1:8000"); target = o.Int("--target", 250000); repeats = o.Int("--repeats", 2);
         sessions = replay ? 6 : o.Int("--sessions", 2); turns = o.Int("--turns", 3); points = o.Has("--concurrency") ? o.Ints("--concurrency", 1) : [1, 2];
         if (target is < 1024 or > 250000 || repeats < 1 || replay && repeats > 10 || turns < 1 || sessions < points.Max() ||
-            points.Any(c => c is not (1 or 2 or 4)) || points.Distinct().Count() != points.Length) throw new ArgumentException("Invalid tool workload");
+            points.Any(c => c is not (1 or 2 or 4 or 8)) || points.Distinct().Count() != points.Length) throw new ArgumentException("Invalid tool workload");
         host = Data.Read(o.Get("--host")); client = new ModelClient(url, 3600);
     }
     public void Dispose() => client.Dispose();

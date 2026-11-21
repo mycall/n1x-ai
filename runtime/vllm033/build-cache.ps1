@@ -1,5 +1,6 @@
-param()
+param([string]$ImageTag = 'n1x-ai:v033-serving-lmcache',[switch]$PrintOnly)
 $ErrorActionPreference = 'Stop'
+if($PrintOnly){Write-Output "Build the pinned ARM64 vLLM 0.33 and LMCache images as $ImageTag";return}
 $root = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 $dir = (New-Item -Force -ItemType Directory "$root/results/build/v033-cache").FullName
 $sdist = Join-Path $dir 'lmcache-0.5.6.tar.gz'
@@ -17,5 +18,5 @@ foreach ($target in 'runtime','') {
     & wslc build @options -t $tag -f "$PSScriptRoot/Dockerfile" "$root/runtime"
     if ($LASTEXITCODE) { throw '0.33 base image build failed' }
 }
-& wslc build -t n1x-ai:v033-serving-lmcache $dir
+& wslc build -t $ImageTag $dir
 if ($LASTEXITCODE) { throw '0.33 LMCache image build failed' }

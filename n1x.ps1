@@ -118,7 +118,10 @@ if($Action -eq 'build'){
     if($buildConfig.ContainsKey('Backend') -and $buildConfig.Backend -eq 'native'){
         throw 'Native runtime builds belong to the separate RTX Spark installation; see wiki/Native-vLLM.md'
     }
-    if($buildConfig.ContainsKey('Backend') -and $buildConfig.Backend -eq 'wslc-myllmbox'){
+    if($buildConfig.ContainsKey('MyllmboxRuntime') -and $buildConfig.MyllmboxRuntime -eq 'vllm033'){
+        $tag=if($ImageTag){$ImageTag}else{'n1x-ai:v033-build'}
+        & "$PSScriptRoot/runtime/vllm033/build-cache.ps1" -ImageTag $tag -PrintOnly:$PrintOnly
+    }elseif($buildConfig.ContainsKey('Backend') -and $buildConfig.Backend -eq 'wslc-myllmbox'){
         $options=@{Myllmbox=$true;Rebuild=$Rebuild;LmcacheFromSource=$LmcacheFromSource;PrintOnly=$PrintOnly}
         if($ImageTag){$options.ImageTag=$ImageTag}
         & "$PSScriptRoot/build.ps1" @options
@@ -420,7 +423,7 @@ switch ($Action) {
             Start-MemoryMonitor
             Update-ClientRegistrations
             Update-LanAccess
-            Write-Host "Loading MyLLMBox. Check .\n1x.ps1 status -Profile $Profile. API: $endpoint/v1"
+            Write-Host "Loading $Profile. Check .\n1x.ps1 status -Profile $Profile. API: $endpoint/v1"
             return
         }
         $model = Join-Path $config.ModelRoot 'Qwen3.8-Flash-Next-W4A16-AutoRound-hybrid'

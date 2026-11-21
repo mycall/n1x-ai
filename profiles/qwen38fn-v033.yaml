@@ -1,0 +1,12 @@
+gpu-memory-utilization: 0.01
+dtype: bfloat16
+moe-backend: marlin
+kv-cache-dtype-skip-layers:
+- sliding_window
+enable-prefix-caching: true
+enable-prompt-tokens-details: true
+enable-auto-tool-choice: true
+tool-call-parser: qwen3_xml
+reasoning-parser: qwen3
+kernel-config:
+  enable_flashinfer_autotune: false
