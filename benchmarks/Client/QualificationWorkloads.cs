@@ -166,7 +166,7 @@ sealed partial class Qualification
         if (correct != rows.Length) throw new InvalidDataException("Tool recovery qualification failed; inspect summary and responses");
     }
 
-    async Task Restart(string stage, int archiveTokens)
+    async Task Restart(string stage, int archiveTokens, int restoreBlockTokens)
     {
         if (stage == "seed")
         {
@@ -186,10 +186,22 @@ sealed partial class Qualification
         }
         if (stage != "verify") throw new ArgumentException("Expected seed or verify");
         var m = Data.Read(Path.Combine(folder, "manifest.json")); var before = await Snapshot("before"); var timer = Stopwatch.StartNew();
-        var results = await Task.WhenAll(m["salts"]!.AsArray().Select(key => Retrieve(m["messages"]!.AsArray(), (string)key!)));
+        var responses = await Task.WhenAll(m["salts"]!.AsArray().Select(key => ChatResponse(m["messages"]!.AsArray(), (string)key!)));
+        var results = responses.Select(r => Codes(r["choices"]![0]!)).ToArray();
         double elapsed = timer.Elapsed.TotalSeconds; var after = await Snapshot("after"); int count = (int)m["tokens"]!;
         var summary = RestoreSummary(before, after, count, results, elapsed);
         summary["tokens_each"] = count;
+        if (restoreBlockTokens > 0)
+        {
+            int expected = (count - 1) / restoreBlockTokens * restoreBlockTokens;
+            var cached = responses.Select(r => (int?)r["usage"]?["prompt_tokens_details"]?["cached_tokens"]).ToArray();
+            summary["expected_cached_tokens_each"] = expected;
+            summary["cached_tokens_by_request"] = JsonSerializer.SerializeToNode(cached);
+            summary["qualified"] = expected > 0 && (bool)summary["qualified"]! &&
+                responses.All(r => (int?)r["usage"]?["prompt_tokens"] == count) &&
+                cached.All(tokens => tokens == expected) &&
+                (double?)summary["delta"]?[Counters[1]] == expected * responses.Length;
+        }
         Save("summary.json", summary);
         if (!(bool)summary["qualified"]!) throw new InvalidDataException("Full simultaneous external restores not established");
     }
@@ -197,7 +209,7 @@ sealed partial class Qualification
     public static async Task Run(string command, string[] args)
     {
         var o = new Options(args, ["--agent-thinking", "--no-lmcache-metrics"], ["--agent-concurrency"],
-            ["--url", "--out", "--phase", "--agent-output-tokens", "--agent-sessions", "--agent-turns", "--output-tokens", "--stage", "--archive-tokens", "--recipe-effort", "--recipe-temperature", "--recipe-seed"]);
+            ["--url", "--out", "--phase", "--agent-output-tokens", "--agent-sessions", "--agent-turns", "--output-tokens", "--stage", "--archive-tokens", "--restore-block-tokens", "--recipe-effort", "--recipe-temperature", "--recipe-seed"]);
         using var probe = new Qualification(o.Get("--out"), o.Get("--url", "http://127.0.0.1:8000"), !o.Has("--no-lmcache-metrics"));
         if (o.Has("--recipe-effort"))
         {
@@ -222,7 +234,7 @@ sealed partial class Qualification
             case "soak" when probe.cacheMetrics: await probe.Mixed(128, true); break;
             case "mixed": await probe.Mixed(o.Int("--output-tokens", 1024), false); break;
             case "recovery": await probe.Recovery(); break;
-            case "restart": await probe.Restart(o.Get("--stage"), o.Int("--archive-tokens", 131000)); break;
+            case "restart": await probe.Restart(o.Get("--stage"), o.Int("--archive-tokens", 131000), o.Int("--restore-block-tokens", 0)); break;
             default: throw new ArgumentException("Invalid qualification phase or cache metrics setting");
         }
     }

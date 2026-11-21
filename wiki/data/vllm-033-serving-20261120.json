@@ -261,7 +261,23 @@
             "vllm:num_preemptions_total": 0,
             "lmcache_mp_num_finished_retrieves_total": 2,
             "lmcache_mp_l2_prefetch_load_completed_chunks_total": 12
-          }
+          },
+          "per_request_ssd": [
+            {
+              "seed_store_submitted": 12,
+              "seed_store_completed": 12,
+              "restore_lookup_objects": 12,
+              "restore_load_submitted": 6,
+              "restore_load_completed": 6
+            },
+            {
+              "seed_store_submitted": 10,
+              "seed_store_completed": 10,
+              "restore_lookup_objects": 12,
+              "restore_load_submitted": 6,
+              "restore_load_completed": 6
+            }
+          ]
         },
         {
           "attempt": 2,
@@ -282,7 +298,23 @@
             "vllm:num_preemptions_total": 0,
             "lmcache_mp_num_finished_retrieves_total": 2,
             "lmcache_mp_l2_prefetch_load_completed_chunks_total": 8
-          }
+          },
+          "per_request_ssd": [
+            {
+              "seed_store_submitted": 10,
+              "seed_store_completed": 10,
+              "restore_lookup_objects": 12,
+              "restore_load_submitted": 4,
+              "restore_load_completed": 4
+            },
+            {
+              "seed_store_submitted": 10,
+              "seed_store_completed": 10,
+              "restore_lookup_objects": 12,
+              "restore_load_submitted": 4,
+              "restore_load_completed": 4
+            }
+          ]
         },
         {
           "attempt": 3,
@@ -303,7 +335,23 @@
             "vllm:num_preemptions_total": 0,
             "lmcache_mp_num_finished_retrieves_total": 2,
             "lmcache_mp_l2_prefetch_load_completed_chunks_total": 12
-          }
+          },
+          "per_request_ssd": [
+            {
+              "seed_store_submitted": 12,
+              "seed_store_completed": 12,
+              "restore_lookup_objects": 12,
+              "restore_load_submitted": 6,
+              "restore_load_completed": 6
+            },
+            {
+              "seed_store_submitted": 10,
+              "seed_store_completed": 10,
+              "restore_lookup_objects": 12,
+              "restore_load_submitted": 6,
+              "restore_load_completed": 6
+            }
+          ]
         }
       ],
       "pairs_full": 2,
@@ -436,6 +484,95 @@
         "vllm:external_prefix_cache_hits_total": 0.0,
         "vllm:num_preemptions_total": 0.0
       }
-    ]
+    ],
+    "ssd_restart_l1_15": {
+      "l1_gib": 1.5,
+      "l2_gib": 16,
+      "windows_guard_gib": 4,
+      "minimum_sampled_available_gib": 5.59,
+      "seed_container": "23918100c17f2bce7aa49a95fe1cfe8241c0d84d4fb25aa45c448b3fefb5986c",
+      "restore_container": "0272c04b808a41301703cba9a96fdf121fa5d88216e8e68efde4255201d81367",
+      "identical_file_name_and_size_inventory": true,
+      "seeded_objects": 69,
+      "expected_seed_objects": 72,
+      "missing_group": 0,
+      "missing_object_bytes": 118226944,
+      "l1_store_allocation_failures": 3,
+      "ssd_objects_loaded": 35,
+      "external_hit_tokens": 94208,
+      "native_hit_tokens": 0,
+      "full_requests": 5,
+      "correct_answers": 6,
+      "requests": 6,
+      "full_pairs": 2,
+      "attempts": [
+        {
+          "prompt_tokens_each": 16883,
+          "correct": 2,
+          "qualified": false,
+          "delta": {
+            "vllm:prefix_cache_hits_total": 0,
+            "vllm:external_prefix_cache_hits_total": 28672,
+            "vllm:num_preemptions_total": 0,
+            "lmcache_mp_num_finished_retrieves_total": 2,
+            "lmcache_mp_l2_prefetch_load_completed_chunks_total": 11
+          },
+          "expected_cached_tokens_each": 16384,
+          "cached_tokens_by_request": [
+            16384,
+            12288
+          ],
+          "attempt": 1,
+          "seeded_object_group_ids_by_block": [
+            "012|012|012|012",
+            "012|012|012|12"
+          ]
+        },
+        {
+          "prompt_tokens_each": 16881,
+          "correct": 2,
+          "qualified": true,
+          "delta": {
+            "vllm:prefix_cache_hits_total": 0,
+            "vllm:external_prefix_cache_hits_total": 32768,
+            "vllm:num_preemptions_total": 0,
+            "lmcache_mp_num_finished_retrieves_total": 2,
+            "lmcache_mp_l2_prefetch_load_completed_chunks_total": 12
+          },
+          "expected_cached_tokens_each": 16384,
+          "cached_tokens_by_request": [
+            16384,
+            16384
+          ],
+          "attempt": 2,
+          "seeded_object_group_ids_by_block": [
+            "12|012|012|012",
+            "012|012|012|012"
+          ]
+        },
+        {
+          "prompt_tokens_each": 16884,
+          "correct": 2,
+          "qualified": true,
+          "delta": {
+            "vllm:prefix_cache_hits_total": 0,
+            "vllm:external_prefix_cache_hits_total": 32768,
+            "vllm:num_preemptions_total": 0,
+            "lmcache_mp_num_finished_retrieves_total": 2,
+            "lmcache_mp_l2_prefetch_load_completed_chunks_total": 12
+          },
+          "expected_cached_tokens_each": 16384,
+          "cached_tokens_by_request": [
+            16384,
+            16384
+          ],
+          "attempt": 3,
+          "seeded_object_group_ids_by_block": [
+            "12|012|012|012",
+            "012|012|012|012"
+          ]
+        }
+      ]
+    }
   }
 }

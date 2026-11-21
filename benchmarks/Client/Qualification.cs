@@ -48,7 +48,10 @@ sealed partial class Qualification : IDisposable
     static JsonObject ToolResult(JsonNode call, object value) => Data.Obj(new { role = "tool", tool_call_id = (string)call["id"]!, content = JsonSerializer.Serialize(value) });
     static string Answer(JsonNode choice) => ((string?)choice["message"]?["content"] ?? "").Trim();
     static bool Stopped(JsonNode choice) => (string?)choice["finish_reason"] == "stop";
-    async Task<JsonNode> Chat(JsonArray messages, string key, int tokens = 128, bool thinking = false, JsonArray? tools = null, string toolChoice = "auto")
+    async Task<JsonNode> Chat(JsonArray messages, string key, int tokens = 128, bool thinking = false, JsonArray? tools = null, string toolChoice = "auto") =>
+        (await ChatResponse(messages, key, tokens, thinking, tools, toolChoice))["choices"]![0]!;
+
+    async Task<JsonNode> ChatResponse(JsonArray messages, string key, int tokens = 128, bool thinking = false, JsonArray? tools = null, string toolChoice = "auto")
     {
         var request = Data.Obj(new { model = "qwen/qwen38fn-best", messages, temperature = 0, max_tokens = tokens, cache_salt = key, chat_template_kwargs = new { enable_thinking = thinking } });
         if (sampling != null) request = Data.Merge(request, sampling);
@@ -68,7 +71,7 @@ sealed partial class Qualification : IDisposable
         }
         double elapsed = timer.Elapsed.TotalSeconds;
         Log("responses.jsonl", Data.Obj(new { salt = key, started_unix_s = started, elapsed_s = elapsed, timing = ModelClient.Timing(r["usage"], r["metrics"], elapsed, null), request, response = r }));
-        return r["choices"]![0]!;
+        return r;
     }
     async Task<Dictionary<string, double>> Snapshot(string name)
     {

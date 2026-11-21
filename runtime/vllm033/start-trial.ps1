@@ -1,4 +1,10 @@
-param([int]$Port = 18133, [switch]$TargetOnly, [switch]$Serving, [string]$CacheVolume)
+param(
+    [int]$Port = 18133,
+    [switch]$TargetOnly,
+    [switch]$Serving,
+    [string]$CacheVolume,
+    [ValidateRange(0.5, 16)][double]$CacheL1GiB = 1
+)
 $ErrorActionPreference = 'Stop'
 $root = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 . "$root/scripts/config.ps1"
@@ -22,6 +28,7 @@ if ($Serving) {
     $args033 += @('--env','N1X_PLE_PREFETCH=1')
 }
 if ($CacheVolume) {
+    $l1Budget = $CacheL1GiB.ToString([Globalization.CultureInfo]::InvariantCulture)
     . "$root/scripts/native.ps1"
     . "$root/scripts/myllmbox.ps1"
     $config.Container = 'n1x-trial-v033'
@@ -30,7 +37,7 @@ if ($CacheVolume) {
     $cacheMode = if ($TargetOnly) { 'target' } else { 'dflash2-k3' }
     $args033 += @('--volume', "${CacheVolume}:/lmcache", '--volume', "${state}:/state:ro",
         '--env','N1X_LMCACHE_STAGED_TRANSFER=1','--env',"N1X_CACHE_NAMESPACE=qwen-w4-$cacheMode-fp8-033-v1",
-        '--env','N1X_LMCACHE_L1_GIB=1','--env','N1X_LMCACHE_L2_GIB=16',
+        '--env',"N1X_LMCACHE_L1_GIB=$l1Budget",'--env','N1X_LMCACHE_L2_GIB=16',
         '--env','N1X_CACHE_BLOCK_TOKENS=4096','--env','N1X_LMCACHE_CHUNK_TOKENS=4096',
         '--entrypoint','python3')
     $image = 'n1x-ai:v033-serving-lmcache'

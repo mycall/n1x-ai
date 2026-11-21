@@ -22,6 +22,21 @@ All six archive queries answered correctly after replacing the trial container. 
 
 The third seed pair ran after the earlier pause. It returned both answers and recorded eight completed SSD stores before the Windows memory guard ended that boot. The first two pairs had already recorded settled disk writes. All three pairs used the same named SSD volume, image and cache settings. Local raw data is under `results/benchmarks/serving033/restart-1`. Use a fresh results directory and trial volume for a complete rerun.
 
+The per-salt counters narrow down the partial recovery. During seeding, each partial request submitted and completed 10 SSD objects. Full requests submitted 10 or 12 and completed every submitted object. The two partial retrieves submitted four SSD reads apiece and completed all four. Each full retrieve submitted and completed six. The missing coverage was present before the SSD read stage, and the seed allocation warnings make host-tier admission the leading explanation. The object count alone cannot identify which block and group combinations were missing. The follow-up records filenames by object group before and after container replacement, and checks each HTTP response for the exact block-aligned token count.
+
+### Host-tier budget comparison
+
+The follow-up changed the host tier to 1.5 GiB, used a fresh 16 GiB SSD volume and kept the image, workload and 4 GiB Windows memory guard fixed. The lowest sampled available Windows memory was 5.59 GiB. Both budgets returned 6/6 correct answers. The 1 GiB results come from the earlier trial, which seeded its third pair on a separate boot. [Per-request restore counts and file inventory summary](data/vllm-033-serving-20261120.json)
+
+| Host tier | Full requests | Full pairs | External tokens recovered | SSD objects read | Shortfall |
+| --- | ---: | ---: | ---: | ---: | --- |
+| 1 GiB | 4/6 | 2/3 | 81,920 | 32 | Two requests recovered 8,192 of 16,384 tokens each |
+| 1.5 GiB | 5/6 | 2/3 | 94,208 | 35 | One request recovered 12,288 of 16,384 tokens |
+
+The 1.5 GiB seed persisted 69 of 72 possible files. The same filenames and sizes were present after container replacement. Each missing file belonged to object group 0 and matched a 118,226,944-byte L1 allocation failure counted as `l1_store`. Missing group 0 in the first block was compatible with full coverage in both observed cases. Missing it in the final block cost 4,096 tokens. All submitted SSD reads completed. This connects the partial restore to host-tier write admission and shows why total files written is an insufficient readiness check.
+
+The project already retries failed reservations after eviction for prefetch. Engine writes take the ordinary `storage_manager` reservation path and skip that retry. A write-side retry should reclaim only eligible objects already confirmed on SSD, preserving unflushed objects and in-flight transfers. The tested 1.5 GiB budget improved coverage but failed the full-prefix acceptance criterion on one pair.
+
 ## Reproduce
 
 The cache-enabled trial uses a 1 GiB host tier and a dedicated 16 GiB SSD tier. The Windows 4 GiB memory guard stopped a 2 GiB host-tier trial during model loading and a 1 GiB trial during the FlashInfer tuning sweep. LMCache had registered 78 KV layers before the latter stop. The cache launcher disables FlashInfer autotuning to reduce startup memory pressure.
@@ -56,3 +71,22 @@ wslc rm n1x-trial-v033
 wslc stop n1x-trial-v033
 wslc rm n1x-trial-v033
 ```
+
+Use `-CacheL1GiB 1.5` on both starts to compare a 1.5 GiB host tier with the default 1 GiB. Keep the SSD volume unique to each budget and leave the Windows memory guard enabled. The restart checker inventories persisted files at the end of seeding and before verification, and requires full block-aligned external recovery per response for all three pairs.
+
+## Native AMD64 FlashInfer comparison
+
+The local machine and its WSLC image are ARM64. The C# workload plan was validated locally. Timing awaits a native AMD64 GPU runner.
+
+Use the same native AMD64 GPU, vLLM image, model, KV geometry and PLE path for both arms. Disable LMCache for the kernel timing comparison and hold the CUDA graph mode and prefill batch fixed. Toggle only `--kernel-config '{"enable_flashinfer_autotune":true}'` or its `false` counterpart. Give each boot a fresh autotune result directory and the same state of the ordinary kernel compilation caches. Record launch-to-health time and separate tuning start and end timestamps.
+
+Run three paired boots in on/off, off/on, on/off order. After health, run one fixed unscored warmup per boot, then use the same C# workload on both arms. This example covers batch-one cold and appended-history requests at three input lengths.
+
+```bash
+dotnet run --project benchmarks/Client -c Release -- speed \
+  --profile "$trial_label" --url http://127.0.0.1:18133 --out "$fresh_directory" \
+  --mode both --depths 4096 32768 131072 --concurrency 1 --repeats 1 \
+  --extension-tokens 2048 --output-tokens 128 --context-limit 262144
+```
+
+Sum valid input tokens and prefill time across the three attempts for each shape and arm. Sum generated tokens after the first token and decode time separately. Keep the timing sources consistent, and report the three startup costs and the total serving time saved on a fixed workload. The payback request count is the extra startup time divided by the serving time saved per request, when the latter is positive.
