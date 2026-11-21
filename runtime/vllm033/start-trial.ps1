@@ -3,6 +3,7 @@ param(
     [switch]$TargetOnly,
     [switch]$Serving,
     [string]$CacheVolume,
+    [switch]$RetryCacheWrites,
     [ValidateRange(0.5, 16)][double]$CacheL1GiB = 1
 )
 $ErrorActionPreference = 'Stop'
@@ -21,6 +22,9 @@ $args033 = @(
 )
 if ($CacheVolume -and (-not $Serving -or $CacheVolume -notmatch '^n1x-033-[a-z0-9-]+$')) {
     throw 'Select -Serving and a separate n1x-033-* cache volume for the 0.33 trial'
+}
+if ($RetryCacheWrites -and -not $CacheVolume) {
+    throw 'Write retry requires a dedicated 0.33 cache volume'
 }
 $image = 'n1x-ai:vllm033-dflash-candidate'
 if ($Serving) {
@@ -41,6 +45,7 @@ if ($CacheVolume) {
         '--env','N1X_CACHE_BLOCK_TOKENS=4096','--env','N1X_LMCACHE_CHUNK_TOKENS=4096',
         '--entrypoint','python3')
     $image = 'n1x-ai:v033-serving-lmcache'
+    if ($RetryCacheWrites) { $args033 += @('--env','N1X_LMCACHE_RETRY_WRITES=1') }
 }
 $args033 += $image
 if ($CacheVolume) {$args033 += @('-u','/opt/n1x/serve.py','--model')}

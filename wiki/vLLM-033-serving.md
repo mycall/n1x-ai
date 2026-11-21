@@ -32,10 +32,17 @@ The follow-up changed the host tier to 1.5 GiB, used a fresh 16 GiB SSD volume a
 | --- | ---: | ---: | ---: | ---: | --- |
 | 1 GiB | 4/6 | 2/3 | 81,920 | 32 | Two requests recovered 8,192 of 16,384 tokens each |
 | 1.5 GiB | 5/6 | 2/3 | 94,208 | 35 | One request recovered 12,288 of 16,384 tokens |
+| 1.5 GiB with write retry | 6/6 | 3/3 | 98,304 | 36 | All requests recovered 16,384 tokens |
 
 The 1.5 GiB seed persisted 69 of 72 possible files. The same filenames and sizes were present after container replacement. Each missing file belonged to object group 0 and matched a 118,226,944-byte L1 allocation failure counted as `l1_store`. Missing group 0 in the first block was compatible with full coverage in both observed cases. Missing it in the final block cost 4,096 tokens. All submitted SSD reads completed. This connects the partial restore to host-tier write admission and shows why total files written is an insufficient readiness check.
 
-The project already retries failed reservations after eviction for prefetch. Engine writes take the ordinary `storage_manager` reservation path and skip that retry. A write-side retry should reclaim only eligible objects already confirmed on SSD, preserving unflushed objects and in-flight transfers. The tested 1.5 GiB budget improved coverage but failed the full-prefix acceptance criterion on one pair.
+The project already retries failed reservations after eviction for prefetch. The 1.5 GiB control left engine writes on the ordinary `storage_manager` reservation path. This budget improved coverage and still failed the full-prefix acceptance criterion on one pair.
+
+### Bounded write retry
+
+The trial's `-RetryCacheWrites` setting enables write-side reclamation for a single L1 manager and a single project filesystem adapter. It retries only failed reservations that reported insufficient memory. The retry considers existing eviction candidates once, skips keys from its own reservation, and keeps the normal L1 lock checks. A candidate must have a final backing file published by the filesystem adapter. File deletion and the L1 reclaim check are coordinated so an in-flight SSD delete cannot supply that check. This preserves pending writes and keeps the L1 and SSD budgets fixed.
+
+With 1.5 GiB and write retry enabled, all four failed initial reservations recovered. All 72 expected KV files reached SSD, and the filenames and sizes matched across container replacement. **All three pairs passed strict verification.** Every answer was correct, all six requests restored 16,384 tokens each, and the counter recorded zero native prefix hits. The Windows memory guard stayed enabled throughout. This qualifies the write retry for the tested six 17K-token histories. [Image, container and per-request evidence](data/vllm-033-serving-20261120.json)
 
 ## Reproduce
 
@@ -73,6 +80,8 @@ wslc rm n1x-trial-v033
 ```
 
 Use `-CacheL1GiB 1.5` on both starts to compare a 1.5 GiB host tier with the default 1 GiB. Keep the SSD volume unique to each budget and leave the Windows memory guard enabled. The restart checker inventories persisted files at the end of seeding and before verification, and requires full block-aligned external recovery per response for all three pairs.
+
+Add `-RetryCacheWrites` to both starts to test the write retry with the 1.5 GiB budget. Build the cache image first so the launcher and server agree on the setting.
 
 ## Native AMD64 FlashInfer comparison
 

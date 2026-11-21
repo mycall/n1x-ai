@@ -1,6 +1,7 @@
 """Experimental bounded L1 reclamation; uses LMCache's existing lock checks."""
 from functools import wraps
 import math
+import os
 import threading
 import weakref
 
@@ -26,8 +27,19 @@ def register_policy(manager, policy):
         state['policy'] = policy
 
 
+def register_write_reclaim(manager, adapters):
+    """Enable store retry only for one bounded filesystem adapter."""
+    if os.environ.get('N1X_LMCACHE_RETRY_WRITES') != '1' or len(adapters) != 1:
+        return
+    reclaim = getattr(next(iter(adapters.values())), 'n1x_reclaim_persisted', None)
+    if reclaim is not None:
+        state = state_for(manager)
+        with state['lock']:
+            state['reclaim'] = weakref.WeakMethod(reclaim)
+
+
 def demand_admission(reserve):
-    """Serialize writers and retry failed prefetch reservations after eviction.
+    """Serialize reservations and retry allocation failures after bounded eviction.
 
     Successful reservations are never repeated. Each candidate is attempted
     once, and deletion rechecks locks atomically inside L1Manager. Readers can
@@ -39,7 +51,9 @@ def demand_admission(reserve):
         with state['lock']:
             results = reserve(manager, keys, is_temporary, layout_desc, tag)
             policy = state['policy']
-            if not tag.startswith('prefetch:') or policy is None:
+            store = tag == 'storage_manager'
+            persisted = state.get('reclaim', lambda: None)() if store else None
+            if policy is None or (persisted is None and not tag.startswith('prefetch:')):
                 return results
             pending = [key for key in keys if results[key][0] == L1Error.OUT_OF_MEMORY]
             if not pending:
@@ -52,18 +66,26 @@ def demand_admission(reserve):
             # Do not hold the policy lock while entering the manager: its
             # listener callbacks acquire the policy lock in the reverse order.
             actions = policy.get_eviction_actions(1.0)
+            requested = set(keys)
+            operation = 'write' if store else 'prefetch'
             deleted = 0
             for action in actions:
                 for candidate in action.keys:
-                    if manager.delete([candidate])[candidate] != L1Error.SUCCESS:
+                    if store and candidate in requested:
+                        continue
+                    if persisted is None:
+                        reclaimed = manager.delete([candidate])[candidate] == L1Error.SUCCESS
+                    else:
+                        reclaimed = persisted(manager, candidate)
+                    if not reclaimed:
                         continue
                     deleted += 1
                     retried = reserve(manager, pending, [flags[key] for key in pending], layout_desc, tag)
                     results.update(retried)
                     pending = [key for key in pending if retried[key][0] == L1Error.OUT_OF_MEMORY]
                     if not pending:
-                        LOG.info('N1X prefetch admission recovered after evicting %d objects', deleted)
+                        LOG.info('N1X %s admission recovered after evicting %d objects', operation, deleted)
                         return results
-            LOG.warning('N1X prefetch admission exhausted eligible objects; evicted=%d pending=%d', deleted, len(pending))
+            LOG.warning('N1X %s admission exhausted eligible objects; evicted=%d pending=%d', operation, deleted, len(pending))
             return results
     return wrapped

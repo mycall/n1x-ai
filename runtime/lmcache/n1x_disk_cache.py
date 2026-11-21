@@ -4,6 +4,7 @@ import logging
 import os
 from pathlib import Path
 import shutil
+import threading
 
 LOG = logging.getLogger(__name__)
 
@@ -13,6 +14,8 @@ class DiskBudget:
         self.root = Path(root).resolve()
         self.capacity = capacity
         self.minimum_free = minimum_free
+        self.delete_lock = threading.Lock()
+        self.active_deletes = 0
         if capacity <= 0 or minimum_free < 0:
             raise ValueError('Invalid disk cache budget')
 
@@ -37,8 +40,14 @@ class DiskBudget:
         for _, path, size in entries:
             if used + incoming <= self.capacity and free >= self.minimum_free + incoming:
                 break
-            logical_size = path.stat().st_size
-            path.unlink(missing_ok=True)
+            with self.delete_lock:
+                try:
+                    logical_size = path.stat().st_size
+                    path.unlink()
+                except FileNotFoundError:
+                    used -= size
+                    free = shutil.disk_usage(self.root).free
+                    continue
             used -= size
             on_delete(path, logical_size)
             free = shutil.disk_usage(self.root).free
@@ -56,10 +65,12 @@ class DiskBudget:
 def install(adapter_class, filename_to_key):
     """Wrap pinned LMCache FS operations without changing its transfer protocol."""
     from lmcache.v1.distributed.internal_api import L2StoreResult
+    from lmcache.v1.distributed.error import L1Error
 
     original_init = adapter_class.__init__
     original_store = adapter_class._execute_store
     original_load = adapter_class._execute_load
+    original_delete = adapter_class._execute_delete
 
     def initialize(self, config):
         original_init(self, config)
@@ -101,6 +112,26 @@ def install(adapter_class, filename_to_key):
         self._n1x_budget.touch(self._key_to_path(key) for key in keys)
         await original_load(self, keys, objects, task_id)
 
+    async def delete(self, keys):
+        budget = self._n1x_budget
+        with budget.delete_lock:
+            budget.active_deletes += 1
+        try:
+            return await original_delete(self, keys)
+        finally:
+            with budget.delete_lock:
+                budget.active_deletes -= 1
+
+    def reclaim_persisted(self, manager, key):
+        budget = self._n1x_budget
+        with budget.delete_lock:
+            # LMCache publishes the final file by atomically renaming a temp
+            # file after writing it. Keep it present through L1 deletion.
+            return (not budget.active_deletes and self._key_to_path(key).is_file()
+                    and manager.delete([key])[key] == L1Error.SUCCESS)
+
     adapter_class.__init__ = initialize
     adapter_class._execute_store = store
     adapter_class._execute_load = load
+    adapter_class._execute_delete = delete
+    adapter_class.n1x_reclaim_persisted = reclaim_persisted

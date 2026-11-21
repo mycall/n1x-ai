@@ -25,8 +25,12 @@ if (-not $cache -or ($Stage -eq 'verify' -and $seed.volume -ne $cache)) {
     throw 'The seed and verification require the same named SSD volume'
 }
 $budget = $trial.Config.Env | Where-Object { $_ -like 'N1X_LMCACHE_L1_GIB=*' }
+$retryWrites = 'N1X_LMCACHE_RETRY_WRITES=1' -in $trial.Config.Env
 if ($Stage -eq 'verify') {
     if ($seed.l1 -and $seed.l1 -ne $budget) { throw 'The seed and verification require the same L1 budget' }
+    if ($seed.PSObject.Properties['retry_writes'] -and $seed.retry_writes -ne $retryWrites) {
+        throw 'The seed and verification require the same write retry setting'
+    }
     & wslc exec n1x-trial-v033 find /lmcache -type f -name '*.data' -printf '%f %s\n' |
         Sort-Object | Set-Content (Join-Path $dir 'verify-disk-before.txt') -Encoding utf8
     if ($LASTEXITCODE) { throw 'Could not inventory the SSD before verification' }
@@ -49,5 +53,5 @@ if ($Stage -eq 'seed') {
         Sort-Object | Set-Content (Join-Path $dir 'seed-disk-after.txt') -Encoding utf8
     if ($LASTEXITCODE) { throw 'Could not inventory the seeded SSD' }
 }
-@{id=$trial.Id; image=$trial.Image; volume=$cache; l1=$budget} | ConvertTo-Json |
+@{id=$trial.Id; image=$trial.Image; volume=$cache; l1=$budget; retry_writes=$retryWrites} | ConvertTo-Json |
     Set-Content (Join-Path $dir "$Stage-container.json") -Encoding utf8

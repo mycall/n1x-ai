@@ -573,6 +573,80 @@
           ]
         }
       ]
+    },
+    "ssd_restart_write_retry": {
+      "image": "sha256:00871ef354e6b6f05377931237b69e009f52f567ea250193a69c1b782cbb74cb",
+      "seed_container": "f2d5e2983f607792a077732abb122a742c7930999d63d1e4f6dccc59d96cb2a9",
+      "restore_container": "7db2b9aca4f9edbbe7b37c1cf144c78a8526a0a53893a97df9bebc088682f584",
+      "l1_gib": 1.5,
+      "l2_gib": 16,
+      "windows_guard_gib": 4,
+      "matching_file_inventory": true,
+      "seeded_objects": 72,
+      "write_admissions_recovered": 4,
+      "requests": 6,
+      "correct_answers": 6,
+      "full_requests": 6,
+      "full_pairs": 3,
+      "external_hit_tokens": 98304.0,
+      "native_hit_tokens": 0.0,
+      "ssd_objects_loaded": 36.0,
+      "attempts": [
+        {
+          "prompt_tokens_each": 16884,
+          "correct": 2,
+          "qualified": true,
+          "delta": {
+            "vllm:prefix_cache_hits_total": 0,
+            "vllm:external_prefix_cache_hits_total": 32768,
+            "vllm:num_preemptions_total": 0,
+            "lmcache_mp_num_finished_retrieves_total": 2,
+            "lmcache_mp_l2_prefetch_load_completed_chunks_total": 12
+          },
+          "expected_cached_tokens_each": 16384,
+          "cached_tokens_by_request": [
+            16384,
+            16384
+          ],
+          "attempt": 1
+        },
+        {
+          "prompt_tokens_each": 16881,
+          "correct": 2,
+          "qualified": true,
+          "delta": {
+            "vllm:prefix_cache_hits_total": 0,
+            "vllm:external_prefix_cache_hits_total": 32768,
+            "vllm:num_preemptions_total": 0,
+            "lmcache_mp_num_finished_retrieves_total": 2,
+            "lmcache_mp_l2_prefetch_load_completed_chunks_total": 12
+          },
+          "expected_cached_tokens_each": 16384,
+          "cached_tokens_by_request": [
+            16384,
+            16384
+          ],
+          "attempt": 2
+        },
+        {
+          "prompt_tokens_each": 16884,
+          "correct": 2,
+          "qualified": true,
+          "delta": {
+            "vllm:prefix_cache_hits_total": 0,
+            "vllm:external_prefix_cache_hits_total": 32768,
+            "vllm:num_preemptions_total": 0,
+            "lmcache_mp_num_finished_retrieves_total": 2,
+            "lmcache_mp_l2_prefetch_load_completed_chunks_total": 12
+          },
+          "expected_cached_tokens_each": 16384,
+          "cached_tokens_by_request": [
+            16384,
+            16384
+          ],
+          "attempt": 3
+        }
+      ]
     }
   }
 }
