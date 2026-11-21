@@ -237,6 +237,205 @@
         "draft_tokens": 51,
         "accepted_tokens": 46
       }
+    ],
+    "ssd_restart": {
+      "seed_container": "dae4b8e271352cf8471eafc9cf755149d275637affa3069bcbf28268270f509a",
+      "restore_container": "1a9e3ae001c49a943da743343b06cf0372b005f56c0c1ce3db50c7c2d9bb19ee",
+      "attempts": [
+        {
+          "attempt": 1,
+          "prompt_tokens_each": 16886,
+          "seed_cached_tokens": [
+            0,
+            0
+          ],
+          "restore_cached_tokens": [
+            16384,
+            16384
+          ],
+          "correct": 2,
+          "full_pair": true,
+          "delta": {
+            "vllm:prefix_cache_hits_total": 0,
+            "vllm:external_prefix_cache_hits_total": 32768,
+            "vllm:num_preemptions_total": 0,
+            "lmcache_mp_num_finished_retrieves_total": 2,
+            "lmcache_mp_l2_prefetch_load_completed_chunks_total": 12
+          }
+        },
+        {
+          "attempt": 2,
+          "prompt_tokens_each": 16884,
+          "seed_cached_tokens": [
+            0,
+            0
+          ],
+          "restore_cached_tokens": [
+            8192,
+            8192
+          ],
+          "correct": 2,
+          "full_pair": false,
+          "delta": {
+            "vllm:prefix_cache_hits_total": 0,
+            "vllm:external_prefix_cache_hits_total": 16384,
+            "vllm:num_preemptions_total": 0,
+            "lmcache_mp_num_finished_retrieves_total": 2,
+            "lmcache_mp_l2_prefetch_load_completed_chunks_total": 8
+          }
+        },
+        {
+          "attempt": 3,
+          "prompt_tokens_each": 16883,
+          "seed_cached_tokens": [
+            0,
+            0
+          ],
+          "restore_cached_tokens": [
+            16384,
+            16384
+          ],
+          "correct": 2,
+          "full_pair": true,
+          "delta": {
+            "vllm:prefix_cache_hits_total": 0,
+            "vllm:external_prefix_cache_hits_total": 32768,
+            "vllm:num_preemptions_total": 0,
+            "lmcache_mp_num_finished_retrieves_total": 2,
+            "lmcache_mp_l2_prefetch_load_completed_chunks_total": 12
+          }
+        }
+      ],
+      "pairs_full": 2,
+      "correct_answers": 6,
+      "requests": 6,
+      "external_hit_tokens": 81920,
+      "native_hit_tokens": 0,
+      "l2_loaded_objects": 32,
+      "finished_retrieves": 6
+    },
+    "near_full": [
+      {
+        "group": "r0-c1",
+        "phase": "cold-selection",
+        "prompt_tokens": 250002,
+        "cached_tokens": 0,
+        "finish": "tool_calls",
+        "answer": "",
+        "tool": [
+          {
+            "id": "chatcmpl-tool-a9f3aff24ae85ce3",
+            "type": "function",
+            "function": {
+              "name": "lookup_inventory",
+              "arguments": "{\"sku\": \"AX-0-0\"}"
+            }
+          }
+        ]
+      },
+      {
+        "group": "r0-c1",
+        "phase": "tool-continuation",
+        "prompt_tokens": 250196,
+        "cached_tokens": 249856,
+        "finish": "stop",
+        "answer": "\n\nSESSION-0000:23:BIRCH-1748",
+        "tool": []
+      },
+      {
+        "group": "r1-c1",
+        "phase": "cold-selection",
+        "prompt_tokens": 250002,
+        "cached_tokens": 0,
+        "finish": "tool_calls",
+        "answer": "",
+        "tool": [
+          {
+            "id": "chatcmpl-tool-89a3c0c42e1fb1ab",
+            "type": "function",
+            "function": {
+              "name": "lookup_inventory",
+              "arguments": "{\"sku\": \"AX-0-0\"}"
+            }
+          }
+        ]
+      },
+      {
+        "group": "r1-c1",
+        "phase": "tool-continuation",
+        "prompt_tokens": 250200,
+        "cached_tokens": 249856,
+        "finish": "stop",
+        "answer": "\n\nSESSION-0000:23:BIRCH-1748",
+        "tool": []
+      },
+      {
+        "group": "r2-c1",
+        "phase": "cold-selection",
+        "prompt_tokens": 250002,
+        "cached_tokens": 0,
+        "finish": "tool_calls",
+        "answer": "",
+        "tool": [
+          {
+            "id": "chatcmpl-tool-8de4f68d19b094f9",
+            "type": "function",
+            "function": {
+              "name": "lookup_inventory",
+              "arguments": "{\"sku\": \"AX-0-0\"}"
+            }
+          }
+        ]
+      },
+      {
+        "group": "r2-c1",
+        "phase": "tool-continuation",
+        "prompt_tokens": 250193,
+        "cached_tokens": 249856,
+        "finish": "stop",
+        "answer": "\n\nSESSION-0000:23:BIRCH-1748",
+        "tool": []
+      }
+    ],
+    "near_full_score": [
+      {
+        "group": "r0-c1",
+        "correct": true,
+        "expected": "SESSION-0000:23:BIRCH-1748",
+        "actual": "\n\nSESSION-0000:23:BIRCH-1748"
+      },
+      {
+        "group": "r1-c1",
+        "correct": true,
+        "expected": "SESSION-0000:23:BIRCH-1748",
+        "actual": "\n\nSESSION-0000:23:BIRCH-1748"
+      },
+      {
+        "group": "r2-c1",
+        "correct": true,
+        "expected": "SESSION-0000:23:BIRCH-1748",
+        "actual": "\n\nSESSION-0000:23:BIRCH-1748"
+      }
+    ],
+    "near_full_counter_deltas": [
+      {
+        "group": "r0-c1",
+        "vllm:prefix_cache_hits_total": 249856.0,
+        "vllm:external_prefix_cache_hits_total": 0.0,
+        "vllm:num_preemptions_total": 0.0
+      },
+      {
+        "group": "r1-c1",
+        "vllm:prefix_cache_hits_total": 249856.0,
+        "vllm:external_prefix_cache_hits_total": 0.0,
+        "vllm:num_preemptions_total": 0.0
+      },
+      {
+        "group": "r2-c1",
+        "vllm:prefix_cache_hits_total": 249856.0,
+        "vllm:external_prefix_cache_hits_total": 0.0,
+        "vllm:num_preemptions_total": 0.0
+      }
     ]
   }
 }
