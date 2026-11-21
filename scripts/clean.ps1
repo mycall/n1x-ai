@@ -43,6 +43,15 @@ if($VhdPath){
         $identity=[Security.Principal.WindowsIdentity]::GetCurrent()
         if(-not ([Security.Principal.WindowsPrincipal]::new($identity)).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)){throw 'Offline VHDX compaction requires an elevated PowerShell'}
         if((Get-DiskImage -ImagePath $VhdPath).Attached){throw 'VHDX is attached. Stop its WSLC session before offline compaction.'}
+        # A guest can hold the backing file even when Get-DiskImage reports detached.
+        $lockedMessage="VHDX is in use: $VhdPath. For WSLC storage, finish any active work and terminate the owning WSLC session before retrying."
+        try {
+            $probe=[IO.File]::Open($VhdPath,[IO.FileMode]::Open,[IO.FileAccess]::Read,[IO.FileShare]::None)
+            $probe.Dispose()
+        } catch [IO.IOException] {
+            if(($_.Exception.GetBaseException().HResult -band 0xffff) -in 32,33){throw $lockedMessage}
+            throw
+        }
     }
 }
 $bytes=0L
@@ -94,7 +103,9 @@ if($VhdPath){
             $output=$result.Stdout+$result.Stderr
             $exitCode=$result.ExitCode
             $output | Write-Host
-            if($exitCode -ne 0 -or ($output -join "`n") -notmatch 'successfully compacted'){
+            if($output -match 'being used by another process'){throw $lockedMessage}
+            if($exitCode -ne 0){throw "DiskPart failed with exit code $exitCode. See its output above."}
+            if($output -notmatch 'successfully compacted'){
                 throw 'DiskPart compaction could not be verified; inspect its output (localized Windows may use different success text).'
             }
         } finally {Remove-Item -LiteralPath $commandFile -Force}
