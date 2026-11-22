@@ -2,6 +2,24 @@
 
 Start with **`qwen38fn-best`** for the standard 96 GiB installation. It uses the 4-bit AutoRound target (W4), DFlash2 with three draft tokens, a 15 GiB key/value (KV) cache, and an 8,192-token prefill batch. It completed 48/48 near-full tool tasks with two and four clients. At four clients, it processed about 31% more correct tasks per second than the 11 GiB control. The two-client control was incomplete. [Default profile comparison](96GiB-comparison-campaign.md)
 
+## NVFP4-GDN-MSE comparison trial
+
+Select `qwen38fn-nvfp4-gdn-mse` to try the mixed-precision checkpoint at revision `03f4a0570496bbe741189f4a2a7d611679e85406` on the 96 GiB partition. It uses the existing checkpoint-PLE MyLLMBox recipe, Marlin experts, MXFP8 b12x dispatch and DFlash2 K3. Its runtime cache and LMCache volume are private to this profile. The 36 shards contain 98.53 GiB of tensor data. GPU fit depends in part on how the loader maps the embedded PLE table. Successful startup, accuracy and throughput still require measurement.
+
+With the serving port and GPU available, run the following from this checkout. Setup resumes missing pinned target files under the configured model root. Use `-SkipDownload` for offline setup. The separate upstream prefill companion is retained for the alternate loader experiment. This profile mounts the target and DFlash2.
+
+```powershell
+$trial = 'qwen38fn-nvfp4-gdn-mse'
+.\n1x.ps1 setup -Profile $trial
+.\n1x.ps1 start -Profile $trial
+.\n1x.ps1 test -Profile $trial
+.\benchmark.ps1 -Profile $trial -Suite recovery
+.\benchmark.ps1 -Profile $trial -Suite speed -SpeedDepths 4096,250000 -SpeedConcurrency 1,4 -SpeedMode cold
+.\n1x.ps1 stop -Profile $trial
+```
+
+Repeat the same workloads with `qwen38fn-best` and compare task success before comparing speed. These runs compare serving profiles, including their PLE and kernel settings.
+
 ## Choose by workload
 
 | When to use it | Profile | What was measured |

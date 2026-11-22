@@ -215,6 +215,15 @@ function Assert-N1xMyllmboxInstallation {
     param([string]$Root,[hashtable]$Config,[switch]$PrepareCache,[switch]$PrepareRuntime,[switch]$SkipDownload,[switch]$SkipPleCopy)
     $paths=Get-N1xMyllmboxPaths $Root $Config
     $null=Get-N1xMyllmboxEnvironment $Root $Config
+    if($Config.ContainsKey('MyllmboxModelRepository')){
+        . "$Root/scripts/models.ps1"
+        if($PrepareCache -and -not $SkipDownload){
+            Get-N1xModelDownload $Config.MyllmboxModelRepository $Config.MyllmboxModelRevision $paths.Model 'nvfp4-gdn-mse'
+        }
+        if(-not (Test-N1xModelDownload $paths.Model $Config.MyllmboxModelRevision 'nvfp4-gdn-mse')){
+            throw "Incomplete or unverified NVFP4-GDN-MSE checkpoint at $($paths.Model). Run setup for this profile to resume the pinned download."
+        }
+    }
     foreach($path in @($paths.Recipe,"$($paths.Model)/config.json","$($paths.Model)/model.safetensors.index.json","$($paths.Drafter)/config.json","$($paths.Drafter)/model.safetensors")){
         if(-not(Test-Path -LiteralPath $path)){throw "Missing MyLLMBox input: $path; existing local weights are required"}
     }
