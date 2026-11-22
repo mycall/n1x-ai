@@ -13,16 +13,6 @@ if(-not (Select-String -LiteralPath (Join-Path $root $bf16.MyllmboxConfig) -Patt
     throw 'The BF16 profile must select BF16 recurrent state'
 }
 $config=Get-N1xConfig -Root $root -Profile qwen38fn-best
-$gdn=Get-N1xConfig -Root $root -Profile qwen38fn-nvfp4-gdn-mse
-foreach($key in @('MyllmboxDrafter','DFlashTokens','RequiredPartitionMiB','Context','MaxSequences','BatchedTokens','KvCacheBytes')){
-    if($gdn[$key] -ne $config[$key]){throw "NVFP4 comparison changed $key"}
-}
-foreach($key in @('MyllmboxModel','Container','CacheVolume','LmcacheVolume','LmcacheNamespace')){
-    if($gdn[$key] -eq $config[$key]){throw "NVFP4 comparison shares $key"}
-}
-if(-not $gdn.MyllmboxCheckpointPle -or $gdn.MyllmboxModelRevision -notmatch '^[a-f0-9]{40}$'){
-    throw 'NVFP4 comparison requires a pinned target with embedded PLE'
-}
 function OptionValue($Arguments,$Name){
     $index=[array]::IndexOf($Arguments,$Name)
     if($index -lt 0){throw "Missing argument $Name"}

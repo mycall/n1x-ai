@@ -7,14 +7,6 @@ function Test-N1xModelDownload([string]$Directory, [string]$Revision, [string]$K
                 $index=Get-Content -LiteralPath (Join-Path $Directory 'model.safetensors.index.json') -Raw -ErrorAction Stop | ConvertFrom-Json
                 $index.weight_map.PSObject.Properties.Value | Sort-Object -Unique
             }
-            'nvfp4-gdn-mse' {
-                'config.json'; 'model.safetensors.index.json'; 'tokenizer.json'; 'tokenizer_config.json'
-                'chat_template.jinja'; 'preprocessor_config.json'; 'hf_quant_config.json'
-                $index=Get-Content -LiteralPath (Join-Path $Directory 'model.safetensors.index.json') -Raw -ErrorAction Stop | ConvertFrom-Json
-                $shards=@($index.weight_map.PSObject.Properties.Value | Sort-Object -Unique)
-                if($shards.Count -ne 36){return $false}
-                $shards
-            }
             'ple' {5..37 | ForEach-Object {'model-{0:00000}-of-00131.safetensors' -f $_}}
             'drafter' {'config.json'; 'model.safetensors'}
             default {throw 'Unknown model kind'}
