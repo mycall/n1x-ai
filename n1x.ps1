@@ -105,6 +105,10 @@ $selectedConfig=@{}
 if(Test-Path -LiteralPath "$PSScriptRoot/config.psd1"){
     $selectedConfig=Get-N1xConfig -Root $PSScriptRoot -Profile $Profile -ModelRoot $ModelRoot -Port $Port
 }
+if($selectedConfig.ContainsKey('Backend') -and $selectedConfig.Backend -eq 'infernix'){
+    & "$PSScriptRoot/scripts/infernix.ps1" -Action $Action -Config $selectedConfig -TimeoutSeconds $TimeoutSeconds -Suite $Suite -PrintOnly:$PrintOnly
+    return
+}
 if($selectedConfig.ContainsKey('Backend') -and $selectedConfig.Backend -eq 'tensorfold-trial'){
     if($Action -notin @('setup','test','status')){
         throw 'TensorFold is a feasibility-only profile. Use setup to install the pinned binary, or test for bounded load probes. Serving and benchmarks are not qualified; see wiki/TensorFold-trial.md.'

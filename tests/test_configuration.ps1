@@ -74,6 +74,14 @@ try {
     try{Get-N1xConfig -Root $temporary;throw 'Misaligned cache geometry accepted'}catch{
         if($_.Exception.Message -ne 'LMCache chunk tokens must be a positive multiple of cache block tokens'){throw}
     }
+    Copy-Item "$root/profiles/infernix-hc4.psd1" "$temporary/profiles/infernix-hc4.psd1"
+    [IO.File]::WriteAllText("$temporary/config.local.psd1",'@{}')
+    $infernix=Get-N1xConfig -Root $temporary -Profile infernix-hc4
+    if($infernix.Context -ne 262144 -or $infernix.MaxOutputTokens -ne $infernix.Context){throw 'Infernix native window was capped'}
+    [IO.File]::WriteAllText("$temporary/config.local.psd1",'@{MaxOutputTokens=262145}')
+    try{Get-N1xConfig -Root $temporary -Profile infernix-hc4;throw 'Oversized Infernix output allowance accepted'}catch{
+        if($_.Exception.Message -ne 'MaxOutputTokens must be a positive integer no greater than Context'){throw}
+    }
     Write-Output 'Configuration and launch checks passed'
 } finally {
     # Only this explicitly created temporary directory may be removed.

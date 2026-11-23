@@ -56,7 +56,12 @@ function Get-N1xConfig {
     $config.ModelRoot=[IO.Path]::GetFullPath($config.ModelRoot)
     if($Port){$config.Port=$Port}
     if($config.Port -lt 1 -or $config.Port -gt 65535){throw 'Port must be between 1 and 65535'}
-    if($config.MaxOutputTokens -isnot [int] -or $config.MaxOutputTokens -lt 1 -or $config.MaxOutputTokens -ge $config.Context){
+    if($config['Backend'] -eq 'infernix'){
+        # The engine clamps each completion to the space left after its tokenized prompt.
+        if($config.MaxOutputTokens -isnot [int] -or $config.MaxOutputTokens -lt 1 -or $config.MaxOutputTokens -gt $config.Context){
+            throw 'MaxOutputTokens must be a positive integer no greater than Context'
+        }
+    } elseif($config.MaxOutputTokens -isnot [int] -or $config.MaxOutputTokens -lt 1 -or $config.MaxOutputTokens -ge $config.Context){
         throw 'MaxOutputTokens must be a positive integer smaller than Context'
     }
     if($config.DFlashTokens -isnot [int] -or $config.DFlashTokens -lt 1 -or $config.DFlashTokens -gt 7){
@@ -68,7 +73,7 @@ function Get-N1xConfig {
         $config.DFlashTokens=3
     }
     if($config.ContainsKey('Backend')){
-        if($config.Backend -notin @('native','wslc-myllmbox','tensorfold-trial')){throw 'Unknown serving backend'}
+        if($config.Backend -notin @('native','wslc-myllmbox','tensorfold-trial','infernix')){throw 'Unknown serving backend'}
         if($config.Backend -eq 'native'){
         foreach($key in @('NativeRuntimeRoot','NativeConfig','NativeModel')){
             if(-not $config.ContainsKey($key) -or -not $config[$key]){throw "Missing native setting: $key"}

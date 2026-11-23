@@ -38,3 +38,17 @@ Set local paths and the default profile in `config.local.psd1`; see [Configurati
 ## License
 
 Project scripts and original changes use the [MIT license](LICENSE). [Third-party notices](NOTICE.md) cover upstream code and separate model licenses. Model weights are not included in this repository.
+
+### Infernix on N1X
+
+Clone the sibling engine checkout on branch `n1x`. Its external artifacts go under the configured model root. Build the ARM64 CUDA 13.5 server, stage the n-gram into a WSLC volume, then start and test it:
+
+```powershell
+git clone --branch n1x https://github.com/mycall/Infernix-dgx-spark-gb10.git ../Infernix-dgx-spark-gb10
+./n1x.ps1 build -Profile infernix-hc4
+./n1x.ps1 setup -Profile infernix-hc4
+./n1x.ps1 start -Profile infernix-hc4
+./n1x.ps1 test -Profile infernix-hc4
+```
+
+Use `http://127.0.0.1:8001/v1` with model ID `infernix-hc4`. This profile uses DFlash2 K3, eight lanes, and eager CUDA execution. Select a different engine checkout or volume with `InfernixRoot` or `InfernixVolume` in `config.local.psd1`. The running model owns the GPU; stop it before starting another large engine.
